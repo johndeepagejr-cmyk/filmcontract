@@ -46,6 +46,10 @@ export const contracts = mysqlTable("contracts", {
   actorId: int("actorId").notNull(),
   paymentTerms: text("paymentTerms").notNull(),
   paymentAmount: decimal("paymentAmount", { precision: 12, scale: 2 }),
+  paymentStatus: mysqlEnum("paymentStatus", ["unpaid", "partial", "paid"])
+    .default("unpaid")
+    .notNull(),
+  paidAmount: decimal("paidAmount", { precision: 12, scale: 2 }).default("0"),
   startDate: timestamp("startDate"),
   endDate: timestamp("endDate"),
   deliverables: text("deliverables"),

@@ -65,3 +65,24 @@
 - [x] Form validation for contract editing
 - [x] Prevent actors from editing contracts
 - [x] Test contract update functionality
+
+## Branding Update
+- [x] Add "Created by John Dee Page Jr" to app footer
+- [x] Update about/credits section with creator info
+
+## Contract Payment System
+- [x] Add payment status field to contracts (unpaid/paid/partial)
+- [x] Add payment amount tracking to database
+- [x] Create payment screen for actors to pay contracts
+- [x] Integrate Stripe payment processing (demo mode)
+- [x] Add "Pay Now" button on contract detail (actors only)
+- [x] Show payment status badge on contracts
+- [x] Payment confirmation and receipt
+
+## Developer Donation System
+- [x] Create donation/support screen
+- [x] Add "Support Developer" button in profile/settings
+- [x] Integrate Stripe for donations to John Dee Page Jr (demo mode)
+- [x] Preset donation amounts ($5, $10, $20, custom)
+- [x] Thank you message after donation
+- [ ] Donation history tracking

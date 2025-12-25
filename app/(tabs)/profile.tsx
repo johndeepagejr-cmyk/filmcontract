@@ -3,6 +3,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
+import { AppFooter } from "@/components/app-footer";
 
 export default function ProfileScreen() {
   const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
@@ -102,13 +103,24 @@ export default function ProfileScreen() {
             )}
           </View>
 
+          {/* Support Developer Button */}
+          <TouchableOpacity
+            onPress={() => router.push("/donate")}
+            className="bg-success px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+          >
+            <Text className="text-white text-lg font-semibold">☕ Support Developer</Text>
+          </TouchableOpacity>
+
           {/* Logout Button */}
           <TouchableOpacity
             onPress={handleLogout}
-            className="bg-error px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            className="bg-error px-6 py-4 rounded-xl items-center active:opacity-80"
           >
             <Text className="text-white text-lg font-semibold">Sign Out</Text>
           </TouchableOpacity>
+
+          {/* Footer */}
+          <AppFooter />
         </View>
       </ScrollView>
     </ScreenContainer>

@@ -59,6 +59,11 @@ export default function ContractDetailScreen() {
   }
 
   const isProducer = contract.producerId === user?.id;
+  const isActor = contract.actorId === user?.id;
+  const totalAmount = contract.paymentAmount ? parseFloat(contract.paymentAmount.toString()) : 0;
+  const paidAmount = contract.paidAmount ? parseFloat(contract.paidAmount.toString()) : 0;
+  const remainingAmount = totalAmount - paidAmount;
+  const isFullyPaid = contract.paymentStatus === "paid" || remainingAmount <= 0;
 
   return (
     <ScreenContainer className="p-6">
@@ -135,6 +140,44 @@ export default function ContractDetailScreen() {
                 <Text className="text-base text-foreground">{contract.deliverables}</Text>
               </View>
             </View>
+          )}
+
+          {/* Payment Status */}
+          {contract.paymentAmount && (
+            <View className="bg-surface rounded-xl p-4 gap-3">
+              <View className="flex-row justify-between items-center">
+                <Text className="text-sm font-medium text-muted">Payment Status</Text>
+                <View
+                  className={`px-3 py-1 rounded-full ${
+                    contract.paymentStatus === "paid"
+                      ? "bg-success"
+                      : contract.paymentStatus === "partial"
+                      ? "bg-warning"
+                      : "bg-error"
+                  }`}
+                >
+                  <Text className="text-xs font-semibold text-white capitalize">
+                    {contract.paymentStatus}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row justify-between items-center">
+                <Text className="text-sm text-muted">Paid Amount</Text>
+                <Text className="text-base font-semibold text-foreground">
+                  ${paidAmount.toLocaleString()} / ${totalAmount.toLocaleString()}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Pay Now Button (Actors Only) */}
+          {isActor && !isFullyPaid && contract.paymentAmount && (
+            <TouchableOpacity
+              onPress={() => router.push(`/contract/pay/${contract.id}`)}
+              className="bg-success px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            >
+              <Text className="text-white text-lg font-semibold">Pay Now</Text>
+            </TouchableOpacity>
           )}
 
           {/* Edit Button (Producers Only) */}

@@ -15,6 +15,13 @@
       "when": 1766654966210,
       "tag": "0001_supreme_lockheed",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1766657730586,
+      "tag": "0002_kind_madelyne_pryor",
+      "breakpoints": true
     }
   ]
 }
