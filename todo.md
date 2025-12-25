@@ -169,3 +169,31 @@
 - [x] Filter contracts by producer name (for actors)
 - [x] Filter contracts by status
 - [x] Show "No results" message when search returns empty
+
+## Contract Versioning
+- [x] Create contract_versions table in database
+- [x] Track all contract edits as new versions
+- [x] Add "View Version History" button on contract detail screen
+- [x] Create version history screen showing all versions
+- [x] Highlight changes between versions (diff view)
+- [x] Show version number and timestamp for each version
+- [x] Allow viewing previous version details (read-only)
+
+## Bulk Actions
+- [x] Add checkbox selection mode to contracts list
+- [x] Add "Select All" / "Deselect All" buttons
+- [x] Create bulk actions menu (Export PDFs, Change Status, Archive)
+- [x] Implement bulk PDF export (all selected contracts)
+- [ ] Implement bulk status change with confirmation
+- [ ] Add archive/unarchive functionality
+- [x] Show selection count in UI
+
+## Analytics Dashboard
+- [x] Create new Analytics tab in navigation
+- [x] Add analytics screen with statistics cards
+- [x] Show total contracts by status (active, pending, completed, cancelled)
+- [x] Show payment statistics (total received, total pending, completion rate)
+- [ ] Add monthly contract creation trend chart
+- [ ] Add payment trend chart over time
+- [ ] Show top actors/producers by contract count
+- [ ] Add date range filter for analytics

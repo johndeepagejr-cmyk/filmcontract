@@ -1,6 +1,6 @@
 import { eq, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, contracts, InsertContract, Contract, contractHistory, InsertContractHistory } from "../drizzle/schema";
+import { InsertUser, users, contracts, InsertContract, Contract, contractHistory, InsertContractHistory, contractVersions, InsertContractVersion } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -139,16 +139,60 @@ export async function updateContractStatus(
 }
 
 /**
- * Update contract details
+ * Update contract details and save version history
  */
 export async function updateContract(
   contractId: number,
-  data: Partial<InsertContract>
+  data: Partial<InsertContract>,
+  userId: number
 ): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
+  // Get current contract data to save as version
+  const currentContract = await getContractById(contractId);
+  if (currentContract) {
+    // Get the latest version number
+    const versions = await db
+      .select()
+      .from(contractVersions)
+      .where(eq(contractVersions.contractId, contractId))
+      .orderBy(desc(contractVersions.versionNumber));
+    
+    const nextVersionNumber = versions.length > 0 ? versions[0].versionNumber + 1 : 1;
+    
+    // Save current state as a version
+    await db.insert(contractVersions).values({
+      contractId,
+      versionNumber: nextVersionNumber,
+      projectTitle: currentContract.projectTitle,
+      actorId: currentContract.actorId,
+      paymentTerms: currentContract.paymentTerms,
+      paymentAmount: currentContract.paymentAmount,
+      startDate: currentContract.startDate,
+      endDate: currentContract.endDate,
+      deliverables: currentContract.deliverables,
+      status: currentContract.status,
+      editedBy: userId,
+    });
+  }
+  
+  // Update the contract
   await db.update(contracts).set(data).where(eq(contracts.id, contractId));
+}
+
+/**
+ * Get all versions of a contract
+ */
+export async function getContractVersions(contractId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(contractVersions)
+    .where(eq(contractVersions.contractId, contractId))
+    .orderBy(desc(contractVersions.versionNumber));
 }
 
 /**

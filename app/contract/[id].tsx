@@ -415,6 +415,14 @@ export default function ContractDetailScreen() {
             </View>
           )}
 
+          {/* View Version History Button */}
+          <TouchableOpacity
+            onPress={() => router.push(`/contract/versions/${contractId}`)}
+            className="bg-surface border border-border px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+          >
+            <Text className="text-foreground text-lg font-semibold">📋 View Version History</Text>
+          </TouchableOpacity>
+
           {/* Export PDF Button */}
           <TouchableOpacity
             onPress={handleExportPDF}

@@ -107,3 +107,25 @@ export const contractTemplates = mysqlTable("contractTemplates", {
 
 export type ContractTemplate = typeof contractTemplates.$inferSelect;
 export type InsertContractTemplate = typeof contractTemplates.$inferInsert;
+
+/**
+ * Contract versions table - stores historical versions of contracts when edited
+ */
+export const contractVersions = mysqlTable("contractVersions", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(),
+  versionNumber: int("versionNumber").notNull(),
+  projectTitle: varchar("projectTitle", { length: 255 }).notNull(),
+  actorId: int("actorId").notNull(),
+  paymentTerms: text("paymentTerms").notNull(),
+  paymentAmount: decimal("paymentAmount", { precision: 12, scale: 2 }),
+  startDate: timestamp("startDate"),
+  endDate: timestamp("endDate"),
+  deliverables: text("deliverables"),
+  status: varchar("status", { length: 50 }).notNull(),
+  editedBy: int("editedBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContractVersion = typeof contractVersions.$inferSelect;
+export type InsertContractVersion = typeof contractVersions.$inferInsert;

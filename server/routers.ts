@@ -133,8 +133,27 @@ export const appRouter = router({
         if (updateData.endDate !== undefined) data.endDate = updateData.endDate ? new Date(updateData.endDate) : null;
         if (updateData.deliverables !== undefined) data.deliverables = updateData.deliverables;
 
-        await db.updateContract(id, data);
+        await db.updateContract(id, data, ctx.user.id);
         return { success: true };
+      }),
+
+    getVersions: protectedProcedure
+      .input(z.object({ contractId: z.number() }))
+      .query(async ({ input }) => {
+        const versions = await db.getContractVersions(input.contractId);
+        // Fetch editor names for each version
+        const versionsWithNames = await Promise.all(
+          versions.map(async (version) => {
+            const editor = await db.getUserById(version.editedBy);
+            const actor = await db.getUserById(version.actorId);
+            return {
+              ...version,
+              editorName: editor?.name || "Unknown",
+              actorName: actor?.name || "Unknown",
+            };
+          })
+        );
+        return versionsWithNames;
       }),
 
     getHistory: protectedProcedure
@@ -186,7 +205,7 @@ export const appRouter = router({
           updateData.actorSignedAt = new Date();
         }
 
-        await db.updateContract(input.contractId, updateData);
+        await db.updateContract(input.contractId, updateData, ctx.user.id);
 
         // Add history event
         await db.addContractHistory(

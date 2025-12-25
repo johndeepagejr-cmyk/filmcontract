@@ -14,11 +14,14 @@ import { RoleSelectionScreen } from "@/components/auth/role-selection-screen";
 import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { useState } from "react";
+import { BulkActionsModal } from "@/components/bulk-actions-modal";
 
 export default function HomeScreen() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedContracts, setSelectedContracts] = useState<number[]>([]);
 
   const {
     data: contracts,
@@ -45,6 +48,27 @@ export default function HomeScreen() {
       contract.status.toLowerCase().includes(query)
     );
   }) || [];
+
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedContracts([]);
+  };
+
+  const toggleContractSelection = (contractId: number) => {
+    if (selectedContracts.includes(contractId)) {
+      setSelectedContracts(selectedContracts.filter((id) => id !== contractId));
+    } else {
+      setSelectedContracts([...selectedContracts, contractId]);
+    }
+  };
+
+  const selectAll = () => {
+    setSelectedContracts(filteredContracts.map((c) => c.id));
+  };
+
+  const deselectAll = () => {
+    setSelectedContracts([]);
+  };
 
   // Show login screen if not authenticated
   if (!isAuthenticated && !authLoading) {
@@ -100,13 +124,44 @@ export default function HomeScreen() {
         <View className="flex-1 gap-6">
           {/* Header */}
           <View className="gap-2">
-            <Text className="text-3xl font-bold text-foreground">Contracts</Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-3xl font-bold text-foreground">Contracts</Text>
+              {filteredContracts.length > 0 && (
+                <TouchableOpacity
+                  onPress={toggleSelectionMode}
+                  className="bg-primary px-4 py-2 rounded-full active:opacity-80"
+                >
+                  <Text className="text-white text-sm font-semibold">
+                    {selectionMode ? "Cancel" : "Select"}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <Text className="text-base text-muted">
               {user?.userRole === "producer"
                 ? "Manage your contracts with actors"
                 : "View your contracts with producers"}
             </Text>
           </View>
+
+          {/* Selection Controls */}
+          {selectionMode && filteredContracts.length > 0 && (
+            <View className="flex-row items-center justify-between bg-surface border border-border rounded-xl p-4">
+              <Text className="text-base text-foreground font-semibold">
+                {selectedContracts.length} selected
+              </Text>
+              <View className="flex-row gap-3">
+                <TouchableOpacity onPress={selectAll} className="active:opacity-70">
+                  <Text className="text-primary font-semibold">Select All</Text>
+                </TouchableOpacity>
+                {selectedContracts.length > 0 && (
+                  <TouchableOpacity onPress={deselectAll} className="active:opacity-70">
+                    <Text className="text-muted font-semibold">Clear</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          )}
 
           {/* Search Bar */}
           <View className="bg-surface border border-border rounded-xl px-4 py-3 flex-row items-center gap-2">
@@ -136,9 +191,30 @@ export default function HomeScreen() {
               {filteredContracts.map((contract) => (
                 <TouchableOpacity
                   key={contract.id}
-                  onPress={() => router.push(`/contract/${contract.id}`)}
+                  onPress={() => {
+                    if (selectionMode) {
+                      toggleContractSelection(contract.id);
+                    } else {
+                      router.push(`/contract/${contract.id}`);
+                    }
+                  }}
                   className="bg-surface rounded-2xl p-4 border border-border active:opacity-70"
                 >
+                  {selectionMode && (
+                    <View className="absolute top-4 right-4 z-10">
+                      <View
+                        className={`w-6 h-6 rounded border-2 items-center justify-center ${
+                          selectedContracts.includes(contract.id)
+                            ? "bg-primary border-primary"
+                            : "bg-transparent border-border"
+                        }`}
+                      >
+                        {selectedContracts.includes(contract.id) && (
+                          <Text className="text-white text-xs font-bold">✓</Text>
+                        )}
+                      </View>
+                    </View>
+                  )}
                   {/* Project Title */}
                   <Text className="text-lg font-bold text-foreground mb-2">
                     {contract.projectTitle}
@@ -184,6 +260,33 @@ export default function HomeScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Bulk Actions Modal */}
+      {selectionMode && selectedContracts.length > 0 && (
+        <View className="absolute bottom-8 left-6 right-6">
+          <TouchableOpacity
+            onPress={() => {}}
+            className="bg-primary px-6 py-4 rounded-full shadow-lg active:opacity-80"
+            style={{ elevation: 5 }}
+          >
+            <Text className="text-white text-center text-lg font-bold">
+              Actions ({selectedContracts.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <BulkActionsModal
+        visible={selectionMode && selectedContracts.length > 0}
+        onClose={() => setSelectedContracts([])}
+        selectedCount={selectedContracts.length}
+        contracts={filteredContracts.filter((c) => selectedContracts.includes(c.id))}
+        onComplete={() => {
+          setSelectionMode(false);
+          setSelectedContracts([]);
+          refetch();
+        }}
+      />
     </ScreenContainer>
   );
 }
