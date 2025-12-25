@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, contracts, InsertContract, Contract } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,114 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+/**
+ * Get all contracts for a specific user (either as producer or actor)
+ */
+export async function getUserContracts(userId: number): Promise<Contract[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(contracts)
+    .where(or(eq(contracts.producerId, userId), eq(contracts.actorId, userId)))
+    .orderBy(desc(contracts.createdAt));
+}
+
+/**
+ * Get a specific contract by ID
+ */
+export async function getContractById(contractId: number): Promise<Contract | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select().from(contracts).where(eq(contracts.id, contractId)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * Create a new contract
+ */
+export async function createContract(data: InsertContract): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(contracts).values(data);
+  return result[0].insertId;
+}
+
+/**
+ * Update contract status
+ */
+export async function updateContractStatus(
+  contractId: number,
+  status: "draft" | "active" | "pending" | "completed" | "cancelled"
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(contracts).set({ status }).where(eq(contracts.id, contractId));
+}
+
+/**
+ * Update user role (producer or actor)
+ */
+export async function updateUserRole(
+  userId: number,
+  userRole: "producer" | "actor"
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users).set({ userRole }).where(eq(users.id, userId));
+}
+
+/**
+ * Get user by ID
+ */
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * Search users by role (for finding actors when creating contracts)
+ */
+export async function getUsersByRole(userRole: "producer" | "actor") {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select().from(users).where(eq(users.userRole, userRole));
+}
+
+/**
+ * Get contract with producer and actor details
+ */
+export async function getContractWithDetails(contractId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select({
+      contract: contracts,
+      producer: users,
+    })
+    .from(contracts)
+    .leftJoin(users, eq(contracts.producerId, users.id))
+    .where(eq(contracts.id, contractId))
+    .limit(1);
+
+  if (!result[0]) return null;
+
+  // Get actor separately
+  const actorResult = await db.select().from(users).where(eq(users.id, result[0].contract.actorId)).limit(1);
+
+  return {
+    ...result[0].contract,
+    producer: result[0].producer,
+    actor: actorResult[0] || null,
+  };
+}

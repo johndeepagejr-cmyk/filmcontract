@@ -8,6 +8,7 @@ export type User = {
   name: string | null;
   email: string | null;
   loginMethod: string | null;
+  userRole?: "producer" | "actor" | null;
   lastSignedIn: Date;
 };
 
