@@ -188,17 +188,34 @@ export async function generateContractPDF(contract: ContractWithNames) {
           ` : ''}
         </div>
 
-        <div class="parties">
-          <div class="party">
-            <div class="signature-line">
-              <strong>Producer Signature</strong><br>
-              ${contract.producerName}
+        <div class="section">
+          <div class="section-title">Signatures</div>
+          <div class="parties">
+            <div class="party">
+              <div class="field-label">Producer Signature</div>
+              ${contract.producerSignature ? `
+                <img src="${contract.producerSignature}" style="width: 100%; max-width: 300px; height: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background: white; margin: 10px 0;" />
+                <div style="font-size: 12px; color: #6b7280;">Signed by ${contract.producerName}</div>
+                ${contract.producerSignedAt ? `<div style="font-size: 12px; color: #6b7280;">Date: ${new Date(contract.producerSignedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>` : ''}
+              ` : `
+                <div class="signature-line">
+                  ${contract.producerName}<br>
+                  <span style="font-size: 12px; color: #6b7280;">(Not signed)</span>
+                </div>
+              `}
             </div>
-          </div>
-          <div class="party">
-            <div class="signature-line">
-              <strong>Actor Signature</strong><br>
-              ${contract.actorName}
+            <div class="party">
+              <div class="field-label">Actor Signature</div>
+              ${contract.actorSignature ? `
+                <img src="${contract.actorSignature}" style="width: 100%; max-width: 300px; height: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background: white; margin: 10px 0;" />
+                <div style="font-size: 12px; color: #6b7280;">Signed by ${contract.actorName}</div>
+                ${contract.actorSignedAt ? `<div style="font-size: 12px; color: #6b7280;">Date: ${new Date(contract.actorSignedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>` : ''}
+              ` : `
+                <div class="signature-line">
+                  ${contract.actorName}<br>
+                  <span style="font-size: 12px; color: #6b7280;">(Not signed)</span>
+                </div>
+              `}
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  TextInput,
 } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,6 +18,7 @@ import { useState } from "react";
 export default function HomeScreen() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     data: contracts,
@@ -31,6 +33,18 @@ export default function HomeScreen() {
     await refetch();
     setRefreshing(false);
   };
+
+  // Filter contracts based on search query
+  const filteredContracts = contracts?.filter((contract) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      contract.projectTitle.toLowerCase().includes(query) ||
+      contract.producerName.toLowerCase().includes(query) ||
+      contract.actorName.toLowerCase().includes(query) ||
+      contract.status.toLowerCase().includes(query)
+    );
+  }) || [];
 
   // Show login screen if not authenticated
   if (!isAuthenticated && !authLoading) {
@@ -94,14 +108,32 @@ export default function HomeScreen() {
             </Text>
           </View>
 
+          {/* Search Bar */}
+          <View className="bg-surface border border-border rounded-xl px-4 py-3 flex-row items-center gap-2">
+            <Text className="text-xl">🔍</Text>
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search by project, actor, or status..."
+              placeholderTextColor="#9CA3AF"
+              className="flex-1 text-foreground"
+              returnKeyType="search"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery("")} className="active:opacity-70">
+                <Text className="text-lg text-muted">✕</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
           {/* Contracts List */}
           {contractsLoading ? (
             <View className="flex-1 items-center justify-center py-12">
               <ActivityIndicator size="large" color="#1E40AF" />
             </View>
-          ) : contracts && contracts.length > 0 ? (
+          ) : filteredContracts && filteredContracts.length > 0 ? (
             <View className="gap-4">
-              {contracts.map((contract) => (
+              {filteredContracts.map((contract) => (
                 <TouchableOpacity
                   key={contract.id}
                   onPress={() => router.push(`/contract/${contract.id}`)}
@@ -132,6 +164,13 @@ export default function HomeScreen() {
                   </View>
                 </TouchableOpacity>
               ))}
+            </View>
+          ) : searchQuery.trim() ? (
+            <View className="flex-1 items-center justify-center py-12">
+              <Text className="text-lg text-muted text-center">No results found</Text>
+              <Text className="text-sm text-muted text-center mt-2">
+                Try searching with different keywords
+              </Text>
             </View>
           ) : (
             <View className="flex-1 items-center justify-center py-12">

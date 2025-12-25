@@ -146,3 +146,26 @@
 
 ## Bug Fixes - Role Selection
 - [x] Fix actor role selection not working when clicked
+
+## Contract Approval Workflow
+- [x] Add Accept/Decline buttons for actors on contract detail screen
+- [x] Update contract status when actor accepts (pending → active)
+- [x] Update contract status when actor declines (pending → cancelled)
+- [x] Track approval actions in contract history timeline
+- [x] Prevent actors from accepting/declining already active contracts
+- [ ] Send push notification to producer when actor responds
+
+## Signatures in PDF Export
+- [x] Update PDF generator to include signature section
+- [x] Display producer signature in PDF if signed
+- [x] Display actor signature in PDF if signed
+- [x] Add signature date/timestamp to PDF
+- [x] Format signatures properly in PDF layout
+
+## Contract Search
+- [x] Add search bar to home screen
+- [x] Filter contracts by project title
+- [x] Filter contracts by actor name (for producers)
+- [x] Filter contracts by producer name (for actors)
+- [x] Filter contracts by status
+- [x] Show "No results" message when search returns empty

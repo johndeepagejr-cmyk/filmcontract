@@ -74,6 +74,7 @@ export default function ContractDetailScreen() {
   const [exportingPDF, setExportingPDF] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
   const signMutation = trpc.contracts.signContract.useMutation();
+  const updateStatusMutation = trpc.contracts.updateStatus.useMutation();
   const utils = trpc.useUtils();
 
   const isProducer = contract.producerId === user?.id;
@@ -82,6 +83,75 @@ export default function ContractDetailScreen() {
   const paidAmount = contract.paidAmount ? parseFloat(contract.paidAmount.toString()) : 0;
   const remainingAmount = totalAmount - paidAmount;
   const isFullyPaid = contract.paymentStatus === "paid" || remainingAmount <= 0;
+
+  const handleAcceptContract = async () => {
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: contract.id,
+        status: "active",
+      });
+      utils.contracts.getById.invalidate({ id: contract.id });
+      utils.contracts.list.invalidate();
+      if (Platform.OS === "web") {
+        alert("Contract accepted!");
+      } else {
+        Alert.alert("Success", "Contract accepted!");
+      }
+    } catch (error) {
+      console.error("Accept error:", error);
+      if (Platform.OS === "web") {
+        alert("Failed to accept contract");
+      } else {
+        Alert.alert("Error", "Failed to accept contract");
+      }
+    }
+  };
+
+  const handleDeclineContract = async () => {
+    if (Platform.OS === "web") {
+      if (!confirm("Are you sure you want to decline this contract?")) return;
+    } else {
+      Alert.alert(
+        "Decline Contract",
+        "Are you sure you want to decline this contract?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Decline",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                await updateStatusMutation.mutateAsync({
+                  id: contract.id,
+                  status: "cancelled",
+                });
+                utils.contracts.getById.invalidate({ id: contract.id });
+                utils.contracts.list.invalidate();
+                Alert.alert("Success", "Contract declined");
+              } catch (error) {
+                console.error("Decline error:", error);
+                Alert.alert("Error", "Failed to decline contract");
+              }
+            },
+          },
+        ]
+      );
+      return;
+    }
+
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: contract.id,
+        status: "cancelled",
+      });
+      utils.contracts.getById.invalidate({ id: contract.id });
+      utils.contracts.list.invalidate();
+      alert("Contract declined");
+    } catch (error) {
+      console.error("Decline error:", error);
+      alert("Failed to decline contract");
+    }
+  };
 
   const handleSign = async (signature: string) => {
     try {
@@ -310,6 +380,40 @@ export default function ContractDetailScreen() {
 
           {/* Contract Timeline */}
           <ContractTimeline contractId={contract.id} />
+
+          {/* Approval Buttons (Actors Only for Pending Contracts) */}
+          {isActor && contract.status === "pending" && (
+            <View className="gap-3">
+              <Text className="text-lg font-bold text-foreground">Contract Approval</Text>
+              <Text className="text-sm text-muted">Review the contract details and choose to accept or decline.</Text>
+              <View className="flex-row gap-3">
+                <TouchableOpacity
+                  onPress={handleAcceptContract}
+                  disabled={updateStatusMutation.isPending}
+                  className="flex-1 bg-success px-6 py-4 rounded-xl items-center active:opacity-80"
+                  style={{ opacity: updateStatusMutation.isPending ? 0.6 : 1 }}
+                >
+                  {updateStatusMutation.isPending ? (
+                    <ActivityIndicator color="#ffffff" />
+                  ) : (
+                    <Text className="text-white text-lg font-semibold">✓ Accept</Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleDeclineContract}
+                  disabled={updateStatusMutation.isPending}
+                  className="flex-1 bg-error px-6 py-4 rounded-xl items-center active:opacity-80"
+                  style={{ opacity: updateStatusMutation.isPending ? 0.6 : 1 }}
+                >
+                  {updateStatusMutation.isPending ? (
+                    <ActivityIndicator color="#ffffff" />
+                  ) : (
+                    <Text className="text-white text-lg font-semibold">✗ Decline</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* Export PDF Button */}
           <TouchableOpacity
