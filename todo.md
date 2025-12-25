@@ -57,3 +57,11 @@
 
 ## Bug Fixes
 - [x] Fix API URL configuration to use actual server URL instead of localhost
+
+## Contract Editing Feature
+- [x] Add update contract endpoint in backend API
+- [x] Create edit contract screen UI
+- [x] Add "Edit" button on contract detail screen (producers only)
+- [x] Form validation for contract editing
+- [x] Prevent actors from editing contracts
+- [x] Test contract update functionality

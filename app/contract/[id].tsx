@@ -1,11 +1,13 @@
-import { ScrollView, Text, View, ActivityIndicator } from "react-native";
+import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
-import { useLocalSearchParams, Stack } from "expo-router";
+import { useLocalSearchParams, Stack, router } from "expo-router";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function ContractDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const contractId = parseInt(id || "0", 10);
+  const { user } = useAuth();
 
   const { data: contract, isLoading } = trpc.contracts.getById.useQuery(
     { id: contractId },
@@ -55,6 +57,8 @@ export default function ContractDetailScreen() {
       </ScreenContainer>
     );
   }
+
+  const isProducer = contract.producerId === user?.id;
 
   return (
     <ScreenContainer className="p-6">
@@ -131,6 +135,16 @@ export default function ContractDetailScreen() {
                 <Text className="text-base text-foreground">{contract.deliverables}</Text>
               </View>
             </View>
+          )}
+
+          {/* Edit Button (Producers Only) */}
+          {isProducer && (
+            <TouchableOpacity
+              onPress={() => router.push(`/contract/edit/${contract.id}`)}
+              className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            >
+              <Text className="text-white text-lg font-semibold">Edit Contract</Text>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>

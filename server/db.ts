@@ -139,6 +139,19 @@ export async function updateContractStatus(
 }
 
 /**
+ * Update contract details
+ */
+export async function updateContract(
+  contractId: number,
+  data: Partial<InsertContract>
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(contracts).set(data).where(eq(contracts.id, contractId));
+}
+
+/**
  * Update user role (producer or actor)
  */
 export async function updateUserRole(

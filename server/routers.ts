@@ -94,6 +94,45 @@ export const appRouter = router({
         await db.updateContractStatus(input.id, input.status);
         return { success: true };
       }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          projectTitle: z.string().min(1).max(255).optional(),
+          actorId: z.number().optional(),
+          paymentTerms: z.string().min(1).optional(),
+          paymentAmount: z.string().optional(),
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+          deliverables: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...updateData } = input;
+        
+        // Verify the contract exists and user is the producer
+        const contract = await db.getContractById(id);
+        if (!contract) {
+          throw new Error("Contract not found");
+        }
+        if (contract.producerId !== ctx.user.id) {
+          throw new Error("Only the producer can edit this contract");
+        }
+
+        // Prepare update data with proper date conversion
+        const data: any = {};
+        if (updateData.projectTitle !== undefined) data.projectTitle = updateData.projectTitle;
+        if (updateData.actorId !== undefined) data.actorId = updateData.actorId;
+        if (updateData.paymentTerms !== undefined) data.paymentTerms = updateData.paymentTerms;
+        if (updateData.paymentAmount !== undefined) data.paymentAmount = updateData.paymentAmount;
+        if (updateData.startDate !== undefined) data.startDate = updateData.startDate ? new Date(updateData.startDate) : null;
+        if (updateData.endDate !== undefined) data.endDate = updateData.endDate ? new Date(updateData.endDate) : null;
+        if (updateData.deliverables !== undefined) data.deliverables = updateData.deliverables;
+
+        await db.updateContract(id, data);
+        return { success: true };
+      }),
   }),
 });
 
