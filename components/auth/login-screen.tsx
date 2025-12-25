@@ -3,13 +3,10 @@ import * as WebBrowser from "expo-web-browser";
 import { useAuth } from "@/hooks/use-auth";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
-import { makeRedirectUri } from "expo-auth-session";
-import Constants from "expo-constants";
+import { getLoginUrl } from "@/constants/oauth";
 import { useState } from "react";
 
 WebBrowser.maybeCompleteAuthSession();
-
-const API_URL = Constants.expoConfig?.extra?.apiUrl || "http://localhost:3000";
 
 export function LoginScreen() {
   const { refresh } = useAuth();
@@ -20,17 +17,20 @@ export function LoginScreen() {
     try {
       setLoading(true);
       
+      const loginUrl = getLoginUrl();
+      
       if (Platform.OS === "web") {
-        // For web, redirect to OAuth endpoint
-        window.location.href = `${API_URL}/oauth/login`;
+        // For web, redirect to Manus OAuth portal
+        window.location.href = loginUrl;
         return;
       }
 
-      // For native, use WebBrowser
-      const redirectUri = makeRedirectUri({ path: "oauth/callback" });
-      const authUrl = `${API_URL}/oauth/login?redirect_uri=${encodeURIComponent(redirectUri)}`;
-      
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+      // For native, use WebBrowser to open OAuth portal
+      const result = await WebBrowser.openAuthSessionAsync(
+        loginUrl,
+        undefined,
+        { showInRecents: true }
+      );
       
       if (result.type === "success") {
         // Refresh user data after successful login

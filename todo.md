@@ -86,3 +86,7 @@
 - [x] Preset donation amounts ($5, $10, $20, custom)
 - [x] Thank you message after donation
 - [ ] Donation history tracking
+
+## Bug Fixes - OAuth
+- [x] Fix "Cannot GET /oauth/login" error
+- [x] Ensure OAuth routes are properly configured
