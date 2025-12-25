@@ -1,21 +1,35 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator, Platform, Alert } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import { router } from "expo-router";
 
 export function RoleSelectionScreen() {
   const [loading, setLoading] = useState(false);
+  const { refresh } = useAuth();
   const updateRoleMutation = trpc.user.updateRole.useMutation();
 
   const handleRoleSelect = async (role: "producer" | "actor") => {
     try {
       setLoading(true);
       await updateRoleMutation.mutateAsync({ userRole: role });
+      // Refresh user data to get updated role
+      await refresh();
       // Navigate to home after role selection
       router.replace("/(tabs)");
+      if (Platform.OS === "web") {
+        alert(`Role set to ${role}!`);
+      } else {
+        Alert.alert("Success", `Role set to ${role}!`);
+      }
     } catch (error) {
       console.error("Role selection error:", error);
+      if (Platform.OS === "web") {
+        alert("Failed to set role. Please try again.");
+      } else {
+        Alert.alert("Error", "Failed to set role. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

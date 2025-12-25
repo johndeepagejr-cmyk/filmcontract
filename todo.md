@@ -143,3 +143,6 @@
 - [ ] Send email when contract is signed (to both parties)
 - [ ] Include direct links to contracts in emails
 - [ ] Add email notification preferences to user settings
+
+## Bug Fixes - Role Selection
+- [x] Fix actor role selection not working when clicked
