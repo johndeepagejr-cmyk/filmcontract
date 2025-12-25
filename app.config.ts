@@ -31,6 +31,9 @@ const config: ExpoConfig = {
   scheme: env.scheme,
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
+  extra: {
+    apiUrl: process.env.API_URL || "https://3000-ia6sbgycqgi78h1m3wxmm-268d213c.us2.manus.computer",
+  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: env.iosBundleId,

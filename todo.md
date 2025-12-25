@@ -54,3 +54,6 @@
 - [x] Test contract creation flow
 - [x] Test contract viewing flow
 - [x] Verify all user flows work end-to-end
+
+## Bug Fixes
+- [x] Fix API URL configuration to use actual server URL instead of localhost
