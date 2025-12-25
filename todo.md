@@ -114,3 +114,32 @@
 - [x] Show chronological log with timestamps
 - [x] Display user who performed each action
 - [x] Add icons for different event types
+
+## Digital Signatures
+- [x] Add signature fields to contracts table (producer_signature, actor_signature)
+- [x] Install and configure signature capture library (react-native-signature-canvas)
+- [x] Create signature capture screen/modal
+- [x] Add "Sign Contract" button for producers and actors
+- [x] Store signatures as base64 images in database
+- [x] Display signatures on contract detail screen
+- [ ] Include signatures in PDF export
+- [x] Prevent editing after both parties sign
+
+## Contract Templates
+- [x] Create contract_templates table in database
+- [ ] Add template management to producer interface
+- [x] Create default templates (feature film, commercial, voice-over, TV series)
+- [x] Template fields: name, description, default payment terms, default deliverables
+- [x] Add "Use Template" option when creating contracts
+- [ ] Allow producers to create custom templates from existing contracts
+- [x] Template library screen with search and filter
+
+## Email Notifications (Skipped - Push notifications already implemented)
+- [ ] Set up email service integration (requires external API keys)
+- [ ] Create email templates (contract created, contract edited, payment received, contract signed)
+- [ ] Send email when contract is created (to actor)
+- [ ] Send email when contract is edited (to both parties)
+- [ ] Send email when payment is received (to producer)
+- [ ] Send email when contract is signed (to both parties)
+- [ ] Include direct links to contracts in emails
+- [ ] Add email notification preferences to user settings

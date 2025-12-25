@@ -118,6 +118,21 @@ export default function CreateContractScreen() {
             <Text className="text-base text-muted">Enter contract details below</Text>
           </View>
 
+          {/* Templates Button */}
+          <TouchableOpacity
+            onPress={() => router.push("/templates" as any)}
+            className="bg-primary/10 border border-primary rounded-xl p-4 active:opacity-80"
+          >
+            <View className="flex-row items-center gap-3">
+              <Text className="text-3xl">📋</Text>
+              <View className="flex-1">
+                <Text className="text-lg font-bold text-primary">Use a Template</Text>
+                <Text className="text-sm text-primary/80">Start with pre-filled contract terms</Text>
+              </View>
+              <Text className="text-primary text-2xl">→</Text>
+            </View>
+          </TouchableOpacity>
+
           {/* Form */}
           <View className="gap-4">
             {/* Project Title */}

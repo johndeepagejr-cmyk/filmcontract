@@ -14,6 +14,8 @@ import { useLocalSearchParams, Stack, router } from "expo-router";
 import { generateContractPDF } from "@/lib/pdf-generator";
 import { useState } from "react";
 import { ContractTimeline } from "@/components/contract-timeline";
+import { SignatureCapture } from "@/components/signature-capture";
+import { Image } from "expo-image";
 
 export default function ContractDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -70,6 +72,9 @@ export default function ContractDetailScreen() {
   }
 
   const [exportingPDF, setExportingPDF] = useState(false);
+  const [showSignature, setShowSignature] = useState(false);
+  const signMutation = trpc.contracts.signContract.useMutation();
+  const utils = trpc.useUtils();
 
   const isProducer = contract.producerId === user?.id;
   const isActor = contract.actorId === user?.id;
@@ -78,7 +83,30 @@ export default function ContractDetailScreen() {
   const remainingAmount = totalAmount - paidAmount;
   const isFullyPaid = contract.paymentStatus === "paid" || remainingAmount <= 0;
 
-  const handleExportPDF = async () => {
+  const handleSign = async (signature: string) => {
+    try {
+      await signMutation.mutateAsync({
+        contractId: contract.id,
+        signature,
+        role: isProducer ? "producer" : "actor",
+      });
+      utils.contracts.getById.invalidate({ id: contract.id });
+      if (Platform.OS === "web") {
+        alert("Contract signed successfully!");
+      } else {
+        Alert.alert("Success", "Contract signed successfully!");
+      }
+    } catch (error) {
+      console.error("Sign error:", error);
+      if (Platform.OS === "web") {
+        alert("Failed to sign contract. Please try again.");
+      } else {
+        Alert.alert("Error", "Failed to sign contract. Please try again.");
+      }
+    }
+  };
+
+  async function handleExportPDF() {
     if (!contract) return;
     try {
       setExportingPDF(true);
@@ -217,6 +245,69 @@ export default function ContractDetailScreen() {
             </TouchableOpacity>
           )}
 
+          {/* Signatures Section */}
+          <View className="bg-surface rounded-xl p-4 gap-4">
+            <Text className="text-lg font-bold text-foreground">Signatures</Text>
+
+            {/* Producer Signature */}
+            <View>
+              <Text className="text-sm font-semibold text-muted mb-2">Producer Signature</Text>
+              {contract.producerSignature ? (
+                <View>
+                  <Image
+                    source={{ uri: contract.producerSignature }}
+                    style={{ width: "100%", height: 120, backgroundColor: "#fff", borderRadius: 8 }}
+                    contentFit="contain"
+                  />
+                  <Text className="text-xs text-muted mt-1">
+                    Signed on {contract.producerSignedAt ? new Date(contract.producerSignedAt).toLocaleDateString() : "Unknown"}
+                  </Text>
+                </View>
+              ) : (
+                <View className="bg-white border border-dashed border-border rounded-lg p-6 items-center">
+                  <Text className="text-sm text-muted">Not signed yet</Text>
+                  {isProducer && (
+                    <TouchableOpacity
+                      onPress={() => setShowSignature(true)}
+                      className="bg-primary px-4 py-2 rounded-lg mt-3 active:opacity-80"
+                    >
+                      <Text className="text-white font-semibold">Sign as Producer</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </View>
+
+            {/* Actor Signature */}
+            <View>
+              <Text className="text-sm font-semibold text-muted mb-2">Actor Signature</Text>
+              {contract.actorSignature ? (
+                <View>
+                  <Image
+                    source={{ uri: contract.actorSignature }}
+                    style={{ width: "100%", height: 120, backgroundColor: "#fff", borderRadius: 8 }}
+                    contentFit="contain"
+                  />
+                  <Text className="text-xs text-muted mt-1">
+                    Signed on {contract.actorSignedAt ? new Date(contract.actorSignedAt).toLocaleDateString() : "Unknown"}
+                  </Text>
+                </View>
+              ) : (
+                <View className="bg-white border border-dashed border-border rounded-lg p-6 items-center">
+                  <Text className="text-sm text-muted">Not signed yet</Text>
+                  {isActor && (
+                    <TouchableOpacity
+                      onPress={() => setShowSignature(true)}
+                      className="bg-primary px-4 py-2 rounded-lg mt-3 active:opacity-80"
+                    >
+                      <Text className="text-white font-semibold">Sign as Actor</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </View>
+          </View>
+
           {/* Contract Timeline */}
           <ContractTimeline contractId={contract.id} />
 
@@ -235,7 +326,7 @@ export default function ContractDetailScreen() {
           </TouchableOpacity>
 
           {/* Edit Button (Producers Only) */}
-          {isProducer && (
+          {isProducer && !contract.producerSignature && !contract.actorSignature && (
             <TouchableOpacity
               onPress={() => router.push(`/contract/edit/${contract.id}`)}
               className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80"
@@ -243,8 +334,24 @@ export default function ContractDetailScreen() {
               <Text className="text-white text-lg font-semibold">Edit Contract</Text>
             </TouchableOpacity>
           )}
+
+          {(contract.producerSignature || contract.actorSignature) && (
+            <View className="bg-warning/10 border border-warning rounded-lg p-3">
+              <Text className="text-sm text-muted">
+                ⚠️ This contract has been signed and can no longer be edited.
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
+
+      {/* Signature Capture Modal */}
+      <SignatureCapture
+        visible={showSignature}
+        onClose={() => setShowSignature(false)}
+        onSave={handleSign}
+        title={isProducer ? "Sign as Producer" : "Sign as Actor"}
+      />
     </ScreenContainer>
   );
 }

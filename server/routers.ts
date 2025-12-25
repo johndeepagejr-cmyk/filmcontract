@@ -4,6 +4,9 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { contractTemplates } from "@/drizzle/schema";
+import { getDb } from "./db";
+import { eq, or } from "drizzle-orm";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -149,6 +152,84 @@ export const appRouter = router({
           })
         );
         return historyWithNames;
+      }),
+
+    signContract: protectedProcedure
+      .input(
+        z.object({
+          contractId: z.number(),
+          signature: z.string(),
+          role: z.enum(["producer", "actor"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const contract = await db.getContractById(input.contractId);
+        if (!contract) {
+          throw new Error("Contract not found");
+        }
+
+        // Verify user is authorized to sign
+        if (input.role === "producer" && contract.producerId !== ctx.user.id) {
+          throw new Error("Only the producer can sign as producer");
+        }
+        if (input.role === "actor" && contract.actorId !== ctx.user.id) {
+          throw new Error("Only the actor can sign as actor");
+        }
+
+        // Update signature
+        const updateData: any = {};
+        if (input.role === "producer") {
+          updateData.producerSignature = input.signature;
+          updateData.producerSignedAt = new Date();
+        } else {
+          updateData.actorSignature = input.signature;
+          updateData.actorSignedAt = new Date();
+        }
+
+        await db.updateContract(input.contractId, updateData);
+
+        // Add history event
+        await db.addContractHistory(
+          input.contractId,
+          ctx.user.id,
+          "status_changed",
+          `${input.role === "producer" ? "Producer" : "Actor"} signed the contract`
+        );
+
+        return { success: true };
+      }),
+  }),
+
+  templates: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) return [];
+      
+      // Get all system templates and user's custom templates
+      const templates = await database
+        .select()
+        .from(contractTemplates)
+        .where(
+          or(
+            eq(contractTemplates.isSystemTemplate, true),
+            eq(contractTemplates.userId, ctx.user.id)
+          )
+        );
+      return templates;
+    }),
+
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const database = await getDb();
+        if (!database) return null;
+        
+        const result = await database
+          .select()
+          .from(contractTemplates)
+          .where(eq(contractTemplates.id, input.id))
+          .limit(1);
+        return result[0] || null;
       }),
   }),
 });

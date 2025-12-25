@@ -56,6 +56,10 @@ export const contracts = mysqlTable("contracts", {
   status: mysqlEnum("status", ["draft", "active", "pending", "completed", "cancelled"])
     .default("draft")
     .notNull(),
+  producerSignature: text("producerSignature"), // Base64 encoded signature image
+  actorSignature: text("actorSignature"), // Base64 encoded signature image
+  producerSignedAt: timestamp("producerSignedAt"),
+  actorSignedAt: timestamp("actorSignedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -83,3 +87,23 @@ export const contractHistory = mysqlTable("contractHistory", {
 
 export type ContractHistory = typeof contractHistory.$inferSelect;
 export type InsertContractHistory = typeof contractHistory.$inferInsert;
+
+/**
+ * Contract templates table - predefined templates for common contract types
+ */
+export const contractTemplates = mysqlTable("contractTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // null for system templates, user ID for custom templates
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: mysqlEnum("category", ["feature_film", "commercial", "voice_over", "tv_series", "custom"])
+    .default("custom")
+    .notNull(),
+  defaultPaymentTerms: text("defaultPaymentTerms"),
+  defaultDeliverables: text("defaultDeliverables"),
+  isSystemTemplate: boolean("isSystemTemplate").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContractTemplate = typeof contractTemplates.$inferSelect;
+export type InsertContractTemplate = typeof contractTemplates.$inferInsert;
