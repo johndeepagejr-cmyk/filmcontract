@@ -90,3 +90,27 @@
 ## Bug Fixes - OAuth
 - [x] Fix "Cannot GET /oauth/login" error
 - [x] Ensure OAuth routes are properly configured
+
+## PDF Export Feature
+- [x] Add PDF generation library
+- [x] Create PDF template for contracts
+- [x] Add "Export PDF" button on contract detail screen
+- [x] Include all contract details in PDF (parties, terms, dates, payment info)
+- [x] Add branding and formatting to PDF
+- [x] Handle PDF download on mobile and web
+
+## Push Notifications
+- [x] Set up push notification permissions
+- [x] Create notification service
+- [x] Send notification when contract is created (to actor)
+- [x] Send notification when payment is received (to producer)
+- [x] Send notification when contract status changes
+- [x] Add notification preferences in profile
+
+## Contract Timeline/History
+- [x] Create contract_history table in database
+- [x] Track contract events (created, edited, paid, status changed)
+- [x] Add timeline component to contract detail screen
+- [x] Show chronological log with timestamps
+- [x] Display user who performed each action
+- [x] Add icons for different event types

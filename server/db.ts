@@ -1,6 +1,6 @@
 import { eq, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, contracts, InsertContract, Contract } from "../drizzle/schema";
+import { InsertUser, users, contracts, InsertContract, Contract, contractHistory, InsertContractHistory } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -183,6 +183,42 @@ export async function getUsersByRole(userRole: "producer" | "actor") {
   if (!db) return [];
 
   return db.select().from(users).where(eq(users.userRole, userRole));
+}
+
+/**
+ * Add contract history event
+ */
+export async function addContractHistory(
+  contractId: number,
+  userId: number,
+  eventType: "created" | "edited" | "status_changed" | "payment_received",
+  eventDescription: string,
+  metadata?: any
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(contractHistory).values({
+    contractId,
+    userId,
+    eventType,
+    eventDescription,
+    metadata: metadata ? JSON.stringify(metadata) : null,
+  });
+}
+
+/**
+ * Get contract history
+ */
+export async function getContractHistory(contractId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(contractHistory)
+    .where(eq(contractHistory.contractId, contractId))
+    .orderBy(desc(contractHistory.createdAt));
 }
 
 /**

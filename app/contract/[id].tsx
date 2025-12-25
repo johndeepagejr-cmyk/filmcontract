@@ -1,15 +1,26 @@
-import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  Text,
+  View,
+  ActivityIndicator,
+  TouchableOpacity,
+  Alert,
+  Platform,
+} from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
-import { useLocalSearchParams, Stack, router } from "expo-router";
-import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/hooks/use-auth";
+import { trpc } from "@/lib/trpc";
+import { useLocalSearchParams, Stack, router } from "expo-router";
+import { generateContractPDF } from "@/lib/pdf-generator";
+import { useState } from "react";
+import { ContractTimeline } from "@/components/contract-timeline";
 
 export default function ContractDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const contractId = parseInt(id || "0", 10);
   const { user } = useAuth();
 
-  const { data: contract, isLoading } = trpc.contracts.getById.useQuery(
+  const { data: contract, isLoading: contractLoading } = trpc.contracts.getById.useQuery(
     { id: contractId },
     { enabled: !!contractId }
   );
@@ -40,7 +51,7 @@ export default function ContractDetailScreen() {
     });
   };
 
-  if (isLoading) {
+  if (contractLoading) {
     return (
       <ScreenContainer className="items-center justify-center">
         <Stack.Screen options={{ title: "Contract Details" }} />
@@ -58,12 +69,38 @@ export default function ContractDetailScreen() {
     );
   }
 
+  const [exportingPDF, setExportingPDF] = useState(false);
+
   const isProducer = contract.producerId === user?.id;
   const isActor = contract.actorId === user?.id;
   const totalAmount = contract.paymentAmount ? parseFloat(contract.paymentAmount.toString()) : 0;
   const paidAmount = contract.paidAmount ? parseFloat(contract.paidAmount.toString()) : 0;
   const remainingAmount = totalAmount - paidAmount;
   const isFullyPaid = contract.paymentStatus === "paid" || remainingAmount <= 0;
+
+  const handleExportPDF = async () => {
+    if (!contract) return;
+    try {
+      setExportingPDF(true);
+      await generateContractPDF({
+        ...contract,
+        producerName: (contract as any).producerName || "Unknown Producer",
+        actorName: (contract as any).actorName || "Unknown Actor",
+      });
+      if (Platform.OS !== "web") {
+        Alert.alert("Success", "Contract PDF exported successfully!");
+      }
+    } catch (error) {
+      console.error("PDF export error:", error);
+      if (Platform.OS === "web") {
+        alert("Failed to export PDF. Please try again.");
+      } else {
+        Alert.alert("Error", "Failed to export PDF. Please try again.");
+      }
+    } finally {
+      setExportingPDF(false);
+    }
+  };
 
   return (
     <ScreenContainer className="p-6">
@@ -180,11 +217,28 @@ export default function ContractDetailScreen() {
             </TouchableOpacity>
           )}
 
+          {/* Contract Timeline */}
+          <ContractTimeline contractId={contract.id} />
+
+          {/* Export PDF Button */}
+          <TouchableOpacity
+            onPress={handleExportPDF}
+            disabled={exportingPDF}
+            className="bg-surface border border-border px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            style={{ opacity: exportingPDF ? 0.6 : 1 }}
+          >
+            {exportingPDF ? (
+              <ActivityIndicator color="#1E40AF" />
+            ) : (
+              <Text className="text-foreground text-lg font-semibold">📄 Export PDF</Text>
+            )}
+          </TouchableOpacity>
+
           {/* Edit Button (Producers Only) */}
           {isProducer && (
             <TouchableOpacity
               onPress={() => router.push(`/contract/edit/${contract.id}`)}
-              className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+              className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80"
             >
               <Text className="text-white text-lg font-semibold">Edit Contract</Text>
             </TouchableOpacity>

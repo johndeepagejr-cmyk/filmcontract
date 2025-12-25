@@ -133,6 +133,23 @@ export const appRouter = router({
         await db.updateContract(id, data);
         return { success: true };
       }),
+
+    getHistory: protectedProcedure
+      .input(z.object({ contractId: z.number() }))
+      .query(async ({ input }) => {
+        const history = await db.getContractHistory(input.contractId);
+        // Fetch user names for each event
+        const historyWithNames = await Promise.all(
+          history.map(async (event) => {
+            const user = await db.getUserById(event.userId);
+            return {
+              ...event,
+              userName: user?.name || "Unknown",
+            };
+          })
+        );
+        return historyWithNames;
+      }),
   }),
 });
 

@@ -62,3 +62,24 @@ export const contracts = mysqlTable("contracts", {
 
 export type Contract = typeof contracts.$inferSelect;
 export type InsertContract = typeof contracts.$inferInsert;
+
+/**
+ * Contract history table - tracks all changes and events for contracts
+ */
+export const contractHistory = mysqlTable("contractHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(),
+  userId: int("userId").notNull(),
+  eventType: mysqlEnum("eventType", [
+    "created",
+    "edited",
+    "status_changed",
+    "payment_received",
+  ]).notNull(),
+  eventDescription: text("eventDescription").notNull(),
+  metadata: text("metadata"), // JSON string for additional data
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContractHistory = typeof contractHistory.$inferSelect;
+export type InsertContractHistory = typeof contractHistory.$inferInsert;

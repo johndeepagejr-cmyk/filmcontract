@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { AppFooter } from "@/components/app-footer";
+import { NotificationSettings } from "@/components/notification-settings";
 
 export default function ProfileScreen() {
   const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
@@ -102,6 +103,9 @@ export default function ProfileScreen() {
               </>
             )}
           </View>
+
+          {/* Notification Settings */}
+          <NotificationSettings />
 
           {/* Support Developer Button */}
           <TouchableOpacity
