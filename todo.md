@@ -281,3 +281,8 @@
 - [x] Fix "not in role" message showing when role is actually set
 - [x] Verify user.userRole is properly populated from API (added userRole to buildUserResponse)
 - [x] Check database to ensure role is actually saved
+
+## Bug Fixes - Page Reload After Role Selection
+- [x] Fix page not reloading after role selection success message
+- [x] Use router navigation instead of page reload (more reliable)
+- [x] Add explicit refresh() call before navigation to ensure user data is updated

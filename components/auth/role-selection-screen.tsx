@@ -21,24 +21,19 @@ export function RoleSelectionScreen() {
       // Wait a bit for the database to update
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log("[RoleSelection] Role selection complete");
+      console.log("[RoleSelection] Role selection complete, refreshing user data...");
       
-      // On web, force a full page reload to fetch fresh user data
-      // This ensures the updated role is properly loaded from the API
-      if (Platform.OS === "web") {
-        console.log("[RoleSelection] Web: forcing page reload");
-        window.location.href = "/";
-      } else {
-        // On native, refresh and navigate
-        console.log("[RoleSelection] Native: refreshing and navigating");
-        await refresh();
-        Alert.alert("Success", `Welcome! You're now logged in as a ${role}.`, [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(tabs)"),
-          },
-        ]);
-      }
+      // Refresh user data to get the updated role
+      await refresh();
+      
+      console.log("[RoleSelection] User data refreshed, navigating to home...");
+      
+      // Navigate to home screen
+      // Using setTimeout to ensure state updates complete before navigation
+      setTimeout(() => {
+        console.log("[RoleSelection] Executing navigation");
+        router.replace("/");
+      }, 100);
     } catch (error) {
       console.error("[RoleSelection] Role selection error:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
