@@ -230,3 +230,8 @@
 - [x] Fix contracts not showing on home screen after login (improved role selection with better error handling)
 - [ ] Verify contract list query is working correctly
 - [ ] Ensure empty state shows properly when no contracts exist
+
+## Bug Fixes - Role Selection Buttons
+- [ ] Fix Producer/Actor buttons not responding when clicked
+- [ ] Verify updateRole API endpoint exists and works
+- [ ] Add proper error handling for failed role updates

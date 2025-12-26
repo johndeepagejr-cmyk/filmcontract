@@ -69,7 +69,10 @@ export function RoleSelectionScreen() {
         {/* Role Buttons */}
         <View className="w-full max-w-sm gap-4">
           <TouchableOpacity
-            onPress={() => handleRoleSelect("producer")}
+            onPress={() => {
+              console.log("[RoleSelection] Producer button clicked!");
+              handleRoleSelect("producer");
+            }}
             disabled={loading}
             className="bg-surface border-2 border-primary px-6 py-6 rounded-xl items-center active:opacity-70"
           >
@@ -81,7 +84,10 @@ export function RoleSelectionScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => handleRoleSelect("actor")}
+            onPress={() => {
+              console.log("[RoleSelection] Actor button clicked!");
+              handleRoleSelect("actor");
+            }}
             disabled={loading}
             className="bg-surface border-2 border-primary px-6 py-6 rounded-xl items-center active:opacity-70"
           >
