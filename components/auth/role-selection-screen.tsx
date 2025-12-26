@@ -25,23 +25,20 @@ export function RoleSelectionScreen() {
       console.log("[RoleSelection] Refreshing user data...");
       await refresh();
       
-      console.log("[RoleSelection] Role selection complete, navigating to home");
+      console.log("[RoleSelection] Role selection complete, forcing navigation");
       
-      if (Platform.OS === "web") {
-        alert(`Role set to ${role}! Redirecting to home...`);
-      } else {
-        Alert.alert("Success", `Role set to ${role}!`, [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(tabs)"),
-          },
-        ]);
-      }
+      // Force navigation by replacing the current route
+      // This will cause the home screen to re-mount and check the updated user role
+      router.replace("/(tabs)");
       
-      // Navigate to home after role selection
-      if (Platform.OS === "web") {
-        router.replace("/(tabs)");
-      }
+      // Show success message after navigation
+      setTimeout(() => {
+        if (Platform.OS === "web") {
+          // Success message will show on the new screen
+        } else {
+          Alert.alert("Success", `Welcome! You're now logged in as a ${role}.`);
+        }
+      }, 500);
     } catch (error) {
       console.error("[RoleSelection] Role selection error:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";

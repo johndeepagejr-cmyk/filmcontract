@@ -267,3 +267,7 @@
 - [ ] Send email when new comment is added
 - [ ] Add email preferences to user settings
 - [ ] Include direct links to contracts in emails
+
+## Bug Fixes - Navigation After Role Selection
+- [x] Fix navigation not working after role selection
+- [x] Ensure user is redirected to home screen after selecting Producer or Actor
