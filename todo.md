@@ -235,3 +235,35 @@
 - [ ] Fix Producer/Actor buttons not responding when clicked
 - [ ] Verify updateRole API endpoint exists and works
 - [ ] Add proper error handling for failed role updates
+
+## Contract Attachments
+- [x] Create contract_attachments table in database
+- [x] Add file upload functionality to contract detail screen
+- [x] Store uploaded files (base64 for now, S3 in production)
+- [x] Display list of attachments on contract detail
+- [x] Add download button for each attachment
+- [x] Support multiple file types (PDF, DOC, images)
+- [x] Show file size and upload date
+- [x] Allow both parties to upload attachments
+
+## Contract Milestones
+- [ ] Create contract_milestones table in database
+- [ ] Add milestones section to contract creation form
+- [ ] Allow defining multiple milestones per contract
+- [ ] Each milestone has: title, description, due date, payment amount
+- [ ] Display milestones on contract detail screen
+- [ ] Add milestone completion tracking
+- [ ] Calculate total milestone payments vs contract amount
+- [ ] Show progress bar for milestone completion
+- [ ] Allow marking milestones as complete (producers only)
+
+## Email Integration
+- [ ] Set up email service configuration
+- [ ] Create email templates for notifications
+- [ ] Send email when contract is created
+- [ ] Send email when contract is edited
+- [ ] Send email when payment is received
+- [ ] Send email when contract is signed
+- [ ] Send email when new comment is added
+- [ ] Add email preferences to user settings
+- [ ] Include direct links to contracts in emails

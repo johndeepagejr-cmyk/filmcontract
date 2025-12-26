@@ -64,6 +64,13 @@
       "when": 1766707346095,
       "tag": "0008_amazing_pixie",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1766713080713,
+      "tag": "0009_slim_sleeper",
+      "breakpoints": true
     }
   ]
 }

@@ -131,6 +131,20 @@ export type InsertContractReminder = typeof contractReminders.$inferInsert;
 /**
  * Contract notes table - stores comments and discussions between parties
  */
+export const contractAttachments = mysqlTable("contractAttachments", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileUrl: text("fileUrl").notNull(),
+  fileSize: int("fileSize").notNull(), // in bytes
+  fileType: varchar("fileType", { length: 100 }).notNull(),
+  uploadedBy: int("uploadedBy").notNull(),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+});
+
+export type ContractAttachment = typeof contractAttachments.$inferSelect;
+export type InsertContractAttachment = typeof contractAttachments.$inferInsert;
+
 export const contractNotes = mysqlTable("contractNotes", {
   id: int("id").autoincrement().primaryKey(),
   contractId: int("contractId").notNull(),

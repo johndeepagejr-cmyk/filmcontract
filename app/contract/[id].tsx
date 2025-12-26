@@ -17,6 +17,7 @@ import { ContractTimeline } from "@/components/contract-timeline";
 import { SignatureCapture } from "@/components/signature-capture";
 import { Image } from "expo-image";
 import { ContractNotes } from "@/components/contract-notes";
+import { ContractAttachments } from "@/components/contract-attachments";
 
 export default function ContractDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -378,6 +379,9 @@ export default function ContractDetailScreen() {
               )}
             </View>
           </View>
+
+          {/* Contract Attachments */}
+          <ContractAttachments contractId={contractId} />
 
           {/* Contract Notes/Discussion */}
           <ContractNotes contractId={contractId} />

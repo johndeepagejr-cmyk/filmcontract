@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
-import { contractTemplates, contractNotes } from "@/drizzle/schema";
+import { contractTemplates, contractNotes, contractAttachments } from "@/drizzle/schema";
 import { getDb } from "./db";
 import { eq, or, sql } from "drizzle-orm";
 
@@ -206,6 +206,50 @@ export const appRouter = router({
         return historyWithNames;
       }),
 
+    getAttachments: protectedProcedure
+      .input(z.object({ contractId: z.number() }))
+      .query(async ({ input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        return database.select().from(contractAttachments).where(eq(contractAttachments.contractId, input.contractId));
+      }),
+    uploadAttachment: protectedProcedure
+      .input(
+        z.object({
+          contractId: z.number(),
+          fileName: z.string(),
+          fileType: z.string(),
+          fileSize: z.number(),
+          fileData: z.string(), // base64
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // In a real app, upload to S3 here
+        // For now, we'll store the base64 data directly (not recommended for production)
+        const fileUrl = `data:${input.fileType};base64,${input.fileData}`;
+        
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        
+        await database.insert(contractAttachments).values({
+          contractId: input.contractId,
+          fileName: input.fileName,
+          fileType: input.fileType,
+          fileSize: input.fileSize,
+          fileUrl,
+          uploadedBy: ctx.user.id,
+        });
+        
+        return { success: true };
+      }),
+    deleteAttachment: protectedProcedure
+      .input(z.object({ attachmentId: z.number() }))
+      .mutation(async ({ input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        await database.delete(contractAttachments).where(eq(contractAttachments.id, input.attachmentId));
+        return { success: true };
+      }),
     signContract: protectedProcedure
       .input(
         z.object({
