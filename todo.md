@@ -276,3 +276,8 @@
 - [x] Fix user data not refreshing after role selection (force page reload on web)
 - [x] Ensure useAuth hook properly updates user.userRole after mutation
 - [x] Verify home screen re-renders with updated user data
+
+## Bug Fixes - Role Detection
+- [x] Fix "not in role" message showing when role is actually set
+- [x] Verify user.userRole is properly populated from API (added userRole to buildUserResponse)
+- [x] Check database to ensure role is actually saved
