@@ -15,6 +15,7 @@ import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { useState } from "react";
 import { BulkActionsModal } from "@/components/bulk-actions-modal";
+import { UpcomingContracts } from "@/components/upcoming-contracts";
 
 export default function HomeScreen() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -143,6 +144,11 @@ export default function HomeScreen() {
                 : "View your contracts with producers"}
             </Text>
           </View>
+
+          {/* Upcoming Deadlines */}
+          {!selectionMode && filteredContracts.length > 0 && (
+            <UpcomingContracts contracts={filteredContracts} />
+          )}
 
           {/* Selection Controls */}
           {selectionMode && filteredContracts.length > 0 && (

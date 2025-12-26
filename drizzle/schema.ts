@@ -111,6 +111,39 @@ export type InsertContractTemplate = typeof contractTemplates.$inferInsert;
 /**
  * Contract versions table - stores historical versions of contracts when edited
  */
+/**
+ * Contract reminders table - stores reminders for important contract dates
+ */
+export const contractReminders = mysqlTable("contractReminders", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(),
+  userId: int("userId").notNull(),
+  reminderType: mysqlEnum("reminderType", ["end_date", "payment_due", "pending_approval"]).notNull(),
+  reminderDate: timestamp("reminderDate").notNull(),
+  message: text("message").notNull(),
+  status: mysqlEnum("status", ["pending", "sent", "dismissed"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContractReminder = typeof contractReminders.$inferSelect;
+export type InsertContractReminder = typeof contractReminders.$inferInsert;
+
+/**
+ * Contract notes table - stores comments and discussions between parties
+ */
+export const contractNotes = mysqlTable("contractNotes", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(),
+  userId: int("userId").notNull(),
+  userName: varchar("userName", { length: 255 }).notNull(),
+  userRole: mysqlEnum("userRole", ["producer", "actor"]).notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContractNote = typeof contractNotes.$inferSelect;
+export type InsertContractNote = typeof contractNotes.$inferInsert;
+
 export const contractVersions = mysqlTable("contractVersions", {
   id: int("id").autoincrement().primaryKey(),
   contractId: int("contractId").notNull(),

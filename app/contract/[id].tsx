@@ -16,6 +16,7 @@ import { useState } from "react";
 import { ContractTimeline } from "@/components/contract-timeline";
 import { SignatureCapture } from "@/components/signature-capture";
 import { Image } from "expo-image";
+import { ContractNotes } from "@/components/contract-notes";
 
 export default function ContractDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -378,8 +379,11 @@ export default function ContractDetailScreen() {
             </View>
           </View>
 
+          {/* Contract Notes/Discussion */}
+          <ContractNotes contractId={contractId} />
+
           {/* Contract Timeline */}
-          <ContractTimeline contractId={contract.id} />
+          <ContractTimeline contractId={contractId} />
 
           {/* Approval Buttons (Actors Only for Pending Contracts) */}
           {isActor && contract.status === "pending" && (
@@ -436,6 +440,16 @@ export default function ContractDetailScreen() {
               <Text className="text-foreground text-lg font-semibold">📄 Export PDF</Text>
             )}
           </TouchableOpacity>
+
+          {/* Renew Contract Button (Producers Only for Completed Contracts) */}
+          {isProducer && contract.status === "completed" && (
+            <TouchableOpacity
+              onPress={() => router.push(`/contract/renew/${contractId}`)}
+              className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            >
+              <Text className="text-white text-lg font-semibold">🔄 Renew Contract</Text>
+            </TouchableOpacity>
+          )}
 
           {/* Edit Button (Producers Only) */}
           {isProducer && !contract.producerSignature && !contract.actorSignature && (

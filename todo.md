@@ -197,3 +197,31 @@
 - [ ] Add payment trend chart over time
 - [ ] Show top actors/producers by contract count
 - [ ] Add date range filter for analytics
+
+## Contract Reminders
+- [x] Create reminders table in database
+- [ ] Add reminder preferences to user settings
+- [x] Implement reminder scheduling for contract end dates
+- [ ] Implement reminder scheduling for payment due dates
+- [ ] Implement reminder scheduling for pending approvals
+- [x] Send push notifications for reminders
+- [x] Add "Upcoming" section to home screen showing contracts with approaching dates
+- [ ] Allow users to snooze or dismiss reminders
+
+## Contract Disputes/Notes System
+- [x] Create contract_notes table in database
+- [x] Add notes/comments section to contract detail screen
+- [x] Allow both parties to add comments with timestamps
+- [x] Show conversation history in chronological order
+- [ ] Add notification when new comment is added
+- [ ] Support @mentions to notify specific party
+- [ ] Add "Unresolved Issues" badge when notes exist
+
+## Contract Renewal Workflow
+- [x] Add "Renew Contract" button to completed contracts
+- [x] Pre-fill renewal form with previous contract terms
+- [x] Allow editing terms before creating renewal
+- [ ] Link renewed contract to original contract
+- [ ] Show contract lineage (original → renewal 1 → renewal 2)
+- [ ] Add renewal history to contract detail screen
+- [ ] Track renewal count in analytics

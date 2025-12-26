@@ -4,9 +4,9 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
-import { contractTemplates } from "@/drizzle/schema";
+import { contractTemplates, contractNotes } from "@/drizzle/schema";
 import { getDb } from "./db";
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -154,6 +154,39 @@ export const appRouter = router({
           })
         );
         return versionsWithNames;
+      }),
+
+    getNotes: protectedProcedure
+      .input(z.object({ contractId: z.number() }))
+      .query(async ({ input }) => {
+        const database = await getDb();
+        if (!database) return [];
+        const notes = await database
+          .select()
+          .from(contractNotes)
+          .where(eq(contractNotes.contractId, input.contractId));
+        return notes;
+      }),
+
+    addNote: protectedProcedure
+      .input(
+        z.object({
+          contractId: z.number(),
+          message: z.string(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
+        const user = ctx.user;
+        await database.insert(contractNotes).values({
+          contractId: input.contractId,
+          userId: user.id,
+          userName: user.name || "Unknown",
+          userRole: user.userRole || "actor",
+          message: input.message,
+        });
+        return { success: true };
       }),
 
     getHistory: protectedProcedure
