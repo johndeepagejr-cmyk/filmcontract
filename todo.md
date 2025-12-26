@@ -271,3 +271,8 @@
 ## Bug Fixes - Navigation After Role Selection
 - [x] Fix navigation not working after role selection
 - [x] Ensure user is redirected to home screen after selecting Producer or Actor
+
+## Bug Fixes - User Data Refresh
+- [x] Fix user data not refreshing after role selection (force page reload on web)
+- [x] Ensure useAuth hook properly updates user.userRole after mutation
+- [x] Verify home screen re-renders with updated user data
