@@ -13,22 +13,42 @@ export function RoleSelectionScreen() {
   const handleRoleSelect = async (role: "producer" | "actor") => {
     try {
       setLoading(true);
-      await updateRoleMutation.mutateAsync({ userRole: role });
+      console.log("[RoleSelection] Starting role selection:", role);
+      
+      const result = await updateRoleMutation.mutateAsync({ userRole: role });
+      console.log("[RoleSelection] Update role mutation result:", result);
+      
+      // Wait a bit for the database to update
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       // Refresh user data to get updated role
+      console.log("[RoleSelection] Refreshing user data...");
       await refresh();
-      // Navigate to home after role selection
-      router.replace("/(tabs)");
+      
+      console.log("[RoleSelection] Role selection complete, navigating to home");
+      
       if (Platform.OS === "web") {
-        alert(`Role set to ${role}!`);
+        alert(`Role set to ${role}! Redirecting to home...`);
       } else {
-        Alert.alert("Success", `Role set to ${role}!`);
+        Alert.alert("Success", `Role set to ${role}!`, [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(tabs)"),
+          },
+        ]);
+      }
+      
+      // Navigate to home after role selection
+      if (Platform.OS === "web") {
+        router.replace("/(tabs)");
       }
     } catch (error) {
-      console.error("Role selection error:", error);
+      console.error("[RoleSelection] Role selection error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       if (Platform.OS === "web") {
-        alert("Failed to set role. Please try again.");
+        alert(`Failed to set role: ${errorMessage}. Please try again.`);
       } else {
-        Alert.alert("Error", "Failed to set role. Please try again.");
+        Alert.alert("Error", `Failed to set role: ${errorMessage}. Please try again.`);
       }
     } finally {
       setLoading(false);

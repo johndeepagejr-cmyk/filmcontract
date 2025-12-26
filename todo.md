@@ -225,3 +225,8 @@
 - [ ] Show contract lineage (original → renewal 1 → renewal 2)
 - [ ] Add renewal history to contract detail screen
 - [ ] Track renewal count in analytics
+
+## Bug Fixes - Contract Display
+- [x] Fix contracts not showing on home screen after login (improved role selection with better error handling)
+- [ ] Verify contract list query is working correctly
+- [ ] Ensure empty state shows properly when no contracts exist
