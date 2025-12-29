@@ -293,3 +293,8 @@
 - [x] Verify updateRole API endpoint is being called
 - [x] Test if window.location.reload() works better than router.replace()
 - [x] Add visible loading indicator when button is clicked
+
+## Bug Fixes - Template Selection Routing
+- [x] Fix "unmatched route" error when selecting a template
+- [x] Verify template selection navigation works correctly
+- [x] Ensure template data is passed to contract creation form
