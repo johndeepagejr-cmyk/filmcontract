@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { DatePicker } from "@/components/date-picker";
 
 export default function UseTemplateScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -178,27 +179,19 @@ export default function UseTemplateScreen() {
           </View>
 
           {/* Dates */}
-          <View>
-            <Text className="text-sm font-semibold text-foreground mb-2">Start Date *</Text>
-            <TextInput
-              value={startDate}
-              onChangeText={setStartDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9CA3AF"
-              className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
-            />
-          </View>
+          <DatePicker
+            label="Start Date *"
+            value={startDate}
+            onChange={setStartDate}
+            placeholder="Select start date"
+          />
 
-          <View>
-            <Text className="text-sm font-semibold text-foreground mb-2">End Date *</Text>
-            <TextInput
-              value={endDate}
-              onChangeText={setEndDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9CA3AF"
-              className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
-            />
-          </View>
+          <DatePicker
+            label="End Date *"
+            value={endDate}
+            onChange={setEndDate}
+            placeholder="Select end date"
+          />
 
           {/* Pre-filled Terms (Read-only) */}
           <View>

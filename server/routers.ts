@@ -7,6 +7,7 @@ import * as db from "./db";
 import { contractTemplates, contractNotes, contractAttachments } from "@/drizzle/schema";
 import { getDb } from "./db";
 import { eq, or, sql } from "drizzle-orm";
+import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -83,6 +84,20 @@ export const appRouter = router({
           deliverables: input.deliverables,
           status: input.status,
         });
+        
+        // Send email notification to actor
+        try {
+          await notifyContractCreated(input.actorId, {
+            projectTitle: input.projectTitle,
+            producerName: ctx.user.name || "Unknown Producer",
+            startDate: input.startDate ? new Date(input.startDate) : null,
+            endDate: input.endDate ? new Date(input.endDate) : null,
+            paymentAmount: input.paymentAmount,
+          });
+        } catch (error) {
+          console.error("Failed to send email notification:", error);
+        }
+        
         return { id: contractId, success: true };
       }),
 

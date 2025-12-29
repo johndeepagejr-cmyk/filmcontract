@@ -315,3 +315,22 @@
 - [x] Fix "uncaught error" when clicking on a contract (React hooks order issue)
 - [x] Add error handling to contract detail screen
 - [x] Verify contract data is loading correctly
+
+## Email Notifications Implementation
+- [x] Set up email service using built-in backend capabilities
+- [x] Create email templates for contract notifications
+- [x] Send email when contract is created (to actor)
+- [ ] Send email when contract is edited (to both parties)
+- [x] Send email when contract is signed (to both parties)
+- [x] Send email when payment is received (to producer)
+- [x] Send email when contract status changes
+- [x] Test email delivery (logs to console for now)
+
+## Date Picker UI Improvement
+- [x] Install date picker library for React Native
+- [x] Create reusable DatePicker component
+- [x] Replace text input with date picker in contract creation form
+- [x] Replace text input with date picker in template use form
+- [ ] Replace text input with date picker in contract edit form
+- [x] Add proper date formatting and validation
+- [x] Test date picker on web and mobile

@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { router } from "expo-router";
+import { DatePicker } from "@/components/date-picker";
 
 export default function CreateContractScreen() {
   const { user, isAuthenticated } = useAuth();
@@ -212,28 +213,20 @@ export default function CreateContractScreen() {
             </View>
 
             {/* Start Date */}
-            <View className="gap-2">
-              <Text className="text-sm font-medium text-foreground">Start Date</Text>
-              <TextInput
-                value={startDate}
-                onChangeText={setStartDate}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#9CA3AF"
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
-              />
-            </View>
+            <DatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={setStartDate}
+              placeholder="Select start date"
+            />
 
             {/* End Date */}
-            <View className="gap-2">
-              <Text className="text-sm font-medium text-foreground">End Date</Text>
-              <TextInput
-                value={endDate}
-                onChangeText={setEndDate}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#9CA3AF"
-                className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
-              />
-            </View>
+            <DatePicker
+              label="End Date"
+              value={endDate}
+              onChange={setEndDate}
+              placeholder="Select end date"
+            />
 
             {/* Deliverables */}
             <View className="gap-2">
