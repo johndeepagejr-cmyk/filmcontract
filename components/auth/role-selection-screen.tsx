@@ -21,19 +21,14 @@ export function RoleSelectionScreen() {
       // Wait a bit for the database to update
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log("[RoleSelection] Role selection complete, refreshing user data...");
+      console.log("[RoleSelection] Role selection complete");
       
-      // Refresh user data to get the updated role
-      await refresh();
-      
-      console.log("[RoleSelection] User data refreshed, navigating to home...");
-      
-      // Navigate to home screen
-      // Using setTimeout to ensure state updates complete before navigation
-      setTimeout(() => {
-        console.log("[RoleSelection] Executing navigation");
-        router.replace("/");
-      }, 100);
+      // Force a full page reload to ensure fresh user data is loaded
+      // This is the most reliable method for mobile browsers
+      if (typeof window !== 'undefined') {
+        console.log("[RoleSelection] Reloading page...");
+        window.location.reload();
+      }
     } catch (error) {
       console.error("[RoleSelection] Role selection error:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
