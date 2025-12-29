@@ -29,6 +29,13 @@ export default function ContractDetailScreen() {
     { enabled: !!contractId }
   );
 
+  // State hooks must be called before any conditional returns
+  const [exportingPDF, setExportingPDF] = useState(false);
+  const [showSignature, setShowSignature] = useState(false);
+  const signMutation = trpc.contracts.signContract.useMutation();
+  const updateStatusMutation = trpc.contracts.updateStatus.useMutation();
+  const utils = trpc.useUtils();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -72,12 +79,6 @@ export default function ContractDetailScreen() {
       </ScreenContainer>
     );
   }
-
-  const [exportingPDF, setExportingPDF] = useState(false);
-  const [showSignature, setShowSignature] = useState(false);
-  const signMutation = trpc.contracts.signContract.useMutation();
-  const updateStatusMutation = trpc.contracts.updateStatus.useMutation();
-  const utils = trpc.useUtils();
 
   const isProducer = contract.producerId === user?.id;
   const isActor = contract.actorId === user?.id;

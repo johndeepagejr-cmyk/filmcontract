@@ -298,3 +298,20 @@
 - [x] Fix "unmatched route" error when selecting a template
 - [x] Verify template selection navigation works correctly
 - [x] Ensure template data is passed to contract creation form
+
+## Stripe Payment Integration (Real Payments)
+- [ ] Request Stripe API keys from user (publishable key and secret key)
+- [ ] Install stripe npm package on backend
+- [ ] Create Stripe payment intent API endpoint for contract payments
+- [ ] Create Stripe payment intent API endpoint for donations
+- [ ] Update payment screen to use real Stripe checkout
+- [ ] Update donation screen to use real Stripe checkout
+- [ ] Add payment confirmation and success handling
+- [ ] Update payment status in database after successful payment
+- [ ] Test contract payment flow end-to-end
+- [ ] Test donation payment flow end-to-end
+
+## Bug Fixes - Contract Detail Error
+- [x] Fix "uncaught error" when clicking on a contract (React hooks order issue)
+- [x] Add error handling to contract detail screen
+- [x] Verify contract data is loading correctly
