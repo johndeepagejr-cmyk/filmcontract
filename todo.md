@@ -403,3 +403,9 @@
 - [x] Add download receipt button to contract detail screen
 - [x] Generate and download PDF when button clicked
 - [x] Test PDF generation and download
+
+## Bug Fixes - Sign-Up Loading Issue
+- [x] Fix sign-up button staying on loading screen indefinitely
+- [x] Check OAuth callback handling
+- [x] Verify redirect URLs are configured correctly
+- [x] Test sign-up flow end-to-end on mobile browser
