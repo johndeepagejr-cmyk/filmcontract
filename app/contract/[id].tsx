@@ -446,6 +446,16 @@ export default function ContractDetailScreen() {
             )}
           </TouchableOpacity>
 
+          {/* Pay Now Button (Actors Only for Unpaid Contracts) */}
+          {isActor && !isFullyPaid && contract.status !== "cancelled" && (
+            <TouchableOpacity
+              onPress={() => router.push(`/payment/${contractId}`)}
+              className="bg-success px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            >
+              <Text className="text-white text-lg font-semibold">💳 Pay Now - ${remainingAmount.toFixed(2)}</Text>
+            </TouchableOpacity>
+          )}
+
           {/* Review Producer Button (Actors Only for Completed Contracts) */}
           {isActor && contract.status === "completed" && (
             <TouchableOpacity

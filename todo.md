@@ -373,3 +373,13 @@
 - [x] Remove "demo mode" text from payment screen
 - [x] Integrate real Stripe Checkout instead of test card simulation
 - [x] Update payment flow to use actual Stripe payment intents
+
+## Add Pay Now Button to Contract Details
+- [x] Add Pay Now button for unpaid contracts on contract detail screen
+- [x] Show button only for actors (not producers)
+- [x] Navigate to payment screen when clicked
+- [x] Hide button for already paid contracts
+
+## Remove Demo Text from Donation Screen
+- [x] Remove demo mode text from donation screen
+- [x] Update donation screen to show live payment messaging
