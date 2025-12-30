@@ -10,6 +10,7 @@ import { eq, or, sql } from "drizzle-orm";
 import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
 import { getProducerReputation, getProducerReviews, createProducerReview, getAllProducersWithReputation } from "./reputation-service";
 import { getActorReputation, getActorReviews, createActorReview, getAllActorsWithReputation } from "./actor-reputation-service";
+import { createContractPaymentIntent, createDonationPaymentIntent, verifyPaymentIntent } from "./stripe-service";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -267,6 +268,18 @@ export const appRouter = router({
         await database.delete(contractAttachments).where(eq(contractAttachments.id, input.attachmentId));
         return { success: true };
       }),
+    updatePaymentStatus: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          paymentStatus: z.enum(["unpaid", "partial", "paid"]),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        await db.updateContract(input.id, { paymentStatus: input.paymentStatus }, ctx.user.id);
+        return { success: true };
+      }),
+
     signContract: protectedProcedure
       .input(
         z.object({
@@ -435,6 +448,55 @@ export const appRouter = router({
           reliabilityRating: input.reliabilityRating,
           wouldHireAgain: input.wouldHireAgain,
         });
+      }),
+  }),
+
+  // Stripe payment integration
+  payments: router({
+    // Create payment intent for contract payment
+    createContractPayment: protectedProcedure
+      .input(
+        z.object({
+          contractId: z.number(),
+          amount: z.number(),
+          actorEmail: z.string(),
+          projectTitle: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { clientSecret, paymentIntentId } = await createContractPaymentIntent(
+          input.amount,
+          input.contractId,
+          input.actorEmail,
+          input.projectTitle
+        );
+        return { clientSecret, paymentIntentId };
+      }),
+
+    // Create payment intent for donation
+    createDonation: publicProcedure
+      .input(
+        z.object({
+          amount: z.number(),
+          donorEmail: z.string().optional(),
+          donorName: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { clientSecret, paymentIntentId } = await createDonationPaymentIntent(
+          input.amount,
+          input.donorEmail,
+          input.donorName
+        );
+        return { clientSecret, paymentIntentId };
+      }),
+
+    // Verify payment was successful
+    verifyPayment: protectedProcedure
+      .input(z.object({ paymentIntentId: z.string() }))
+      .mutation(async ({ input }) => {
+        const isSuccessful = await verifyPaymentIntent(input.paymentIntentId);
+        return { success: isSuccessful };
       }),
   }),
 });

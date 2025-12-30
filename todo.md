@@ -300,16 +300,16 @@
 - [x] Ensure template data is passed to contract creation form
 
 ## Stripe Payment Integration (Real Payments)
-- [ ] Request Stripe API keys from user (publishable key and secret key)
-- [ ] Install stripe npm package on backend
-- [ ] Create Stripe payment intent API endpoint for contract payments
-- [ ] Create Stripe payment intent API endpoint for donations
-- [ ] Update payment screen to use real Stripe checkout
+- [x] Request Stripe API keys from user (publishable key and secret key)
+- [x] Install stripe npm package on backend
+- [x] Create Stripe payment intent API endpoint for contract payments
+- [x] Create Stripe payment intent API endpoint for donations
+- [x] Update payment screen to use real Stripe checkout
 - [ ] Update donation screen to use real Stripe checkout
-- [ ] Add payment confirmation and success handling
-- [ ] Update payment status in database after successful payment
-- [ ] Test contract payment flow end-to-end
-- [ ] Test donation payment flow end-to-end
+- [x] Add payment confirmation and success handling
+- [x] Update payment status in database after successful payment
+- [x] Test contract payment flow end-to-end
+- [ ] Test donation payment flow end-to-end (payment screen created)
 
 ## Bug Fixes - Contract Detail Error
 - [x] Fix "uncaught error" when clicking on a contract (React hooks order issue)
