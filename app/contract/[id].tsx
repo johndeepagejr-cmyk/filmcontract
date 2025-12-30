@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
 import { useLocalSearchParams, Stack, router } from "expo-router";
 import { generateContractPDF } from "@/lib/pdf-generator";
+import { downloadReceiptPDF } from "@/lib/pdf-receipt-generator";
 import { useState } from "react";
 import { ContractTimeline } from "@/components/contract-timeline";
 import { SignatureCapture } from "@/components/signature-capture";
@@ -31,6 +32,7 @@ export default function ContractDetailScreen() {
 
   // State hooks must be called before any conditional returns
   const [exportingPDF, setExportingPDF] = useState(false);
+  const [downloadingReceipt, setDownloadingReceipt] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
   const signMutation = trpc.contracts.signContract.useMutation();
   const updateStatusMutation = trpc.contracts.updateStatus.useMutation();
@@ -453,6 +455,49 @@ export default function ContractDetailScreen() {
               className="bg-success px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
             >
               <Text className="text-white text-lg font-semibold">💳 Pay Now - ${remainingAmount.toFixed(2)}</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Download Receipt Button (Actors Only for Paid Contracts) */}
+          {isActor && isFullyPaid && (
+            <TouchableOpacity
+              onPress={() => {
+                setDownloadingReceipt(true);
+                try {
+                  downloadReceiptPDF({
+                    receiptNumber: `${contractId}-${Date.now()}`,
+                    contractId,
+                    projectTitle: contract.projectTitle,
+                    actorName: user?.name || "Actor",
+                    producerName: contract.producer?.name || "Producer",
+                    paymentAmount: contract.paymentAmount || "0",
+                    paymentDate: contract.updatedAt,
+                    paymentMethod: "Credit Card",
+                  });
+                  if (Platform.OS === "web") {
+                    alert("Receipt downloaded successfully!");
+                  } else {
+                    Alert.alert("Success", "Receipt downloaded successfully!");
+                  }
+                } catch (error) {
+                  if (Platform.OS === "web") {
+                    alert("Failed to download receipt");
+                  } else {
+                    Alert.alert("Error", "Failed to download receipt");
+                  }
+                } finally {
+                  setDownloadingReceipt(false);
+                }
+              }}
+              disabled={downloadingReceipt}
+              className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+              style={{ opacity: downloadingReceipt ? 0.6 : 1 }}
+            >
+              {downloadingReceipt ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text className="text-white text-lg font-semibold">🧾 Download Receipt</Text>
+              )}
             </TouchableOpacity>
           )}
 

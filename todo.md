@@ -390,3 +390,16 @@
 - [x] Send receipt email to actor after successful payment
 - [x] Send confirmation email to producer when payment received
 - [x] Include PDF receipt as email attachment (logged to console for now)
+
+## Real Email Service Integration (Skipped for now)
+- [ ] Request SendGrid or Mailgun API key from user
+- [ ] Install email service SDK
+- [ ] Update receipt-generator.ts to send actual emails
+- [ ] Test email delivery
+
+## Downloadable PDF Receipts
+- [x] Install PDF generation library (jsPDF)
+- [x] Create PDF receipt generator function
+- [x] Add download receipt button to contract detail screen
+- [x] Generate and download PDF when button clicked
+- [x] Test PDF generation and download
