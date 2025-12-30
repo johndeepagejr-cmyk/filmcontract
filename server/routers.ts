@@ -8,6 +8,7 @@ import { contractTemplates, contractNotes, contractAttachments } from "@/drizzle
 import { getDb } from "./db";
 import { eq, or, sql } from "drizzle-orm";
 import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
+import { getProducerReputation, getProducerReviews, createProducerReview, getAllProducersWithReputation } from "./reputation-service";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -341,6 +342,51 @@ export const appRouter = router({
           .where(eq(contractTemplates.id, input.id))
           .limit(1);
         return result[0] || null;
+      }),
+  }),
+
+  reputation: router({
+    // Get reputation stats for a specific producer (public)
+    getProducerReputation: publicProcedure
+      .input(z.object({ producerId: z.number() }))
+      .query(async ({ input }) => {
+        return getProducerReputation(input.producerId);
+      }),
+
+    // Get all reviews for a producer (public)
+    getProducerReviews: publicProcedure
+      .input(z.object({ producerId: z.number() }))
+      .query(async ({ input }) => {
+        return getProducerReviews(input.producerId);
+      }),
+
+    // Get list of all producers with reputation (public directory)
+    getAllProducers: publicProcedure.query(async () => {
+      return getAllProducersWithReputation();
+    }),
+
+    // Submit a review for a producer (actors only)
+    submitReview: protectedProcedure
+      .input(
+        z.object({
+          producerId: z.number(),
+          contractId: z.number(),
+          rating: z.number().min(1).max(5),
+          review: z.string().optional(),
+          paymentOnTime: z.boolean(),
+          wouldWorkAgain: z.boolean(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return createProducerReview({
+          producerId: input.producerId,
+          actorId: ctx.user.id,
+          contractId: input.contractId,
+          rating: input.rating,
+          review: input.review,
+          paymentOnTime: input.paymentOnTime,
+          wouldWorkAgain: input.wouldWorkAgain,
+        });
       }),
   }),
 });

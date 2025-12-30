@@ -176,3 +176,23 @@ export const contractVersions = mysqlTable("contractVersions", {
 
 export type ContractVersion = typeof contractVersions.$inferSelect;
 export type InsertContractVersion = typeof contractVersions.$inferInsert;
+
+/**
+ * Producer reviews table - stores actor reviews and ratings for producers
+ * Used for the reputation/transparency system
+ */
+export const producerReviews = mysqlTable("producerReviews", {
+  id: int("id").autoincrement().primaryKey(),
+  producerId: int("producerId").notNull(),
+  actorId: int("actorId").notNull(),
+  contractId: int("contractId").notNull(),
+  rating: int("rating").notNull(), // 1-5 stars
+  review: text("review"),
+  paymentOnTime: boolean("paymentOnTime").notNull(), // Was payment made on time?
+  wouldWorkAgain: boolean("wouldWorkAgain").notNull(), // Would actor work with this producer again?
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProducerReview = typeof producerReviews.$inferSelect;
+export type InsertProducerReview = typeof producerReviews.$inferInsert;

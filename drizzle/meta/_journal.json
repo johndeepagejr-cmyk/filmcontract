@@ -71,6 +71,13 @@
       "when": 1766713080713,
       "tag": "0009_slim_sleeper",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1767059138114,
+      "tag": "0010_overjoyed_nemesis",
+      "breakpoints": true
     }
   ]
 }

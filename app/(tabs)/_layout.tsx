@@ -5,12 +5,16 @@ import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Platform } from "react-native";
 import { useColors } from "@/hooks/use-colors";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function TabLayout() {
   const colors = useColors();
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const bottomPadding = Platform.OS === "web" ? 12 : Math.max(insets.bottom, 8);
   const tabBarHeight = 56 + bottomPadding;
+  
+  const isActor = user?.userRole === "actor";
 
   return (
     <Tabs
@@ -35,13 +39,29 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="analytics"
-        options={{
-          title: "Analytics",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar" color={color} />,
-        }}
-      />
+      {isActor ? (
+        <Tabs.Screen
+          name="producers"
+          options={{
+            title: "Producers",
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              require("expo-router").router.push("/producers");
+            },
+          }}
+        />
+      ) : (
+        <Tabs.Screen
+          name="analytics"
+          options={{
+            title: "Analytics",
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar" color={color} />,
+          }}
+        />
+      )}
       <Tabs.Screen
         name="create"
         options={{

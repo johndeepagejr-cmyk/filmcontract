@@ -334,3 +334,15 @@
 - [ ] Replace text input with date picker in contract edit form
 - [x] Add proper date formatting and validation
 - [x] Test date picker on web and mobile
+
+## Industry Reputation System (Transparency Feature)
+- [x] Create database schema for producer reviews
+- [x] Add reputation calculation logic (completed contracts, on-time payments, ratings)
+- [x] Create public producer profile API endpoint
+- [x] Build producer profile screen showing reputation stats
+- [x] Add review submission form for actors (after contract completion)
+- [x] Display average rating and review count on producer profiles
+- [x] Show contract completion rate and payment reliability
+- [x] Add public producer directory/search page
+- [x] Allow actors to browse producers by reputation
+- [x] Test reputation calculations with sample data
