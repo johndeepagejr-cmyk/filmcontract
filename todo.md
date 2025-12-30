@@ -383,3 +383,10 @@
 ## Remove Demo Text from Donation Screen
 - [x] Remove demo mode text from donation screen
 - [x] Update donation screen to show live payment messaging
+
+## Payment Receipt Emails
+- [x] Create PDF receipt generator function
+- [x] Generate receipt with payment details (amount, date, contract, parties)
+- [x] Send receipt email to actor after successful payment
+- [x] Send confirmation email to producer when payment received
+- [x] Include PDF receipt as email attachment (logged to console for now)

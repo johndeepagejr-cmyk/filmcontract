@@ -65,6 +65,7 @@ export default function PaymentScreen() {
         await updatePaymentMutation.mutateAsync({
           id: contractIdNum,
           paymentStatus: "paid",
+          paymentAmount: contract.paymentAmount || "0",
         });
 
         if (Platform.OS === "web") {

@@ -11,6 +11,7 @@ import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, not
 import { getProducerReputation, getProducerReviews, createProducerReview, getAllProducersWithReputation } from "./reputation-service";
 import { getActorReputation, getActorReviews, createActorReview, getAllActorsWithReputation } from "./actor-reputation-service";
 import { createContractPaymentIntent, createDonationPaymentIntent, verifyPaymentIntent } from "./stripe-service";
+import { sendPaymentReceiptEmail } from "./receipt-generator";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -273,10 +274,17 @@ export const appRouter = router({
         z.object({
           id: z.number(),
           paymentStatus: z.enum(["unpaid", "partial", "paid"]),
+          paymentAmount: z.string().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
         await db.updateContract(input.id, { paymentStatus: input.paymentStatus }, ctx.user.id);
+        
+        // Send receipt email when payment is completed
+        if (input.paymentStatus === "paid" && input.paymentAmount) {
+          await sendPaymentReceiptEmail(input.id, input.paymentAmount, "Credit Card");
+        }
+        
         return { success: true };
       }),
 
