@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, userRole FROM users WHERE userRole IN ('actor', 'producer') ORDER BY id DESC LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7kHNQX9cUeo4guX.root --database 9Ds5MzMMryKSoRAkX3DK9S --execute SELECT id, name, userRole FROM users WHERE userRole IN ('actor', 'producer') ORDER BY id DESC LIMIT 10",
+  "rows": [
+    {
+      "id": "420068",
+      "name": "Lisa Anderson",
+      "userRole": "actor"
+    },
+    {
+      "id": "420067",
+      "name": "David Kim",
+      "userRole": "actor"
+    },
+    {
+      "id": "420066",
+      "name": "Emma Rodriguez",
+      "userRole": "actor"
+    },
+    {
+      "id": "420065",
+      "name": "Michael Chen",
+      "userRole": "actor"
+    },
+    {
+      "id": "420064",
+      "name": "Sarah Johnson",
+      "userRole": "actor"
+    },
+    {
+      "id": "1",
+      "name": "John Doeknow",
+      "userRole": "producer"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tuserRole\n420068\tLisa Anderson\tactor\n420067\tDavid Kim\tactor\n420066\tEmma Rodriguez\tactor\n420065\tMichael Chen\tactor\n420064\tSarah Johnson\tactor\n1\tJohn Doeknow\tproducer\n",
+  "stderr": "",
+  "execution_time_ms": 143
+}

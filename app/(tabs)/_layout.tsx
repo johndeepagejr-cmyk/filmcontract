@@ -15,6 +15,7 @@ export default function TabLayout() {
   const tabBarHeight = 56 + bottomPadding;
   
   const isActor = user?.userRole === "actor";
+  const isProducer = user?.userRole === "producer";
 
   return (
     <Tabs
@@ -50,6 +51,20 @@ export default function TabLayout() {
             tabPress: (e) => {
               e.preventDefault();
               require("expo-router").router.push("/producers");
+            },
+          }}
+        />
+      ) : isProducer ? (
+        <Tabs.Screen
+          name="actors"
+          options={{
+            title: "Actors",
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
+          }}
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              require("expo-router").router.push("/actors");
             },
           }}
         />

@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO users (openId, name, email, userRole, createdAt, updatedAt) VALUES\n('sample_actor_1', 'Sarah Johnson', 'sarah.johnson@example.com', 'actor', NOW(), NOW()),\n('sample_actor_2', 'Michael Chen', 'michael.chen@example.com', 'actor', NOW(), NOW()),\n('sample_actor_3', 'Emma Rodriguez', 'emma.rodriguez@example.com', 'actor', NOW(), NOW()),\n('sample_actor_4', 'David Kim', 'david.kim@example.com', 'actor', NOW(), NOW()),\n('sample_actor_5', 'Lisa Anderson', 'lisa.anderson@example.com', 'actor', NOW(), NOW())",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7kHNQX9cUeo4guX.root --database 9Ds5MzMMryKSoRAkX3DK9S --execute INSERT INTO users (openId, name, email, userRole, createdAt, updatedAt) VALUES\n('sample_actor_1', 'Sarah Johnson', 'sarah.johnson@example.com', 'actor', NOW(), NOW()),\n('sample_actor_2', 'Michael Chen', 'michael.chen@example.com', 'actor', NOW(), NOW()),\n('sample_actor_3', 'Emma Rodriguez', 'emma.rodriguez@example.com', 'actor', NOW(), NOW()),\n('sample_actor_4', 'David Kim', 'david.kim@example.com', 'actor', NOW(), NOW()),\n('sample_actor_5', 'Lisa Anderson', 'lisa.anderson@example.com', 'actor', NOW(), NOW())",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 62
+}

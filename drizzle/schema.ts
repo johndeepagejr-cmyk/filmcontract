@@ -196,3 +196,24 @@ export const producerReviews = mysqlTable("producerReviews", {
 
 export type ProducerReview = typeof producerReviews.$inferSelect;
 export type InsertProducerReview = typeof producerReviews.$inferInsert;
+
+/**
+ * Actor reviews table - stores producer reviews and ratings for actors
+ * Two-way transparency system
+ */
+export const actorReviews = mysqlTable("actorReviews", {
+  id: int("id").autoincrement().primaryKey(),
+  actorId: int("actorId").notNull(),
+  producerId: int("producerId").notNull(),
+  contractId: int("contractId").notNull(),
+  rating: int("rating").notNull(), // 1-5 stars
+  review: text("review"),
+  professionalismRating: int("professionalismRating").notNull(), // 1-5 stars
+  reliabilityRating: int("reliabilityRating").notNull(), // 1-5 stars
+  wouldHireAgain: boolean("wouldHireAgain").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorReview = typeof actorReviews.$inferSelect;
+export type InsertActorReview = typeof actorReviews.$inferInsert;

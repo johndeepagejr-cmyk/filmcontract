@@ -9,6 +9,7 @@ import { getDb } from "./db";
 import { eq, or, sql } from "drizzle-orm";
 import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
 import { getProducerReputation, getProducerReviews, createProducerReview, getAllProducersWithReputation } from "./reputation-service";
+import { getActorReputation, getActorReviews, createActorReview, getAllActorsWithReputation } from "./actor-reputation-service";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -386,6 +387,53 @@ export const appRouter = router({
           review: input.review,
           paymentOnTime: input.paymentOnTime,
           wouldWorkAgain: input.wouldWorkAgain,
+        });
+      }),
+  }),
+
+  actorReputation: router({
+    // Get reputation stats for a specific actor (public)
+    getActorReputation: publicProcedure
+      .input(z.object({ actorId: z.number() }))
+      .query(async ({ input }) => {
+        return getActorReputation(input.actorId);
+      }),
+
+    // Get all reviews for an actor (public)
+    getActorReviews: publicProcedure
+      .input(z.object({ actorId: z.number() }))
+      .query(async ({ input }) => {
+        return getActorReviews(input.actorId);
+      }),
+
+    // Get list of all actors with reputation (public directory)
+    getAllActors: publicProcedure.query(async () => {
+      return getAllActorsWithReputation();
+    }),
+
+    // Submit a review for an actor (producers only)
+    submitReview: protectedProcedure
+      .input(
+        z.object({
+          actorId: z.number(),
+          contractId: z.number(),
+          rating: z.number().min(1).max(5),
+          review: z.string().optional(),
+          professionalismRating: z.number().min(1).max(5),
+          reliabilityRating: z.number().min(1).max(5),
+          wouldHireAgain: z.boolean(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return createActorReview({
+          actorId: input.actorId,
+          producerId: ctx.user.id,
+          contractId: input.contractId,
+          rating: input.rating,
+          review: input.review,
+          professionalismRating: input.professionalismRating,
+          reliabilityRating: input.reliabilityRating,
+          wouldHireAgain: input.wouldHireAgain,
         });
       }),
   }),

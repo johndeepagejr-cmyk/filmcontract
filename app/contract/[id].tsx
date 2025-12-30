@@ -456,6 +456,16 @@ export default function ContractDetailScreen() {
             </TouchableOpacity>
           )}
 
+          {/* Review Actor Button (Producers Only for Completed Contracts) */}
+          {isProducer && contract.status === "completed" && (
+            <TouchableOpacity
+              onPress={() => router.push(`/review-actor/${contractId}`)}
+              className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            >
+              <Text className="text-white text-lg font-semibold">⭐ Review Actor</Text>
+            </TouchableOpacity>
+          )}
+
           {/* Renew Contract Button (Producers Only for Completed Contracts) */}
           {isProducer && contract.status === "completed" && (
             <TouchableOpacity

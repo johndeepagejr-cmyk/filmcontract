@@ -346,3 +346,14 @@
 - [x] Add public producer directory/search page
 - [x] Allow actors to browse producers by reputation
 - [x] Test reputation calculations with sample data
+
+## Actor Directory (Two-Way Transparency)
+- [x] Create actor reviews database schema
+- [x] Add actor reputation calculation logic
+- [x] Create actor profile API endpoints
+- [x] Build actor directory screen for producers
+- [x] Build actor profile screen showing reputation
+- [x] Add review submission for producers to review actors
+- [x] Update tab navigation to show Actors tab for producers
+- [x] Create sample actor profiles for testing
+- [x] Add sample reviews for actors

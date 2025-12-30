@@ -1,0 +1,8 @@
+{
+  "query": "-- Sample actor profiles with reviews for testing\n-- Insert sample actors (userRole = 'actor')\nINSERT INTO users (name, email, userRole, createdAt, updatedAt) VALUES\n('Sarah Johnson', 'sarah.johnson@example.com', 'actor', NOW(), NOW()),\n('Michael Chen', 'michael.chen@example.com', 'actor', NOW(), NOW()),\n('Emma Rodriguez', 'emma.rodriguez@example.com', 'actor', NOW(), NOW()),\n('David Kim', 'david.kim@example.com', 'actor', NOW(), NOW()),\n('Lisa Anderson', 'lisa.anderson@example.com', 'actor', NOW(), NOW())",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7kHNQX9cUeo4guX.root --database 9Ds5MzMMryKSoRAkX3DK9S --execute -- Sample actor profiles with reviews for testing\n-- Insert sample actors (userRole = 'actor')\nINSERT INTO users (name, email, userRole, createdAt, updatedAt) VALUES\n('Sarah Johnson', 'sarah.johnson@example.com', 'actor', NOW(), NOW()),\n('Michael Chen', 'michael.chen@example.com', 'actor', NOW(), NOW()),\n('Emma Rodriguez', 'emma.rodriguez@example.com', 'actor', NOW(), NOW()),\n('David Kim', 'david.kim@example.com', 'actor', NOW(), NOW()),\n('Lisa Anderson', 'lisa.anderson@example.com', 'actor', NOW(), NOW())",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1364 (HY000) at line 3: Field 'openId' doesn't have a default value"
+  ]
+}
