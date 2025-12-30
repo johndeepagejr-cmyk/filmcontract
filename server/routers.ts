@@ -459,6 +459,123 @@ export const appRouter = router({
       }),
   }),
 
+  // Actor profile management
+  actorProfile: router({
+    // Get actor profile by user ID
+    get: publicProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getActorProfile(input.userId);
+      }),
+
+    // Get current user's actor profile
+    getMy: protectedProcedure.query(async ({ ctx }) => {
+      return db.getActorProfile(ctx.user.id);
+    }),
+
+    // Create or update actor profile
+    upsert: protectedProcedure
+      .input(
+        z.object({
+          bio: z.string().optional(),
+          location: z.string().optional(),
+          yearsExperience: z.number().optional(),
+          specialties: z.array(z.string()).optional(),
+          profilePhotoUrl: z.string().optional(),
+          coverPhotoUrl: z.string().optional(),
+          height: z.string().optional(),
+          weight: z.string().optional(),
+          eyeColor: z.string().optional(),
+          hairColor: z.string().optional(),
+          website: z.string().optional(),
+          imdbUrl: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.upsertActorProfile(ctx.user.id, input);
+      }),
+
+    // Get actor's photos
+    getPhotos: publicProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getActorPhotos(input.userId);
+      }),
+
+    // Add photo to portfolio
+    addPhoto: protectedProcedure
+      .input(
+        z.object({
+          photoUrl: z.string(),
+          caption: z.string().optional(),
+          photoType: z.enum(["headshot", "portfolio", "behind_scenes"]).default("portfolio"),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.addActorPhoto(ctx.user.id, input);
+      }),
+
+    // Delete photo
+    deletePhoto: protectedProcedure
+      .input(z.object({ photoId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deleteActorPhoto(input.photoId, ctx.user.id);
+      }),
+
+    // Get actor's filmography
+    getFilms: publicProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getActorFilms(input.userId);
+      }),
+
+    // Add film to filmography
+    addFilm: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1),
+          role: z.string().min(1),
+          year: z.number(),
+          description: z.string().optional(),
+          posterUrl: z.string().optional(),
+          projectType: z.enum(["feature_film", "short_film", "tv_series", "commercial", "theater", "voice_over", "other"]).default("feature_film"),
+          director: z.string().optional(),
+          productionCompany: z.string().optional(),
+          imdbUrl: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.addActorFilm(ctx.user.id, input);
+      }),
+
+    // Update film
+    updateFilm: protectedProcedure
+      .input(
+        z.object({
+          filmId: z.number(),
+          title: z.string().min(1).optional(),
+          role: z.string().min(1).optional(),
+          year: z.number().optional(),
+          description: z.string().optional(),
+          posterUrl: z.string().optional(),
+          projectType: z.enum(["feature_film", "short_film", "tv_series", "commercial", "theater", "voice_over", "other"]).optional(),
+          director: z.string().optional(),
+          productionCompany: z.string().optional(),
+          imdbUrl: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.updateActorFilm(input.filmId, ctx.user.id, input);
+      }),
+
+    // Delete film
+    deleteFilm: protectedProcedure
+      .input(z.object({ filmId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deleteActorFilm(input.filmId, ctx.user.id);
+      }),
+  }),
+
   // Stripe payment integration
   payments: router({
     // Create payment intent for contract payment

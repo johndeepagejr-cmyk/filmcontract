@@ -1,6 +1,6 @@
-import { eq, or, desc } from "drizzle-orm";
+import { eq, or, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, contracts, InsertContract, Contract, contractHistory, InsertContractHistory, contractVersions, InsertContractVersion } from "../drizzle/schema";
+import { InsertUser, users, contracts, InsertContract, Contract, contractHistory, InsertContractHistory, contractVersions, InsertContractVersion, actorProfiles, actorPhotos, actorFilms, InsertActorProfile, InsertActorPhoto, InsertActorFilm } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -292,4 +292,182 @@ export async function getContractWithDetails(contractId: number) {
     producer: result[0].producer,
     actor: actorResult[0] || null,
   };
+}
+
+/**
+ * Actor Profile Management Functions
+ */
+
+/**
+ * Get actor profile by user ID
+ */
+export async function getActorProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(actorProfiles)
+    .where(eq(actorProfiles.userId, userId))
+    .limit(1);
+
+  if (result.length === 0) return null;
+
+  const profile = result[0];
+  
+  // Parse specialties JSON if it exists
+  const parsedProfile: any = { ...profile };
+  if (profile.specialties) {
+    try {
+      parsedProfile.specialties = JSON.parse(profile.specialties as string);
+    } catch (e) {
+      parsedProfile.specialties = [];
+    }
+  }
+
+  return parsedProfile;
+
+}
+
+/**
+ * Create or update actor profile
+ */
+export async function upsertActorProfile(
+  userId: number,
+  data: {
+    bio?: string;
+    location?: string;
+    yearsExperience?: number;
+    specialties?: string[];
+    profilePhotoUrl?: string;
+    coverPhotoUrl?: string;
+    height?: string;
+    weight?: string;
+    eyeColor?: string;
+    hairColor?: string;
+    website?: string;
+    imdbUrl?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Convert specialties array to JSON string
+  const profileData: any = { ...data };
+  if (data.specialties) {
+    profileData.specialties = JSON.stringify(data.specialties);
+  }
+
+  const values: InsertActorProfile = {
+    userId,
+    ...profileData,
+  };
+
+  await db
+    .insert(actorProfiles)
+    .values(values)
+    .onDuplicateKeyUpdate({
+      set: profileData,
+    });
+
+  return getActorProfile(userId);
+}
+
+/**
+ * Get actor's photos
+ */
+export async function getActorPhotos(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(actorPhotos)
+    .where(eq(actorPhotos.userId, userId))
+    .orderBy(actorPhotos.displayOrder, actorPhotos.createdAt);
+}
+
+/**
+ * Add photo to actor's portfolio
+ */
+export async function addActorPhoto(userId: number, data: Omit<InsertActorPhoto, 'userId'>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(actorPhotos).values({
+    userId,
+    ...data,
+  });
+
+  return result[0].insertId;
+}
+
+/**
+ * Delete actor photo
+ */
+export async function deleteActorPhoto(photoId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(actorPhotos)
+    .where(and(eq(actorPhotos.id, photoId), eq(actorPhotos.userId, userId)));
+}
+
+/**
+ * Get actor's filmography
+ */
+export async function getActorFilms(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(actorFilms)
+    .where(eq(actorFilms.userId, userId))
+    .orderBy(desc(actorFilms.year), actorFilms.displayOrder);
+}
+
+/**
+ * Add film to actor's filmography
+ */
+export async function addActorFilm(userId: number, data: Omit<InsertActorFilm, 'userId'>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(actorFilms).values({
+    userId,
+    ...data,
+  });
+
+  return result[0].insertId;
+}
+
+/**
+ * Update film in actor's filmography
+ */
+export async function updateActorFilm(
+  filmId: number,
+  userId: number,
+  data: Partial<InsertActorFilm>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(actorFilms)
+    .set(data)
+    .where(and(eq(actorFilms.id, filmId), eq(actorFilms.userId, userId)));
+}
+
+/**
+ * Delete film from actor's filmography
+ */
+export async function deleteActorFilm(filmId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(actorFilms)
+    .where(and(eq(actorFilms.id, filmId), eq(actorFilms.userId, userId)));
 }

@@ -217,3 +217,68 @@ export const actorReviews = mysqlTable("actorReviews", {
 
 export type ActorReview = typeof actorReviews.$inferSelect;
 export type InsertActorReview = typeof actorReviews.$inferInsert;
+
+/**
+ * Actor profiles table - extended profile information for actors
+ * Facebook-style profile with bio, location, experience, etc.
+ */
+export const actorProfiles = mysqlTable("actorProfiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(), // References users.id
+  bio: text("bio"), // Actor's biography/about section
+  location: varchar("location", { length: 255 }), // City, State or Country
+  yearsExperience: int("yearsExperience"), // Years of acting experience
+  specialties: text("specialties"), // JSON array of specialties (Drama, Comedy, Action, etc.)
+  profilePhotoUrl: text("profilePhotoUrl"), // Main profile photo
+  coverPhotoUrl: text("coverPhotoUrl"), // Cover/banner photo
+  height: varchar("height", { length: 50 }), // e.g., "5'10\""
+  weight: varchar("weight", { length: 50 }), // e.g., "165 lbs"
+  eyeColor: varchar("eyeColor", { length: 50 }),
+  hairColor: varchar("hairColor", { length: 50 }),
+  website: varchar("website", { length: 500 }),
+  imdbUrl: varchar("imdbUrl", { length: 500 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorProfile = typeof actorProfiles.$inferSelect;
+export type InsertActorProfile = typeof actorProfiles.$inferInsert;
+
+/**
+ * Actor portfolio photos table - gallery of headshots and portfolio images
+ */
+export const actorPhotos = mysqlTable("actorPhotos", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // References users.id
+  photoUrl: text("photoUrl").notNull(),
+  caption: text("caption"),
+  photoType: mysqlEnum("photoType", ["headshot", "portfolio", "behind_scenes"]).default("portfolio").notNull(),
+  displayOrder: int("displayOrder").default(0).notNull(), // For ordering photos
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ActorPhoto = typeof actorPhotos.$inferSelect;
+export type InsertActorPhoto = typeof actorPhotos.$inferInsert;
+
+/**
+ * Actor filmography table - past films and roles
+ */
+export const actorFilms = mysqlTable("actorFilms", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // References users.id
+  title: varchar("title", { length: 255 }).notNull(),
+  role: varchar("role", { length: 255 }).notNull(), // Character name or role type
+  year: int("year").notNull(),
+  description: text("description"),
+  posterUrl: text("posterUrl"), // Movie poster or still image
+  projectType: mysqlEnum("projectType", ["feature_film", "short_film", "tv_series", "commercial", "theater", "voice_over", "other"]).default("feature_film").notNull(),
+  director: varchar("director", { length: 255 }),
+  productionCompany: varchar("productionCompany", { length: 255 }),
+  imdbUrl: varchar("imdbUrl", { length: 500 }),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorFilm = typeof actorFilms.$inferSelect;
+export type InsertActorFilm = typeof actorFilms.$inferInsert;

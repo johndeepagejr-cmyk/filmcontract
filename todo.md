@@ -409,3 +409,42 @@
 - [x] Check OAuth callback handling
 - [x] Verify redirect URLs are configured correctly
 - [x] Test sign-up flow end-to-end on mobile browser
+
+## Actor Profile Portfolio System (Facebook-style)
+- [ ] Create actor_profiles table with bio, location, years_experience, specialties
+- [ ] Create actor_photos table for profile pictures and portfolio images
+- [ ] Create actor_films table for filmography (title, role, year, description, poster_url)
+- [ ] Add profile photo upload API endpoint
+- [ ] Add portfolio photo upload API endpoint
+- [ ] Add filmography CRUD API endpoints
+- [ ] Create "Edit Profile" screen for actors
+- [ ] Add bio text area with character limit
+- [ ] Add location and years of experience fields
+- [ ] Add specialties/skills multi-select (Drama, Comedy, Action, Voice-Over, etc.)
+- [ ] Add profile photo upload with image picker
+- [ ] Add portfolio photo gallery with multiple uploads
+- [ ] Add filmography section with add/edit/delete films
+- [ ] Update actor profile display to show all portfolio content
+- [ ] Add photo gallery viewer with swipe navigation
+- [ ] Show filmography list with poster images
+- [ ] Test profile creation and editing flow
+- [ ] Test photo uploads and display
+
+- [x] Create actor_profiles table with bio, location, years_experience, specialties
+- [x] Create actor_photos table for profile pictures and portfolio images
+- [x] Create actor_films table for filmography (title, role, year, description, poster_url)
+- [x] Add profile photo upload API endpoint
+- [x] Add portfolio photo upload API endpoint
+- [x] Add filmography CRUD API endpoints
+- [x] Create "Edit Profile" screen for actors
+- [x] Add bio text area with character limit
+- [x] Add location and years of experience fields
+- [x] Add specialties/skills multi-select (Drama, Comedy, Action, Voice-Over, etc.)
+- [x] Add profile photo upload with image picker
+- [x] Add portfolio photo gallery with multiple uploads
+- [x] Add filmography section with add/edit/delete films
+- [x] Update actor profile display to show all portfolio content
+- [x] Add photo gallery viewer with swipe navigation
+- [x] Show filmography list with poster images
+- [x] Test profile creation and editing flow
+- [x] Test photo uploads and display

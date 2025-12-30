@@ -16,6 +16,15 @@ export default function ProfileScreen() {
     }
   );
 
+  const { data: actorProfile } = trpc.actorProfile.getMy.useQuery(undefined, {
+    enabled: isAuthenticated && user?.userRole === "actor",
+  });
+
+  const { data: films } = trpc.actorProfile.getFilms.useQuery(
+    { userId: user?.id || 0 },
+    { enabled: isAuthenticated && user?.userRole === "actor" && !!user?.id }
+  );
+
   const handleLogout = async () => {
     await logout();
     router.replace("/");
@@ -52,6 +61,14 @@ export default function ProfileScreen() {
 
           {/* User Info Card */}
           <View className="bg-surface rounded-2xl p-6 gap-4">
+            {user?.userRole === "actor" && (
+              <TouchableOpacity
+                onPress={() => router.push("/profile/edit")}
+                className="absolute top-4 right-4 bg-primary px-4 py-2 rounded-full active:opacity-80"
+              >
+                <Text className="text-white font-semibold text-sm">Edit Profile</Text>
+              </TouchableOpacity>
+            )}
             <View className="gap-1">
               <Text className="text-sm font-medium text-muted">Name</Text>
               <Text className="text-lg font-semibold text-foreground">
@@ -80,6 +97,114 @@ export default function ProfileScreen() {
               </View>
             </View>
           </View>
+
+          {/* Actor Profile Info */}
+          {user?.userRole === "actor" && actorProfile && (
+            <View className="bg-surface rounded-2xl p-6 gap-4">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-lg font-bold text-foreground">About Me</Text>
+                <TouchableOpacity
+                  onPress={() => router.push("/profile/edit")}
+                  className="active:opacity-70"
+                >
+                  <Text className="text-sm text-primary font-semibold">Edit</Text>
+                </TouchableOpacity>
+              </View>
+
+              {actorProfile.bio && (
+                <Text className="text-base text-foreground leading-6">{actorProfile.bio}</Text>
+              )}
+
+              {actorProfile.location && (
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-base text-muted">📍 {actorProfile.location}</Text>
+                </View>
+              )}
+
+              {actorProfile.yearsExperience && (
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-base text-muted">
+                    🎬 {actorProfile.yearsExperience} years experience
+                  </Text>
+                </View>
+              )}
+
+              {actorProfile.specialties && (actorProfile.specialties as string[]).length > 0 && (
+                <View className="gap-2">
+                  <Text className="text-sm font-semibold text-muted">Specialties</Text>
+                  <View className="flex-row flex-wrap gap-2">
+                    {(actorProfile.specialties as string[]).map((specialty) => (
+                      <View key={specialty} className="bg-primary/10 px-3 py-1 rounded-full">
+                        <Text className="text-sm font-semibold text-primary">{specialty}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {(actorProfile.height || actorProfile.weight || actorProfile.eyeColor || actorProfile.hairColor) && (
+                <View className="gap-2">
+                  <Text className="text-sm font-semibold text-muted">Physical Attributes</Text>
+                  <View className="flex-row flex-wrap gap-4">
+                    {actorProfile.height && (
+                      <Text className="text-sm text-foreground">Height: {actorProfile.height}</Text>
+                    )}
+                    {actorProfile.weight && (
+                      <Text className="text-sm text-foreground">Weight: {actorProfile.weight}</Text>
+                    )}
+                    {actorProfile.eyeColor && (
+                      <Text className="text-sm text-foreground">Eyes: {actorProfile.eyeColor}</Text>
+                    )}
+                    {actorProfile.hairColor && (
+                      <Text className="text-sm text-foreground">Hair: {actorProfile.hairColor}</Text>
+                    )}
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Filmography */}
+          {user?.userRole === "actor" && (
+            <View className="bg-surface rounded-2xl p-6 gap-4">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-lg font-bold text-foreground">
+                  Filmography ({films?.length || 0})
+                </Text>
+                <TouchableOpacity
+                  onPress={() => router.push("/profile/filmography")}
+                  className="bg-primary px-4 py-2 rounded-full active:opacity-80"
+                >
+                  <Text className="text-white font-semibold text-sm">Manage</Text>
+                </TouchableOpacity>
+              </View>
+
+              {films && films.length > 0 ? (
+                <View className="gap-3">
+                  {films.slice(0, 3).map((film) => (
+                    <View key={film.id} className="gap-1">
+                      <Text className="text-base font-semibold text-foreground">{film.title}</Text>
+                      <Text className="text-sm text-muted">
+                        {film.role} • {film.year}
+                      </Text>
+                    </View>
+                  ))}
+                  {films.length > 3 && (
+                    <TouchableOpacity
+                      onPress={() => router.push("/profile/filmography")}
+                      className="active:opacity-70"
+                    >
+                      <Text className="text-sm text-primary font-semibold">
+                        View all {films.length} films →
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ) : (
+                <Text className="text-sm text-muted">No films added yet</Text>
+              )}
+            </View>
+          )}
 
           {/* Statistics Card */}
           <View className="bg-surface rounded-2xl p-6 gap-4">
