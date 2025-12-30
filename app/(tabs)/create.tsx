@@ -11,12 +11,14 @@ import {
 import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
-import { router } from "expo-router";
+import { useState, useEffect } from "react";
+import { router, useLocalSearchParams } from "expo-router";
 import { DatePicker } from "@/components/date-picker";
 
 export default function CreateContractScreen() {
   const { user, isAuthenticated } = useAuth();
+  const { actorEmail } = useLocalSearchParams<{ actorEmail?: string }>();
+  
   const [projectTitle, setProjectTitle] = useState("");
   const [actorId, setActorId] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
@@ -28,6 +30,16 @@ export default function CreateContractScreen() {
   const { data: actors, isLoading: actorsLoading } = trpc.user.getActors.useQuery(undefined, {
     enabled: isAuthenticated && user?.userRole === "producer",
   });
+
+  // Pre-fill actor when coming from actor profile
+  useEffect(() => {
+    if (actorEmail && actors) {
+      const actor = actors.find((a) => a.email === actorEmail);
+      if (actor) {
+        setActorId(actor.id.toString());
+      }
+    }
+  }, [actorEmail, actors]);
 
   const createMutation = trpc.contracts.create.useMutation({
     onSuccess: () => {

@@ -1,13 +1,16 @@
-import { ScrollView, Text, View, ActivityIndicator } from "react-native";
+import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, Linking } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function ActorProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const actorId = parseInt(id || "0", 10);
   const colors = useColors();
+  const { user } = useAuth();
+  const isProducer = user?.userRole === "producer";
 
   const { data: reputation, isLoading: reputationLoading } =
     trpc.actorReputation.getActorReputation.useQuery(
@@ -86,7 +89,28 @@ export default function ActorProfileScreen() {
             <Text className="text-sm text-muted">
               Member since {formatDate(reputation.joinedDate)}
             </Text>
+            {reputation.actorEmail && (
+              <TouchableOpacity
+                onPress={() => Linking.openURL(`mailto:${reputation.actorEmail}`)}
+                className="mt-2"
+                style={{ opacity: 1 }}
+                activeOpacity={0.7}
+              >
+                <Text className="text-primary text-sm">{reputation.actorEmail}</Text>
+              </TouchableOpacity>
+            )}
           </View>
+
+          {/* Hire Button for Producers */}
+          {isProducer && (
+            <TouchableOpacity
+              onPress={() => router.push(`/create?actorEmail=${encodeURIComponent(reputation.actorEmail || '')}`)}
+              className="bg-primary px-8 py-4 rounded-full items-center active:opacity-80"
+              style={{ opacity: 1 }}
+            >
+              <Text className="text-background text-lg font-semibold">💼 Hire This Actor</Text>
+            </TouchableOpacity>
+          )}
 
           {/* Rating Overview */}
           <View className="bg-surface rounded-2xl p-6 gap-4">

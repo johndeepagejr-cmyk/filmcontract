@@ -357,3 +357,9 @@
 - [x] Update tab navigation to show Actors tab for producers
 - [x] Create sample actor profiles for testing
 - [x] Add sample reviews for actors
+
+## Actor Contact & Hire Feature
+- [x] Display actor email/contact info on actor profile
+- [x] Add "Hire This Actor" button on actor profile (producers only)
+- [x] Pre-fill contract creation form with actor email when hiring
+- [x] Test hire flow from actor profile to contract creation
