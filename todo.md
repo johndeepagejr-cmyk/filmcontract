@@ -448,3 +448,20 @@
 - [x] Show filmography list with poster images
 - [x] Test profile creation and editing flow
 - [x] Test photo uploads and display
+
+## Copyright Protection & Legal Documentation
+- [ ] Add copyright notice to app footer
+- [ ] Create Terms of Service page
+- [ ] Create Privacy Policy page
+- [ ] Create restrictive LICENSE file
+- [ ] Generate ownership documentation (COPYRIGHT.md)
+- [ ] Add copyright headers to key source files
+- [ ] Link legal pages from app settings
+
+- [x] Add copyright notice to app footer
+- [x] Create Terms of Service page
+- [x] Create Privacy Policy page
+- [x] Create restrictive LICENSE file
+- [x] Generate ownership documentation (COPYRIGHT.md)
+- [x] Add copyright headers to key source files
+- [x] Link legal pages from app settings
