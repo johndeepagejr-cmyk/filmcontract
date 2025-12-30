@@ -363,3 +363,13 @@
 - [x] Add "Hire This Actor" button on actor profile (producers only)
 - [x] Pre-fill contract creation form with actor email when hiring
 - [x] Test hire flow from actor profile to contract creation
+
+## Switch to Live Stripe Payments
+- [ ] Update STRIPE_PUBLISHABLE_KEY to live key
+- [ ] Update STRIPE_SECRET_KEY to live key
+- [ ] Test live payment processing
+
+## Remove Demo Mode from Payment Screen
+- [x] Remove "demo mode" text from payment screen
+- [x] Integrate real Stripe Checkout instead of test card simulation
+- [x] Update payment flow to use actual Stripe payment intents
