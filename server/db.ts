@@ -653,3 +653,99 @@ export async function reorderPortfolioPhotos(
 
   return getPortfolioPhotos(userId);
 }
+
+/**
+ * Actor Video Functions
+ */
+
+/**
+ * Get all videos for a user
+ */
+export async function getActorVideos(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { actorVideos } = await import("../drizzle/schema.js");
+  
+  return db
+    .select()
+    .from(actorVideos)
+    .where(eq(actorVideos.userId, userId))
+    .orderBy(actorVideos.displayOrder);
+}
+
+/**
+ * Add a video
+ */
+export async function addActorVideo(
+  userId: number,
+  data: {
+    videoUrl: string;
+    thumbnailUrl?: string;
+    title: string;
+    description?: string;
+    duration?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { actorVideos } = await import("../drizzle/schema.js");
+
+  // Get the current max display order
+  const existing = await getActorVideos(userId);
+  const maxOrder = existing.length > 0 ? Math.max(...existing.map(v => v.displayOrder)) : 0;
+
+  await db.insert(actorVideos).values({
+    userId,
+    videoUrl: data.videoUrl,
+    thumbnailUrl: data.thumbnailUrl || null,
+    title: data.title,
+    description: data.description || null,
+    duration: data.duration || null,
+    displayOrder: maxOrder + 1,
+  });
+
+  return getActorVideos(userId);
+}
+
+/**
+ * Update a video
+ */
+export async function updateActorVideo(
+  videoId: number,
+  userId: number,
+  data: {
+    title?: string;
+    description?: string;
+    displayOrder?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { actorVideos } = await import("../drizzle/schema.js");
+
+  await db
+    .update(actorVideos)
+    .set(data)
+    .where(and(eq(actorVideos.id, videoId), eq(actorVideos.userId, userId)));
+
+  return getActorVideos(userId);
+}
+
+/**
+ * Delete a video
+ */
+export async function deleteActorVideo(videoId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { actorVideos } = await import("../drizzle/schema.js");
+
+  await db
+    .delete(actorVideos)
+    .where(and(eq(actorVideos.id, videoId), eq(actorVideos.userId, userId)));
+
+  return getActorVideos(userId);
+}

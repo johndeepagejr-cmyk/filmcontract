@@ -538,3 +538,28 @@
 - [ ] Display badges in search results
 - [ ] Add admin interface for verification (future)
 - [ ] Define verification criteria
+
+## Feature: Video Demo Reels
+- [x] Create actor_videos table in database
+- [x] Add video upload API endpoint with S3 storage
+- [x] Create video reel management screen
+- [ ] Add video player to actor profile display
+- [ ] Support video thumbnails and captions
+- [ ] Display video reels in actor directory cards
+
+## Feature: In-App Messaging
+- [x] Create messages table in database
+- [x] Create conversations table for message threads
+- [ ] Add messaging API endpoints (send, get conversations, get messages)
+- [ ] Build messages/inbox screen
+- [ ] Build conversation/chat screen
+- [ ] Add real-time message notifications
+- [ ] Add "Message" button to actor and producer profiles
+
+## Feature: Availability Calendar
+- [x] Create actor_availability table in database
+- [ ] Add availability API endpoints (set dates, get availability)
+- [ ] Create availability calendar screen for actors
+- [ ] Display availability status on actor profiles
+- [ ] Add availability filter to actor search
+- [ ] Show available date ranges in actor cards
