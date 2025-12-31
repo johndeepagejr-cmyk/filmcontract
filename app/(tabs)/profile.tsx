@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Share } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
@@ -38,6 +38,18 @@ export default function ProfileScreen() {
     router.replace("/");
   };
 
+  const handleSharePortfolio = async () => {
+    if (!user?.id) return;
+    try {
+      await Share.share({
+        message: `Check out my FilmContract portfolio!`,
+        url: `https://8081-ia6sbgycqgi78h1m3wxmm-268d213c.us2.manus.computer/public-portfolio/${user.id}`,
+      });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
   if (!isAuthenticated && !authLoading) {
     return (
       <ScreenContainer className="p-6 items-center justify-center">
@@ -62,7 +74,8 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 gap-6">
           {/* Header */}
-            <View className="gap-2">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-1 gap-2">
               <View className="flex-row items-center gap-2">
                 <Text className="text-2xl font-bold text-foreground">{user?.name}</Text>
                 {user?.isVerified && (
@@ -72,6 +85,13 @@ export default function ProfileScreen() {
                 )}
               </View>
               <Text className="text-base text-muted">{user?.email}</Text>
+            </View>
+            <TouchableOpacity
+              onPress={handleSharePortfolio}
+              className="bg-primary px-4 py-2 rounded-full active:opacity-80"
+            >
+              <Text className="text-white font-semibold">Share</Text>
+            </TouchableOpacity>
           </View>
 
           {/* User Info Card */}

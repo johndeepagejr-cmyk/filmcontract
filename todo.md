@@ -555,3 +555,14 @@
 - [x] Add swipe navigation between photos
 - [ ] Add zoom capability in gallery viewer
 - [x] Add close button to exit gallery
+
+## Advanced Photo Features
+- [ ] Add drag-and-drop reordering for portfolio photos
+- [ ] Install image manipulation library for editing
+- [ ] Add photo editing screen with filters (brightness, contrast, saturation)
+- [ ] Add crop functionality before upload
+- [x] Create public portfolio link generation API
+- [x] Add "Share Portfolio" button to profile screen
+- [x] Generate unique shareable URLs for portfolios
+- [x] Create public portfolio view page (no login required)
+- [x] Test shareable links on social media
