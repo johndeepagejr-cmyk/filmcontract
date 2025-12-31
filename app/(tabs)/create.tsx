@@ -17,7 +17,13 @@ import { DatePicker } from "@/components/date-picker";
 
 export default function CreateContractScreen() {
   const { user, isAuthenticated } = useAuth();
-  const { actorEmail } = useLocalSearchParams<{ actorEmail?: string }>();
+  const params = useLocalSearchParams<{ 
+    actorEmail?: string;
+    templateId?: string;
+    paymentTerms?: string;
+    deliverables?: string;
+  }>();
+  const { actorEmail, templateId, paymentTerms: templatePaymentTerms, deliverables: templateDeliverables } = params;
   
   const [projectTitle, setProjectTitle] = useState("");
   const [actorId, setActorId] = useState("");
@@ -40,6 +46,16 @@ export default function CreateContractScreen() {
       }
     }
   }, [actorEmail, actors]);
+
+  // Pre-fill from template
+  useEffect(() => {
+    if (templatePaymentTerms) {
+      setPaymentTerms(templatePaymentTerms);
+    }
+    if (templateDeliverables) {
+      setDeliverables(templateDeliverables);
+    }
+  }, [templatePaymentTerms, templateDeliverables]);
 
   const createMutation = trpc.contracts.create.useMutation({
     onSuccess: () => {
@@ -133,7 +149,7 @@ export default function CreateContractScreen() {
 
           {/* Templates Button */}
           <TouchableOpacity
-            onPress={() => router.push("/templates" as any)}
+            onPress={() => router.push("/contracts/templates" as any)}
             className="bg-primary/10 border border-primary rounded-xl p-4 active:opacity-80"
           >
             <View className="flex-row items-center gap-3">

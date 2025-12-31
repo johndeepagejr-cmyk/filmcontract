@@ -1,5 +1,5 @@
 import { getDb } from "./db";
-import { contracts, actorReviews, users } from "@/drizzle/schema";
+import { contracts, actorReviews, users, actorProfiles } from "@/drizzle/schema";
 import { eq, and, sql } from "drizzle-orm";
 
 export interface ActorReputation {
@@ -16,6 +16,12 @@ export interface ActorReputation {
   totalReviews: number;
   wouldHireAgainRate: number; // Percentage
   joinedDate: Date;
+  // Profile fields
+  profilePhotoUrl?: string | null;
+  location?: string | null;
+  specialties?: string[] | null;
+  yearsExperience?: number | null;
+  bio?: string | null;
 }
 
 /**
@@ -28,6 +34,13 @@ export async function getActorReputation(actorId: number): Promise<ActorReputati
   // Get actor info
   const actor = await db.select().from(users).where(eq(users.id, actorId)).limit(1);
   if (!actor[0]) return null;
+
+  // Get actor profile
+  const profile = await db
+    .select()
+    .from(actorProfiles)
+    .where(eq(actorProfiles.userId, actorId))
+    .limit(1);
 
   // Get contract stats
   const allContracts = await db
@@ -66,19 +79,25 @@ export async function getActorReputation(actorId: number): Promise<ActorReputati
   const wouldHireAgainRate = totalReviews > 0 ? (wouldHireAgain / totalReviews) * 100 : 0;
 
   return {
-    actorId,
+    actorId: actor[0].id,
     actorName: actor[0].name || "Unknown Actor",
     actorEmail: actor[0].email,
     totalContracts,
     completedContracts,
     activeContracts,
     completionRate: Math.round(completionRate),
-    averageRating: Math.round(averageRating * 10) / 10,
-    professionalismRating: Math.round(professionalismRating * 10) / 10,
-    reliabilityRating: Math.round(reliabilityRating * 10) / 10,
+    averageRating,
+    professionalismRating,
+    reliabilityRating,
     totalReviews,
     wouldHireAgainRate: Math.round(wouldHireAgainRate),
     joinedDate: actor[0].createdAt,
+    // Profile fields
+    profilePhotoUrl: profile[0]?.profilePhotoUrl,
+    location: profile[0]?.location,
+    specialties: profile[0]?.specialties as string[] | null,
+    yearsExperience: profile[0]?.yearsExperience,
+    bio: profile[0]?.bio,
   };
 }
 

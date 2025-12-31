@@ -12,6 +12,8 @@ import { getProducerReputation, getProducerReviews, createProducerReview, getAll
 import { getActorReputation, getActorReviews, createActorReview, getAllActorsWithReputation } from "./actor-reputation-service";
 import { createContractPaymentIntent, createDonationPaymentIntent, verifyPaymentIntent } from "./stripe-service";
 import { sendPaymentReceiptEmail } from "./receipt-generator";
+import { storagePut } from "./storage";
+import { savePushToken, notifyContractCreated as pushNotifyContractCreated, notifyContractSigned as pushNotifyContractSigned } from "./notification-service";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -515,6 +517,31 @@ export const appRouter = router({
         return db.addActorPhoto(ctx.user.id, input);
       }),
 
+    // Upload photo to S3 and return URL
+    uploadPhoto: protectedProcedure
+      .input(
+        z.object({
+          base64Data: z.string(),
+          fileName: z.string(),
+          mimeType: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Convert base64 to buffer
+        const base64WithoutPrefix = input.base64Data.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64WithoutPrefix, "base64");
+        
+        // Generate unique filename
+        const timestamp = Date.now();
+        const extension = input.fileName.split(".").pop() || "jpg";
+        const uniqueFileName = `actor-photos/${ctx.user.id}/${timestamp}-${input.fileName}`;
+        
+        // Upload to S3
+        const { url } = await storagePut(uniqueFileName, buffer, input.mimeType);
+        
+        return { photoUrl: url };
+      }),
+
     // Delete photo
     deletePhoto: protectedProcedure
       .input(z.object({ photoId: z.number() }))
@@ -573,6 +600,17 @@ export const appRouter = router({
       .input(z.object({ filmId: z.number() }))
       .mutation(async ({ ctx, input }) => {
         return db.deleteActorFilm(input.filmId, ctx.user.id);
+      }),
+  }),
+
+  // Push notifications
+  notifications: router({
+    // Register push token
+    registerToken: protectedProcedure
+      .input(z.object({ pushToken: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const success = await savePushToken(ctx.user.id, input.pushToken);
+        return { success };
       }),
   }),
 

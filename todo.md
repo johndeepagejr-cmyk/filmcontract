@@ -465,3 +465,40 @@
 - [x] Generate ownership documentation (COPYRIGHT.md)
 - [x] Add copyright headers to key source files
 - [x] Link legal pages from app settings
+
+## Feature: Photo Upload for Actor Profiles
+- [x] Add image picker integration (expo-image-picker)
+- [x] Create photo upload API endpoint with S3 storage
+- [x] Add profile photo section to Edit Profile screen
+- [ ] Add portfolio photo gallery to Edit Profile screen
+- [x] Display profile photo in actor profile view
+- [ ] Display portfolio gallery in actor profile view
+- [ ] Add photo management screen (delete, reorder photos)
+
+## Feature: Actor Search & Discovery
+- [x] Create actor directory/search screen for producers
+- [x] Add search bar with text search
+- [x] Add filter by location
+- [x] Add filter by specialties (multi-select)
+- [x] Add filter by years of experience (range)
+- [x] Display actor cards with photo, name, location, specialties
+- [x] Add actor profile detail view from search results
+- [x] Add "Contact" or "Create Contract" button from actor profile
+
+## Feature: Contract Templates Library
+- [x] Create contract templates database table
+- [x] Add pre-made templates (day player, featured role, background, voice-over)
+- [x] Create template selection screen when creating contract
+- [x] Add template preview before selection
+- [x] Auto-fill contract form with template data
+- [x] Allow customization after template selection
+
+## Feature: Push Notifications
+- [x] Set up Expo push notification service
+- [x] Request notification permissions on app start
+- [x] Store push tokens in database
+- [x] Send notification when contract is created
+- [x] Send notification when contract is signed
+- [x] Send notification when payment is released
+- [ ] Add notification settings toggle in profile
+- [ ] Test notifications on iOS and Android

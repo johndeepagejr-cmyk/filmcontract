@@ -28,6 +28,8 @@ export const users = mysqlTable("users", {
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   /** User role in the film industry (producer or actor) */
   userRole: mysqlEnum("userRole", ["producer", "actor"]),
+  /** Push notification token for mobile notifications */
+  pushToken: text("pushToken"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

@@ -1,12 +1,81 @@
-import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity } from "react-native";
+import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, TextInput, Image } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { Stack, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
+import { useState, useMemo } from "react";
+
+const SPECIALTIES = [
+  "Drama",
+  "Comedy",
+  "Action",
+  "Horror",
+  "Thriller",
+  "Romance",
+  "Sci-Fi",
+  "Voice-Over",
+  "Commercial",
+  "Theater",
+  "Improv",
+  "Musical",
+];
 
 export default function ActorsDirectoryScreen() {
   const colors = useColors();
   const { data: actors, isLoading } = trpc.actorReputation.getAllActors.useQuery();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [minExperience, setMinExperience] = useState<string>("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const toggleSpecialty = (specialty: string) => {
+    if (selectedSpecialties.includes(specialty)) {
+      setSelectedSpecialties(selectedSpecialties.filter((s) => s !== specialty));
+    } else {
+      setSelectedSpecialties([...selectedSpecialties, specialty]);
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedSpecialties([]);
+    setMinExperience("");
+  };
+
+  const filteredActors = useMemo(() => {
+    if (!actors) return [];
+
+    return actors.filter((actor) => {
+      // Text search
+      if (searchQuery && !actor.actorName.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
+      }
+
+      // Specialty filter (check if actor has ANY of the selected specialties)
+      if (selectedSpecialties.length > 0 && actor.specialties) {
+        const actorSpecialties = actor.specialties as string[];
+        const hasMatchingSpecialty = selectedSpecialties.some((s) =>
+          actorSpecialties.includes(s)
+        );
+        if (!hasMatchingSpecialty) return false;
+      }
+
+      // Experience filter
+      if (minExperience && actor.yearsExperience) {
+        if (actor.yearsExperience < parseInt(minExperience)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [actors, searchQuery, selectedSpecialties, minExperience]);
+
+  const activeFilterCount = (
+    (searchQuery ? 1 : 0) +
+    selectedSpecialties.length +
+    (minExperience ? 1 : 0)
+  );
 
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
@@ -51,9 +120,91 @@ export default function ActorsDirectoryScreen() {
             </Text>
           </View>
 
-          {actors && actors.length > 0 ? (
+          {/* Search Bar */}
+          <View className="gap-2">
+            <TextInput
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search by name..."
+              placeholderTextColor="#9CA3AF"
+              className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
+            />
+          </View>
+
+          {/* Filter Toggle */}
+          <View className="flex-row items-center justify-between">
+            <TouchableOpacity
+              onPress={() => setShowFilters(!showFilters)}
+              className="flex-row items-center gap-2 active:opacity-70"
+            >
+              <Text className="text-base font-semibold text-primary">
+                {showFilters ? "▼" : "▶"} Filters
+              </Text>
+              {activeFilterCount > 0 && (
+                <View className="bg-primary px-2 py-1 rounded-full">
+                  <Text className="text-xs font-bold text-white">{activeFilterCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+            {activeFilterCount > 0 && (
+              <TouchableOpacity onPress={clearFilters} className="active:opacity-70">
+                <Text className="text-sm text-error font-semibold">Clear All</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Filters */}
+          {showFilters && (
+            <View className="bg-surface border border-border rounded-xl p-4 gap-4">
+              {/* Specialties Filter */}
+              <View className="gap-2">
+                <Text className="text-base font-semibold text-foreground">Specialties</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {SPECIALTIES.map((specialty) => (
+                    <TouchableOpacity
+                      key={specialty}
+                      onPress={() => toggleSpecialty(specialty)}
+                      className={`px-3 py-2 rounded-full border ${
+                        selectedSpecialties.includes(specialty)
+                          ? "bg-primary border-primary"
+                          : "bg-background border-border"
+                      } active:opacity-70`}
+                    >
+                      <Text
+                        className={`text-sm font-semibold ${
+                          selectedSpecialties.includes(specialty) ? "text-white" : "text-foreground"
+                        }`}
+                      >
+                        {specialty}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* Experience Filter */}
+              <View className="gap-2">
+                <Text className="text-base font-semibold text-foreground">Minimum Experience</Text>
+                <TextInput
+                  value={minExperience}
+                  onChangeText={setMinExperience}
+                  placeholder="e.g., 5 years"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="numeric"
+                  className="bg-background border border-border rounded-xl px-4 py-3 text-foreground"
+                />
+              </View>
+            </View>
+          )}
+
+          {/* Results Count */}
+          <Text className="text-sm text-muted">
+            {filteredActors.length} actor{filteredActors.length !== 1 ? "s" : ""} found
+          </Text>
+
+          {filteredActors && filteredActors.length > 0 ? (
             <View className="gap-4">
-              {actors.map((actor) => (
+              {filteredActors.map((actor) => (
                 <TouchableOpacity
                   key={actor.actorId}
                   onPress={() => router.push(`/actor/${actor.actorId}`)}
@@ -62,16 +213,27 @@ export default function ActorsDirectoryScreen() {
                   activeOpacity={0.7}
                 >
                   <View className="flex-row items-center gap-3">
-                    <View className="w-16 h-16 rounded-full bg-success items-center justify-center">
-                      <Text className="text-2xl font-bold text-background">
-                        {actor.actorName.charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
+                    {actor.profilePhotoUrl ? (
+                      <Image
+                        source={{ uri: actor.profilePhotoUrl }}
+                        className="w-16 h-16 rounded-full"
+                        style={{ backgroundColor: "#E5E7EB" }}
+                      />
+                    ) : (
+                      <View className="w-16 h-16 rounded-full bg-success items-center justify-center">
+                        <Text className="text-2xl font-bold text-background">
+                          {actor.actorName.charAt(0).toUpperCase()}
+                        </Text>
+                      </View>
+                    )}
 
                     <View className="flex-1 gap-1">
                       <Text className="text-lg font-semibold text-foreground">
                         {actor.actorName}
                       </Text>
+                      {actor.location && (
+                        <Text className="text-sm text-muted">📍 {actor.location}</Text>
+                      )}
                       <View className="flex-row items-center gap-2">
                         <Text className="text-warning">
                           {renderStars(actor.averageRating)}
@@ -85,6 +247,24 @@ export default function ActorsDirectoryScreen() {
                       </View>
                     </View>
                   </View>
+
+                  {/* Specialties */}
+                  {actor.specialties && actor.specialties.length > 0 && (
+                    <View className="flex-row flex-wrap gap-2">
+                      {actor.specialties.slice(0, 3).map((specialty, idx) => (
+                        <View key={idx} className="bg-primary/10 px-2 py-1 rounded-full">
+                          <Text className="text-xs font-semibold text-primary">{specialty}</Text>
+                        </View>
+                      ))}
+                      {actor.specialties.length > 3 && (
+                        <View className="bg-border px-2 py-1 rounded-full">
+                          <Text className="text-xs font-semibold text-muted">
+                            +{actor.specialties.length - 3} more
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
 
                   <View className="flex-row gap-4">
                     <View className="flex-1">

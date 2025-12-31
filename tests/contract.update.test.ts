@@ -16,6 +16,7 @@ function createAuthContext(userId: number, userRole: "producer" | "actor"): { ct
     createdAt: new Date(),
     updatedAt: new Date(),
     lastSignedIn: new Date(),
+      pushToken: null,
   };
 
   const ctx: TrpcContext = {

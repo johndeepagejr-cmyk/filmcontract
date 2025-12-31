@@ -1,4 +1,4 @@
-import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
@@ -68,6 +68,15 @@ export default function ProfileScreen() {
               >
                 <Text className="text-white font-semibold text-sm">Edit Profile</Text>
               </TouchableOpacity>
+            )}
+            {user?.userRole === "actor" && actorProfile?.profilePhotoUrl && (
+              <View className="items-center mb-2">
+                <Image
+                  source={{ uri: actorProfile.profilePhotoUrl }}
+                  className="w-24 h-24 rounded-full"
+                  style={{ backgroundColor: "#E5E7EB" }}
+                />
+              </View>
             )}
             <View className="gap-1">
               <Text className="text-sm font-medium text-muted">Name</Text>

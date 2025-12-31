@@ -6,12 +6,14 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
+import * as ImagePicker from "expo-image-picker";
 
 const SPECIALTIES = [
   "Drama",
@@ -40,11 +42,15 @@ export default function EditProfileScreen() {
   const [hairColor, setHairColor] = useState("");
   const [website, setWebsite] = useState("");
   const [imdbUrl, setImdbUrl] = useState("");
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [loading, setLoading] = useState(true);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const { data: profile } = trpc.actorProfile.getMy.useQuery(undefined, {
     enabled: !!user,
   });
+
+  const uploadPhoto = trpc.actorProfile.uploadPhoto.useMutation();
 
   const upsertProfile = trpc.actorProfile.upsert.useMutation({
     onSuccess: () => {
@@ -68,11 +74,47 @@ export default function EditProfileScreen() {
       setHairColor(profile.hairColor || "");
       setWebsite(profile.website || "");
       setImdbUrl(profile.imdbUrl || "");
+      setProfilePhotoUrl(profile.profilePhotoUrl || "");
       setLoading(false);
     } else {
       setLoading(false);
     }
   }, [profile]);
+
+  const pickImage = async () => {
+    // Request permission
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission needed", "Please allow access to your photos to upload a profile picture");
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: "images" as any,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0].base64) {
+      setUploadingPhoto(true);
+      try {
+        const { photoUrl } = await uploadPhoto.mutateAsync({
+          base64Data: result.assets[0].base64,
+          fileName: `profile-${Date.now()}.jpg`,
+          mimeType: "image/jpeg",
+        });
+        setProfilePhotoUrl(photoUrl);
+        Alert.alert("Success", "Photo uploaded! Don't forget to save your profile.");
+      } catch (error: any) {
+        Alert.alert("Error", error.message || "Failed to upload photo");
+      } finally {
+        setUploadingPhoto(false);
+      }
+    }
+  };
 
   const toggleSpecialty = (specialty: string) => {
     if (selectedSpecialties.includes(specialty)) {
@@ -94,6 +136,7 @@ export default function EditProfileScreen() {
       hairColor,
       website,
       imdbUrl,
+      profilePhotoUrl: profilePhotoUrl || undefined,
     });
   };
 
@@ -126,6 +169,36 @@ export default function EditProfileScreen() {
                 <Text className="text-white font-semibold">Save</Text>
               )}
             </TouchableOpacity>
+          </View>
+
+          {/* Profile Photo */}
+          <View className="gap-2 items-center">
+            <Text className="text-base font-semibold text-foreground self-start">Profile Photo</Text>
+            <TouchableOpacity
+              onPress={pickImage}
+              disabled={uploadingPhoto}
+              className="items-center gap-3 active:opacity-70"
+            >
+              {profilePhotoUrl ? (
+                <Image
+                  source={{ uri: profilePhotoUrl }}
+                  className="w-32 h-32 rounded-full"
+                  style={{ backgroundColor: "#E5E7EB" }}
+                />
+              ) : (
+                <View className="w-32 h-32 rounded-full bg-surface border-2 border-dashed border-border items-center justify-center">
+                  <Text className="text-4xl">📷</Text>
+                </View>
+              )}
+              {uploadingPhoto ? (
+                <ActivityIndicator size="small" color="#1E40AF" />
+              ) : (
+                <Text className="text-sm text-primary font-semibold">
+                  {profilePhotoUrl ? "Change Photo" : "Upload Photo"}
+                </Text>
+              )}
+            </TouchableOpacity>
+            <Text className="text-xs text-muted text-center">Square photo recommended (1:1 ratio)</Text>
           </View>
 
           {/* Bio */}
