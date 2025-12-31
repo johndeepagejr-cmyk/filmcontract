@@ -1,6 +1,5 @@
 import {
   boolean,
-  date,
   decimal,
   int,
   mysqlEnum,
@@ -326,68 +325,3 @@ export const actorFilms = mysqlTable("actorFilms", {
 
 export type ActorFilm = typeof actorFilms.$inferSelect;
 export type InsertActorFilm = typeof actorFilms.$inferInsert;
-
-/**
- * Actor videos table - demo reels and video clips
- */
-export const actorVideos = mysqlTable("actorVideos", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  videoUrl: text("videoUrl").notNull(),
-  thumbnailUrl: text("thumbnailUrl"),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description"),
-  duration: int("duration"), // Duration in seconds
-  displayOrder: int("displayOrder").default(0).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type ActorVideo = typeof actorVideos.$inferSelect;
-export type InsertActorVideo = typeof actorVideos.$inferInsert;
-
-/**
- * Conversations table - message threads between users
- */
-export const conversations = mysqlTable("conversations", {
-  id: int("id").autoincrement().primaryKey(),
-  user1Id: int("user1Id").notNull(),
-  user2Id: int("user2Id").notNull(),
-  lastMessageAt: timestamp("lastMessageAt").defaultNow().notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Conversation = typeof conversations.$inferSelect;
-export type InsertConversation = typeof conversations.$inferInsert;
-
-/**
- * Messages table - individual messages in conversations
- */
-export const messages = mysqlTable("messages", {
-  id: int("id").autoincrement().primaryKey(),
-  conversationId: int("conversationId").notNull(),
-  senderId: int("senderId").notNull(),
-  content: text("content").notNull(),
-  isRead: boolean("isRead").default(false).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-});
-
-export type Message = typeof messages.$inferSelect;
-export type InsertMessage = typeof messages.$inferInsert;
-
-/**
- * Actor availability table - available dates for scheduling
- */
-export const actorAvailability = mysqlTable("actorAvailability", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  startDate: date("startDate").notNull(),
-  endDate: date("endDate").notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
-export type ActorAvailability = typeof actorAvailability.$inferSelect;
-export type InsertActorAvailability = typeof actorAvailability.$inferInsert;

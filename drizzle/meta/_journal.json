@@ -120,27 +120,6 @@
       "when": 1767145188224,
       "tag": "0016_parched_network",
       "breakpoints": true
-    },
-    {
-      "idx": 17,
-      "version": "5",
-      "when": 1767145403955,
-      "tag": "0017_solid_korath",
-      "breakpoints": true
-    },
-    {
-      "idx": 18,
-      "version": "5",
-      "when": 1767145584535,
-      "tag": "0018_vengeful_mariko_yashida",
-      "breakpoints": true
-    },
-    {
-      "idx": 19,
-      "version": "5",
-      "when": 1767145683483,
-      "tag": "0019_modern_sunspot",
-      "breakpoints": true
     }
   ]
 }
