@@ -589,3 +589,6 @@
 - [x] Save user's theme preference to database
 - [x] Apply selected theme to public portfolio view
 - [x] Test all three themes with different photo counts
+
+## Current Bug Fixes
+- [x] Fix uncaught error when navigating to profile screen (missing Image import)
