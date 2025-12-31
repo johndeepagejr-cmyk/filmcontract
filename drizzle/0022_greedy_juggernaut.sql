@@ -1,0 +1,1 @@
+ALTER TABLE `actorProfiles` ADD `portfolioTheme` enum('grid','masonry','carousel') DEFAULT 'grid' NOT NULL;

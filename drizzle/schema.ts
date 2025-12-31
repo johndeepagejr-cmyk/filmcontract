@@ -241,6 +241,7 @@ export const actorProfiles = mysqlTable("actorProfiles", {
   hairColor: varchar("hairColor", { length: 50 }),
   website: varchar("website", { length: 500 }),
   imdbUrl: varchar("imdbUrl", { length: 500 }),
+  portfolioTheme: mysqlEnum("portfolioTheme", ["grid", "masonry", "carousel"]).default("grid").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -269,17 +270,18 @@ export type InsertPortfolioPhoto = typeof portfolioPhotos.$inferInsert;
 
 export const producerProfiles = mysqlTable("producerProfiles", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
+  userId: int("userId").notNull().unique(), // References users.id
   companyName: varchar("companyName", { length: 255 }),
-  bio: text("bio"),
+  bio: text("bio"), // Producer/company biography
   location: varchar("location", { length: 255 }),
   yearsInBusiness: int("yearsInBusiness"),
-  website: varchar("website", { length: 500 }),
+  specialties: text("specialties"), // JSON array of specialties
   profilePhotoUrl: text("profilePhotoUrl"),
   companyLogoUrl: text("companyLogoUrl"),
-  specialties: text("specialties"), // JSON array: ["Feature Films", "Commercials", etc.]
-  notableProjects: text("notableProjects"), // JSON array of project titles
-  awards: text("awards"),
+  website: varchar("website", { length: 500 }),
+  notableProjects: text("notableProjects"), // JSON array of notable projects
+  awards: text("awards"), // JSON array of awards
+  portfolioTheme: mysqlEnum("portfolioTheme", ["grid", "masonry", "carousel"]).default("grid").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

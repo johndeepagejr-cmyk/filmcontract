@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { ScreenContainer } from "@/components/screen-container";
 import { useLocalSearchParams } from "expo-router";
 import { trpc } from "@/lib/trpc";
+import { GridLayout, MasonryLayout, CarouselLayout } from "@/components/portfolio-layouts";
 
 export default function PublicPortfolioScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
@@ -176,24 +177,19 @@ export default function PublicPortfolioScreen() {
             </View>
           )}
 
-          {/* Portfolio Photos */}
+          {/* Portfolio Photos with Theme */}
           {portfolioPhotos && portfolioPhotos.length > 0 && (
             <View className="gap-4">
               <Text className="text-lg font-semibold text-foreground">Portfolio</Text>
-              <View className="gap-4">
-                {portfolioPhotos.map((photo) => (
-                  <View key={photo.id} className="bg-surface rounded-2xl p-4 gap-3">
-                    <Image
-                      source={{ uri: photo.photoUrl }}
-                      className="w-full h-64 rounded-xl"
-                      contentFit="cover"
-                    />
-                    {photo.caption && (
-                      <Text className="text-sm text-muted">{photo.caption}</Text>
-                    )}
-                  </View>
-                ))}
-              </View>
+              {profile.portfolioTheme === "masonry" && (
+                <MasonryLayout photos={portfolioPhotos} />
+              )}
+              {profile.portfolioTheme === "carousel" && (
+                <CarouselLayout photos={portfolioPhotos} />
+              )}
+              {(profile.portfolioTheme === "grid" || !profile.portfolioTheme) && (
+                <GridLayout photos={portfolioPhotos} />
+              )}
             </View>
           )}
 

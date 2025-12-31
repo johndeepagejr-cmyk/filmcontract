@@ -1,0 +1,2 @@
+ALTER TABLE `producerProfiles` ADD `portfolioTheme` enum('grid','masonry','carousel') DEFAULT 'grid' NOT NULL;--> statement-breakpoint
+ALTER TABLE `producerProfiles` ADD CONSTRAINT `producerProfiles_userId_unique` UNIQUE(`userId`);

@@ -578,3 +578,14 @@
 - [x] Track portfolio view counts
 - [x] Track photo engagement metrics
 - [ ] Add analytics dashboard to profile
+
+## Portfolio Themes Feature
+- [x] Add portfolioTheme field to actor_profiles and producer_profiles tables
+- [x] Create theme selection screen
+- [x] Design grid layout component
+- [x] Design masonry layout component
+- [x] Design carousel layout component
+- [x] Add theme preview in selection screen
+- [x] Save user's theme preference to database
+- [x] Apply selected theme to public portfolio view
+- [x] Test all three themes with different photo counts
