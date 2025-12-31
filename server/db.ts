@@ -624,11 +624,11 @@ export async function deletePortfolioPhoto(photoId: number, userId: number) {
 
   const { portfolioPhotos } = await import("../drizzle/schema.js");
 
-  await db
+  const result = await db
     .delete(portfolioPhotos)
     .where(and(eq(portfolioPhotos.id, photoId), eq(portfolioPhotos.userId, userId)));
 
-  return getPortfolioPhotos(userId);
+  return { success: true, deletedCount: result.rowsAffected || 0 };
 }
 
 /**
