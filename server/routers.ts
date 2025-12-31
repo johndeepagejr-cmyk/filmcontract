@@ -603,6 +603,48 @@ export const appRouter = router({
       }),
   }),
 
+  // Producer Profile Management
+  producerProfile: router({
+    // Get current user's producer profile
+    get: protectedProcedure.query(async ({ ctx }) => {
+      return db.getProducerProfile(ctx.user.id);
+    }),
+
+    // Create or update producer profile
+    upsert: protectedProcedure
+      .input(
+        z.object({
+          companyName: z.string().optional(),
+          bio: z.string().optional(),
+          location: z.string().optional(),
+          yearsInBusiness: z.number().optional(),
+          website: z.string().optional(),
+          profilePhotoUrl: z.string().optional(),
+          companyLogoUrl: z.string().optional(),
+          specialties: z.array(z.string()).optional(),
+          notableProjects: z.array(z.string()).optional(),
+          awards: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.upsertProducerProfile(ctx.user.id, input);
+      }),
+
+    // Upload profile photo
+    uploadPhoto: protectedProcedure
+      .input(
+        z.object({
+          base64: z.string(),
+          filename: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const buffer = Buffer.from(input.base64, "base64");
+        const url = await storagePut(`producer-photos/${ctx.user.id}/${input.filename}`, buffer);
+        return { url };
+      }),
+  }),
+
   // Push notifications
   notifications: router({
     // Register push token

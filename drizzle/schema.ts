@@ -247,6 +247,29 @@ export type ActorProfile = typeof actorProfiles.$inferSelect;
 export type InsertActorProfile = typeof actorProfiles.$inferInsert;
 
 /**
+ * Producer profiles table - detailed information about producers
+ */
+export const producerProfiles = mysqlTable("producerProfiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  companyName: varchar("companyName", { length: 255 }),
+  bio: text("bio"),
+  location: varchar("location", { length: 255 }),
+  yearsInBusiness: int("yearsInBusiness"),
+  website: varchar("website", { length: 500 }),
+  profilePhotoUrl: text("profilePhotoUrl"),
+  companyLogoUrl: text("companyLogoUrl"),
+  specialties: text("specialties"), // JSON array: ["Feature Films", "Commercials", etc.]
+  notableProjects: text("notableProjects"), // JSON array of project titles
+  awards: text("awards"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ProducerProfile = typeof producerProfiles.$inferSelect;
+export type InsertProducerProfile = typeof producerProfiles.$inferInsert;
+
+/**
  * Actor portfolio photos table - gallery of headshots and portfolio images
  */
 export const actorPhotos = mysqlTable("actorPhotos", {

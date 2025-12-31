@@ -502,3 +502,13 @@
 - [x] Send notification when payment is released
 - [ ] Add notification settings toggle in profile
 - [ ] Test notifications on iOS and Android
+
+## Feature: Producer Profile System (Match Actor Profiles)
+- [x] Create producer_profiles table in database
+- [x] Add producer profile fields (company name, bio, location, years in business, profile photo, company logo)
+- [x] Create producer profile API endpoints (upsert, get, upload photo)
+- [x] Build Edit Producer Profile screen with photo upload
+- [x] Update producer profile display to show all info
+- [x] Add producer profile photos to producer directory
+- [x] Create producer portfolio/past projects section
+- [x] Test producer profile system end-to-end

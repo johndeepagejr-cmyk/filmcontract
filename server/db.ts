@@ -1,6 +1,6 @@
 import { eq, or, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, contracts, InsertContract, Contract, contractHistory, InsertContractHistory, contractVersions, InsertContractVersion, actorProfiles, actorPhotos, actorFilms, InsertActorProfile, InsertActorPhoto, InsertActorFilm } from "../drizzle/schema";
+import { InsertUser, users, contracts, InsertContract, Contract, contractHistory, InsertContractHistory, contractVersions, InsertContractVersion, actorProfiles, actorPhotos, actorFilms, producerProfiles, InsertActorProfile, InsertActorPhoto, InsertActorFilm } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -470,4 +470,73 @@ export async function deleteActorFilm(filmId: number, userId: number) {
   await db
     .delete(actorFilms)
     .where(and(eq(actorFilms.id, filmId), eq(actorFilms.userId, userId)));
+}
+
+/**
+ * Producer Profile Functions
+ */
+
+/**
+ * Get producer profile by user ID
+ */
+export async function getProducerProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(producerProfiles)
+    .where(eq(producerProfiles.userId, userId))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Create or update producer profile
+ */
+export async function upsertProducerProfile(
+  userId: number,
+  data: {
+    companyName?: string;
+    bio?: string;
+    location?: string;
+    yearsInBusiness?: number;
+    website?: string;
+    profilePhotoUrl?: string;
+    companyLogoUrl?: string;
+    specialties?: string[];
+    notableProjects?: string[];
+    awards?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await getProducerProfile(userId);
+
+  const profileData = {
+    userId,
+    companyName: data.companyName,
+    bio: data.bio,
+    location: data.location,
+    yearsInBusiness: data.yearsInBusiness,
+    website: data.website,
+    profilePhotoUrl: data.profilePhotoUrl,
+    companyLogoUrl: data.companyLogoUrl,
+    specialties: data.specialties ? JSON.stringify(data.specialties) : null,
+    notableProjects: data.notableProjects ? JSON.stringify(data.notableProjects) : null,
+    awards: data.awards,
+  };
+
+  if (existing) {
+    await db
+      .update(producerProfiles)
+      .set(profileData)
+      .where(eq(producerProfiles.userId, userId));
+  } else {
+    await db.insert(producerProfiles).values(profileData);
+  }
+
+  return getProducerProfile(userId);
 }

@@ -20,6 +20,10 @@ export default function ProfileScreen() {
     enabled: isAuthenticated && user?.userRole === "actor",
   });
 
+  const { data: producerProfile } = trpc.producerProfile.get.useQuery(undefined, {
+    enabled: isAuthenticated && user?.userRole === "producer",
+  });
+
   const { data: films } = trpc.actorProfile.getFilms.useQuery(
     { userId: user?.id || 0 },
     { enabled: isAuthenticated && user?.userRole === "actor" && !!user?.id }
@@ -69,10 +73,27 @@ export default function ProfileScreen() {
                 <Text className="text-white font-semibold text-sm">Edit Profile</Text>
               </TouchableOpacity>
             )}
+            {user?.userRole === "producer" && (
+              <TouchableOpacity
+                onPress={() => router.push("/producer-profile/edit")}
+                className="absolute top-4 right-4 bg-primary px-4 py-2 rounded-full active:opacity-80"
+              >
+                <Text className="text-white font-semibold text-sm">Edit Profile</Text>
+              </TouchableOpacity>
+            )}
             {user?.userRole === "actor" && actorProfile?.profilePhotoUrl && (
               <View className="items-center mb-2">
                 <Image
                   source={{ uri: actorProfile.profilePhotoUrl }}
+                  className="w-24 h-24 rounded-full"
+                  style={{ backgroundColor: "#E5E7EB" }}
+                />
+              </View>
+            )}
+            {user?.userRole === "producer" && producerProfile?.profilePhotoUrl && (
+              <View className="items-center mb-2">
+                <Image
+                  source={{ uri: producerProfile.profilePhotoUrl }}
                   className="w-24 h-24 rounded-full"
                   style={{ backgroundColor: "#E5E7EB" }}
                 />
@@ -168,6 +189,87 @@ export default function ProfileScreen() {
                       <Text className="text-sm text-foreground">Hair: {actorProfile.hairColor}</Text>
                     )}
                   </View>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Producer Profile Info */}
+          {user?.userRole === "producer" && producerProfile && (
+            <View className="bg-surface rounded-2xl p-6 gap-4">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-lg font-bold text-foreground">Company Info</Text>
+                <TouchableOpacity
+                  onPress={() => router.push("/producer-profile/edit")}
+                  className="active:opacity-70"
+                >
+                  <Text className="text-sm text-primary font-semibold">Edit</Text>
+                </TouchableOpacity>
+              </View>
+
+              {producerProfile.companyName && (
+                <View className="gap-1">
+                  <Text className="text-sm font-semibold text-muted">Company Name</Text>
+                  <Text className="text-base text-foreground font-semibold">
+                    {producerProfile.companyName}
+                  </Text>
+                </View>
+              )}
+
+              {producerProfile.bio && (
+                <Text className="text-base text-foreground leading-6">{producerProfile.bio}</Text>
+              )}
+
+              {producerProfile.location && (
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-base text-muted">📍 {producerProfile.location}</Text>
+                </View>
+              )}
+
+              {producerProfile.yearsInBusiness && (
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-base text-muted">
+                    🎬 {producerProfile.yearsInBusiness} years in business
+                  </Text>
+                </View>
+              )}
+
+              {producerProfile.website && (
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-base text-primary">🌐 {producerProfile.website}</Text>
+                </View>
+              )}
+
+              {producerProfile.specialties && JSON.parse(producerProfile.specialties as string).length > 0 && (
+                <View className="gap-2">
+                  <Text className="text-sm font-semibold text-muted">Specialties</Text>
+                  <View className="flex-row flex-wrap gap-2">
+                    {JSON.parse(producerProfile.specialties as string).map((specialty: string) => (
+                      <View key={specialty} className="bg-primary/10 px-3 py-1 rounded-full">
+                        <Text className="text-sm font-semibold text-primary">{specialty}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {producerProfile.notableProjects && JSON.parse(producerProfile.notableProjects as string).length > 0 && (
+                <View className="gap-2">
+                  <Text className="text-sm font-semibold text-muted">Notable Projects</Text>
+                  <View className="gap-1">
+                    {JSON.parse(producerProfile.notableProjects as string).map((project: string, index: number) => (
+                      <Text key={index} className="text-sm text-foreground">
+                        • {project}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {producerProfile.awards && (
+                <View className="gap-2">
+                  <Text className="text-sm font-semibold text-muted">Awards & Recognition</Text>
+                  <Text className="text-sm text-foreground">{producerProfile.awards}</Text>
                 </View>
               )}
             </View>
