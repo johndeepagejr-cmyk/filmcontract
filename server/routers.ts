@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
-import { contractTemplates, contractNotes, contractAttachments } from "@/drizzle/schema";
+import { contractTemplates, contractNotes, contractAttachments, portfolioViews, contracts } from "@/drizzle/schema";
 import { getDb } from "./db";
 import { eq, or, sql } from "drizzle-orm";
 import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
@@ -819,6 +819,137 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const isSuccessful = await verifyPaymentIntent(input.paymentIntentId);
         return { success: isSuccessful };
+      }),
+  }),
+
+  // Analytics
+  analytics: router({
+    // Get portfolio view statistics
+    getPortfolioStats: protectedProcedure
+      .input(
+        z.object({
+          days: z.number().optional().default(30), // Last N days
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const database = getDb();
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - input.days);
+
+        // Get total views
+        const totalViewsResult = await database
+          .select({ count: sql<number>`count(*)` })
+          .from(portfolioViews)
+          .where(sql`${portfolioViews.portfolioUserId} = ${ctx.user.id}`);
+        
+        const totalViews = Number(totalViewsResult[0]?.count || 0);
+
+        // Get recent views (within date range)
+        const recentViewsResult = await database
+          .select({ count: sql<number>`count(*)` })
+          .from(portfolioViews)
+          .where(
+            sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`
+          );
+        
+        const recentViews = Number(recentViewsResult[0]?.count || 0);
+
+        // Get unique visitors (by IP)
+        const uniqueVisitorsResult = await database
+          .select({ count: sql<number>`count(DISTINCT ${portfolioViews.viewerIp})` })
+          .from(portfolioViews)
+          .where(
+            sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`
+          );
+        
+        const uniqueVisitors = Number(uniqueVisitorsResult[0]?.count || 0);
+
+        // Get views by day for chart
+        const viewsByDay = await database
+          .select({
+            date: sql<string>`DATE(${portfolioViews.createdAt})`,
+            count: sql<number>`count(*)`,
+          })
+          .from(portfolioViews)
+          .where(
+            sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`
+          )
+          .groupBy(sql`DATE(${portfolioViews.createdAt})`);
+
+        return {
+          totalViews,
+          recentViews,
+          uniqueVisitors,
+          viewsByDay: viewsByDay.map((row) => ({
+            date: row.date,
+            views: Number(row.count),
+          })),
+        };
+      }),
+
+    // Get contract trends over time
+    getContractTrends: protectedProcedure
+      .input(
+        z.object({
+          days: z.number().optional().default(30),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const database = getDb();
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - input.days);
+
+        // Get contracts created by day
+        const contractsByDay = await database
+          .select({
+            date: sql<string>`DATE(${contracts.createdAt})`,
+            count: sql<number>`count(*)`,
+          })
+          .from(contracts)
+          .where(
+            sql`(${contracts.producerId} = ${ctx.user.id} OR ${contracts.actorId} = ${ctx.user.id}) AND ${contracts.createdAt} >= ${cutoffDate}`
+          )
+          .groupBy(sql`DATE(${contracts.createdAt})`)
+
+        return {
+          contractsByDay: contractsByDay.map((row) => ({
+            date: row.date,
+            count: Number(row.count),
+          })),
+        };
+      }),
+
+    // Get payment trends over time
+    getPaymentTrends: protectedProcedure
+      .input(
+        z.object({
+          days: z.number().optional().default(30),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const contracts = await db.getUserContracts(ctx.user.id);
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - input.days);
+
+        // Group payments by month
+        const paymentsByMonth: Record<string, number> = {};
+        
+        contracts.forEach((contract) => {
+          if (contract.paymentStatus === "paid" && contract.updatedAt) {
+            const contractDate = new Date(contract.updatedAt);
+            if (contractDate >= cutoffDate) {
+              const monthKey = `${contractDate.getFullYear()}-${String(contractDate.getMonth() + 1).padStart(2, "0")}`;
+              const amount = parseFloat(contract.paidAmount?.toString() || "0") || 0;
+              paymentsByMonth[monthKey] = (paymentsByMonth[monthKey] || 0) + amount;
+            }
+          }
+        });
+
+        return {
+          paymentsByMonth: Object.entries(paymentsByMonth)
+            .map(([month, amount]) => ({ month, amount }))
+            .sort((a, b) => a.month.localeCompare(b.month)),
+        };
       }),
   }),
 });
