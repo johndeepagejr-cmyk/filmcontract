@@ -1,12 +1,84 @@
-import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity } from "react-native";
+import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, TextInput } from "react-native";
+import { Image } from "expo-image";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { Stack, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
+import { useState, useMemo } from "react";
 
 export default function ProducersDirectoryScreen() {
   const colors = useColors();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [locationFilter, setLocationFilter] = useState("");
+  
   const { data: producers, isLoading } = trpc.reputation.getAllProducers.useQuery();
+  const { data: producerProfiles } = trpc.producers.getAllProducers.useQuery();
+
+  const specialtyOptions = [
+    "Feature Films",
+    "Commercials",
+    "TV Series",
+    "Documentaries",
+    "Music Videos",
+    "Web Content",
+    "Indie Films",
+    "Corporate Videos",
+  ];
+
+  const toggleSpecialty = (specialty: string) => {
+    if (selectedSpecialties.includes(specialty)) {
+      setSelectedSpecialties(selectedSpecialties.filter((s) => s !== specialty));
+    } else {
+      setSelectedSpecialties([...selectedSpecialties, specialty]);
+    }
+  };
+
+  // Merge producer reputation with profile data
+  const enrichedProducers = useMemo(() => {
+    if (!producers || !producerProfiles) return producers || [];
+    
+    return producers.map((producer) => {
+      const profile = producerProfiles.find((p) => p.userId === producer.producerId);
+      return {
+        ...producer,
+        profile,
+      };
+    });
+  }, [producers, producerProfiles]);
+
+  // Filter producers
+  const filteredProducers = useMemo(() => {
+    if (!enrichedProducers) return [];
+
+    return enrichedProducers.filter((producer) => {
+      // Search query filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesName = producer.producerName.toLowerCase().includes(query);
+        const matchesCompany = producer.profile?.companyName?.toLowerCase().includes(query);
+        if (!matchesName && !matchesCompany) return false;
+      }
+
+      // Location filter
+      if (locationFilter && producer.profile?.location) {
+        if (!producer.profile.location.toLowerCase().includes(locationFilter.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // Specialty filter
+      if (selectedSpecialties.length > 0 && producer.profile?.specialties) {
+        const producerSpecialties = JSON.parse(producer.profile.specialties as string);
+        const hasMatchingSpecialty = selectedSpecialties.some((s) =>
+          producerSpecialties.includes(s)
+        );
+        if (!hasMatchingSpecialty) return false;
+      }
+
+      return true;
+    });
+  }, [enrichedProducers, searchQuery, locationFilter, selectedSpecialties]);
 
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
@@ -45,15 +117,66 @@ export default function ProducersDirectoryScreen() {
       <ScrollView className="flex-1">
         <View className="p-6 gap-4">
           <View className="gap-2">
-            <Text className="text-2xl font-bold text-foreground">Find Producers</Text>
+            <Text className="text-2xl font-bold text-foreground">Producer Directory</Text>
             <Text className="text-muted">
-              Browse producer profiles and reputation to find the right fit for your project
+              Browse production companies and find the right fit for your project
             </Text>
           </View>
 
-          {producers && producers.length > 0 ? (
+          {/* Search Bar */}
+          <TextInput
+            placeholder="Search by company name..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            className="bg-surface px-4 py-3 rounded-xl text-foreground"
+            placeholderTextColor="#9CA3AF"
+          />
+
+          {/* Location Filter */}
+          <TextInput
+            placeholder="Filter by location..."
+            value={locationFilter}
+            onChangeText={setLocationFilter}
+            className="bg-surface px-4 py-3 rounded-xl text-foreground"
+            placeholderTextColor="#9CA3AF"
+          />
+
+          {/* Specialty Filters */}
+          <View className="gap-3">
+            <Text className="text-sm font-semibold text-muted">Filter by Specialties</Text>
+            <View className="flex-row flex-wrap gap-2">
+              {specialtyOptions.map((specialty) => (
+                <TouchableOpacity
+                  key={specialty}
+                  onPress={() => toggleSpecialty(specialty)}
+                  className={`px-4 py-2 rounded-full ${
+                    selectedSpecialties.includes(specialty)
+                      ? "bg-primary"
+                      : "bg-surface"
+                  }`}
+                >
+                  <Text
+                    className={`text-sm font-semibold ${
+                      selectedSpecialties.includes(specialty)
+                        ? "text-white"
+                        : "text-foreground"
+                    }`}
+                  >
+                    {specialty}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Results Count */}
+          <Text className="text-sm text-muted">
+            {filteredProducers?.length || 0} {filteredProducers?.length === 1 ? "producer" : "producers"} found
+          </Text>
+
+          {filteredProducers && filteredProducers.length > 0 ? (
             <View className="gap-4">
-              {producers.map((producer) => (
+              {filteredProducers.map((producer) => (
                 <TouchableOpacity
                   key={producer.producerId}
                   onPress={() => router.push(`/producer/${producer.producerId}`)}
@@ -62,16 +185,27 @@ export default function ProducersDirectoryScreen() {
                   activeOpacity={0.7}
                 >
                   <View className="flex-row items-center gap-3">
-                    <View className="w-16 h-16 rounded-full bg-primary items-center justify-center">
-                      <Text className="text-2xl font-bold text-background">
-                        {producer.producerName.charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
+                    {producer.profile?.companyLogoUrl ? (
+                      <Image
+                        source={{ uri: producer.profile.companyLogoUrl }}
+                        className="w-16 h-16 rounded-xl"
+                        contentFit="cover"
+                      />
+                    ) : (
+                      <View className="w-16 h-16 rounded-full bg-primary items-center justify-center">
+                        <Text className="text-2xl font-bold text-background">
+                          {producer.producerName.charAt(0).toUpperCase()}
+                        </Text>
+                      </View>
+                    )}
 
                     <View className="flex-1 gap-1">
                       <Text className="text-lg font-semibold text-foreground">
-                        {producer.producerName}
+                        {producer.profile?.companyName || producer.producerName}
                       </Text>
+                      {producer.profile?.location && (
+                        <Text className="text-sm text-muted">📍 {producer.profile.location}</Text>
+                      )}
                       <View className="flex-row items-center gap-2">
                         <Text className="text-warning">
                           {renderStars(producer.averageRating)}

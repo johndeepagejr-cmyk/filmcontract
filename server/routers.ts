@@ -603,6 +603,34 @@ export const appRouter = router({
       }),
   }),
 
+  // Producers Directory
+  producers: router({    // Get all producers with profiles
+    getAllProducers: publicProcedure.query(async () => {
+      const database = await getDb();
+      if (!database) return [];
+
+      const { producerProfiles, users } = await import("../drizzle/schema.js");
+      
+      return database
+        .select({
+          userId: producerProfiles.userId,
+          companyName: producerProfiles.companyName,
+          bio: producerProfiles.bio,
+          location: producerProfiles.location,
+          yearsInBusiness: producerProfiles.yearsInBusiness,
+          website: producerProfiles.website,
+          profilePhotoUrl: producerProfiles.profilePhotoUrl,
+          companyLogoUrl: producerProfiles.companyLogoUrl,
+          specialties: producerProfiles.specialties,
+          notableProjects: producerProfiles.notableProjects,
+          awards: producerProfiles.awards,
+          userName: users.name,
+        })
+        .from(producerProfiles)
+        .leftJoin(users, eq(producerProfiles.userId, users.id));
+    }),
+  }),
+
   // Producer Profile Management
   producerProfile: router({
     // Get current user's producer profile
@@ -642,6 +670,95 @@ export const appRouter = router({
         const buffer = Buffer.from(input.base64, "base64");
         const url = await storagePut(`producer-photos/${ctx.user.id}/${input.filename}`, buffer);
         return { url };
+      }),
+  }),
+
+  // Portfolio Photos Management
+  portfolioPhotos: router({
+    // Get user's portfolio photos
+    getPhotos: publicProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getPortfolioPhotos(input.userId);
+      }),
+
+    // Get current user's portfolio photos
+    getMy: protectedProcedure.query(async ({ ctx }) => {
+      return db.getPortfolioPhotos(ctx.user.id);
+    }),
+
+    // Add portfolio photo
+    addPhoto: protectedProcedure
+      .input(
+        z.object({
+          photoUrl: z.string(),
+          caption: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.addPortfolioPhoto(ctx.user.id, input);
+      }),
+
+    // Upload photo to S3 and return URL
+    uploadPhoto: protectedProcedure
+      .input(
+        z.object({
+          base64Data: z.string(),
+          fileName: z.string(),
+          mimeType: z.string(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        // Convert base64 to buffer
+        const base64WithoutPrefix = input.base64Data.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64WithoutPrefix, "base64");
+        
+        // Generate unique filename
+        const timestamp = Date.now();
+        const extension = input.fileName.split(".").pop() || "jpg";
+        const uniqueFileName = `portfolio-photos/${ctx.user.id}/${timestamp}-${input.fileName}`;
+        
+        // Upload to S3
+        const { url } = await storagePut(uniqueFileName, buffer, input.mimeType);
+        
+        return { photoUrl: url };
+      }),
+
+    // Update photo caption or order
+    updatePhoto: protectedProcedure
+      .input(
+        z.object({
+          photoId: z.number(),
+          caption: z.string().optional(),
+          displayOrder: z.number().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { photoId, ...data } = input;
+        return db.updatePortfolioPhoto(photoId, ctx.user.id, data);
+      }),
+
+    // Delete photo
+    deletePhoto: protectedProcedure
+      .input(z.object({ photoId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deletePortfolioPhoto(input.photoId, ctx.user.id);
+      }),
+
+    // Reorder photos
+    reorderPhotos: protectedProcedure
+      .input(
+        z.object({
+          photoOrders: z.array(
+            z.object({
+              id: z.number(),
+              displayOrder: z.number(),
+            })
+          ),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.reorderPortfolioPhotos(ctx.user.id, input.photoOrders);
       }),
   }),
 

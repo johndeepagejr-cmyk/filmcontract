@@ -540,3 +540,116 @@ export async function upsertProducerProfile(
 
   return getProducerProfile(userId);
 }
+
+/**
+ * Portfolio Photo Functions
+ */
+
+/**
+ * Get all portfolio photos for a user
+ */
+export async function getPortfolioPhotos(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { portfolioPhotos } = await import("../drizzle/schema.js");
+  
+  return db
+    .select()
+    .from(portfolioPhotos)
+    .where(eq(portfolioPhotos.userId, userId))
+    .orderBy(portfolioPhotos.displayOrder);
+}
+
+/**
+ * Add a portfolio photo
+ */
+export async function addPortfolioPhoto(
+  userId: number,
+  data: {
+    photoUrl: string;
+    caption?: string;
+    displayOrder?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { portfolioPhotos } = await import("../drizzle/schema.js");
+
+  // Get the current max display order
+  const existing = await getPortfolioPhotos(userId);
+  const maxOrder = existing.length > 0 ? Math.max(...existing.map(p => p.displayOrder)) : 0;
+
+  await db.insert(portfolioPhotos).values({
+    userId,
+    photoUrl: data.photoUrl,
+    caption: data.caption || null,
+    displayOrder: data.displayOrder !== undefined ? data.displayOrder : maxOrder + 1,
+  });
+
+  return getPortfolioPhotos(userId);
+}
+
+/**
+ * Update a portfolio photo
+ */
+export async function updatePortfolioPhoto(
+  photoId: number,
+  userId: number,
+  data: {
+    caption?: string;
+    displayOrder?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { portfolioPhotos } = await import("../drizzle/schema.js");
+
+  await db
+    .update(portfolioPhotos)
+    .set(data)
+    .where(and(eq(portfolioPhotos.id, photoId), eq(portfolioPhotos.userId, userId)));
+
+  return getPortfolioPhotos(userId);
+}
+
+/**
+ * Delete a portfolio photo
+ */
+export async function deletePortfolioPhoto(photoId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { portfolioPhotos } = await import("../drizzle/schema.js");
+
+  await db
+    .delete(portfolioPhotos)
+    .where(and(eq(portfolioPhotos.id, photoId), eq(portfolioPhotos.userId, userId)));
+
+  return getPortfolioPhotos(userId);
+}
+
+/**
+ * Reorder portfolio photos
+ */
+export async function reorderPortfolioPhotos(
+  userId: number,
+  photoOrders: { id: number; displayOrder: number }[]
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { portfolioPhotos } = await import("../drizzle/schema.js");
+
+  // Update each photo's display order
+  for (const { id, displayOrder } of photoOrders) {
+    await db
+      .update(portfolioPhotos)
+      .set({ displayOrder })
+      .where(and(eq(portfolioPhotos.id, id), eq(portfolioPhotos.userId, userId)));
+  }
+
+  return getPortfolioPhotos(userId);
+}

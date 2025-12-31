@@ -512,3 +512,29 @@
 - [x] Add producer profile photos to producer directory
 - [x] Create producer portfolio/past projects section
 - [x] Test producer profile system end-to-end
+
+## Feature: Portfolio Galleries (Multiple Photos)
+- [ ] Create portfolio_photos table in database
+- [ ] Add portfolio photo upload API endpoints
+- [ ] Build portfolio photo management screen
+- [ ] Add photo gallery display to actor profiles
+- [ ] Add photo gallery display to producer profiles
+- [ ] Support photo reordering and deletion
+- [ ] Add photo captions/descriptions
+
+## Feature: Producer Search Directory
+- [ ] Create producer directory screen for actors
+- [ ] Add search and filter UI for producers
+- [ ] Implement backend search with filters
+- [ ] Display producer cards with company info
+- [ ] Add producer profile detail view
+- [ ] Add "View Contracts" or "Contact" button
+
+## Feature: Verification Badges
+- [ ] Add verified field to users table
+- [ ] Create verification badge component
+- [ ] Display badges on actor profiles
+- [ ] Display badges on producer profiles
+- [ ] Display badges in search results
+- [ ] Add admin interface for verification (future)
+- [ ] Define verification criteria

@@ -30,6 +30,8 @@ export const users = mysqlTable("users", {
   userRole: mysqlEnum("userRole", ["producer", "actor"]),
   /** Push notification token for mobile notifications */
   pushToken: text("pushToken"),
+  /** Verification status for established professionals */
+  isVerified: boolean("isVerified").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -249,6 +251,22 @@ export type InsertActorProfile = typeof actorProfiles.$inferInsert;
 /**
  * Producer profiles table - detailed information about producers
  */
+/**
+ * Portfolio photos table - gallery of photos for both actors and producers
+ */
+export const portfolioPhotos = mysqlTable("portfolioPhotos", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  photoUrl: text("photoUrl").notNull(),
+  caption: text("caption"),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PortfolioPhoto = typeof portfolioPhotos.$inferSelect;
+export type InsertPortfolioPhoto = typeof portfolioPhotos.$inferInsert;
+
 export const producerProfiles = mysqlTable("producerProfiles", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),

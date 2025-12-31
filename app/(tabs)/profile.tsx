@@ -29,6 +29,10 @@ export default function ProfileScreen() {
     { enabled: isAuthenticated && user?.userRole === "actor" && !!user?.id }
   );
 
+  const { data: portfolioPhotos } = trpc.portfolioPhotos.getMy.useQuery(undefined, {
+    enabled: isAuthenticated && !!user?.id,
+  });
+
   const handleLogout = async () => {
     await logout();
     router.replace("/");
@@ -58,9 +62,16 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 gap-6">
           {/* Header */}
-          <View className="gap-2">
-            <Text className="text-3xl font-bold text-foreground">Profile</Text>
-            <Text className="text-base text-muted">Your account information</Text>
+            <View className="gap-2">
+              <View className="flex-row items-center gap-2">
+                <Text className="text-2xl font-bold text-foreground">{user?.name}</Text>
+                {user?.isVerified && (
+                  <View className="bg-primary rounded-full px-2 py-1">
+                    <Text className="text-white text-xs font-bold">✓ VERIFIED</Text>
+                  </View>
+                )}
+              </View>
+              <Text className="text-base text-muted">{user?.email}</Text>
           </View>
 
           {/* User Info Card */}
@@ -274,6 +285,38 @@ export default function ProfileScreen() {
               )}
             </View>
           )}
+
+          {/* Portfolio Photos */}
+          <View className="bg-surface rounded-2xl p-6 gap-4">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-lg font-bold text-foreground">
+                Portfolio Photos ({portfolioPhotos?.length || 0})
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push("/portfolio/photos")}
+                className="bg-primary px-4 py-2 rounded-full active:opacity-80"
+              >
+                <Text className="text-white font-semibold text-sm">Manage</Text>
+              </TouchableOpacity>
+            </View>
+
+            {portfolioPhotos && portfolioPhotos.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-2">
+                <View className="flex-row gap-3 px-2">
+                  {portfolioPhotos.slice(0, 5).map((photo) => (
+                    <Image
+                      key={photo.id}
+                      source={{ uri: photo.photoUrl }}
+                      className="w-32 h-32 rounded-xl"
+                      contentFit="cover"
+                    />
+                  ))}
+                </View>
+              </ScrollView>
+            ) : (
+              <Text className="text-sm text-muted">No photos added yet</Text>
+            )}
+          </View>
 
           {/* Filmography */}
           {user?.userRole === "actor" && (
