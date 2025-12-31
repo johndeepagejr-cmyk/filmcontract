@@ -544,3 +544,14 @@
 - [x] Check delete API endpoint
 - [x] Verify frontend delete handler
 - [x] Test photo deletion end-to-end
+
+## Photo Management Improvements
+- [x] Test photo deletion end-to-end
+- [x] Add bulk selection mode for photos
+- [x] Add "Select All" / "Deselect All" buttons
+- [x] Implement bulk delete for selected photos
+- [ ] Add bulk reorder functionality
+- [x] Create full-screen photo gallery viewer
+- [x] Add swipe navigation between photos
+- [ ] Add zoom capability in gallery viewer
+- [x] Add close button to exit gallery
