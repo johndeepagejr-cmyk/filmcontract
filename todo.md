@@ -566,3 +566,15 @@
 - [x] Generate unique shareable URLs for portfolios
 - [x] Create public portfolio view page (no login required)
 - [x] Test shareable links on social media
+
+## QR Code & Analytics Features
+- [x] Install QR code generation library
+- [x] Add QR code generation API endpoint
+- [x] Create QR code display/download screen
+- [x] Add "Generate QR Code" button to profile
+- [ ] Implement drag-and-drop reordering for photos
+- [ ] Update photo order in database
+- [x] Create portfolio_views analytics table
+- [x] Track portfolio view counts
+- [x] Track photo engagement metrics
+- [ ] Add analytics dashboard to profile

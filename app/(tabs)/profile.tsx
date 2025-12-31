@@ -86,12 +86,20 @@ export default function ProfileScreen() {
               </View>
               <Text className="text-base text-muted">{user?.email}</Text>
             </View>
-            <TouchableOpacity
-              onPress={handleSharePortfolio}
-              className="bg-primary px-4 py-2 rounded-full active:opacity-80"
-            >
-              <Text className="text-white font-semibold">Share</Text>
-            </TouchableOpacity>
+            <View className="flex-row gap-2">
+              <TouchableOpacity
+                onPress={() => router.push("/profile/qr-code")}
+                className="bg-surface px-4 py-2 rounded-full active:opacity-80 border border-border"
+              >
+                <Text className="text-foreground font-semibold">QR Code</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSharePortfolio}
+                className="bg-primary px-4 py-2 rounded-full active:opacity-80"
+              >
+                <Text className="text-white font-semibold">Share</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* User Info Card */}

@@ -325,3 +325,33 @@ export const actorFilms = mysqlTable("actorFilms", {
 
 export type ActorFilm = typeof actorFilms.$inferSelect;
 export type InsertActorFilm = typeof actorFilms.$inferInsert;
+
+/**
+ * Portfolio views analytics table - tracks portfolio page views
+ */
+export const portfolioViews = mysqlTable("portfolioViews", {
+  id: int("id").autoincrement().primaryKey(),
+  portfolioUserId: int("portfolioUserId").notNull(), // User whose portfolio was viewed
+  viewerIp: varchar("viewerIp", { length: 45 }),
+  viewerUserAgent: text("viewerUserAgent"),
+  referrer: text("referrer"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PortfolioView = typeof portfolioViews.$inferSelect;
+export type InsertPortfolioView = typeof portfolioViews.$inferInsert;
+
+/**
+ * Photo engagement analytics table - tracks photo interactions
+ */
+export const photoEngagement = mysqlTable("photoEngagement", {
+  id: int("id").autoincrement().primaryKey(),
+  photoId: int("photoId").notNull(),
+  portfolioUserId: int("portfolioUserId").notNull(),
+  viewerIp: varchar("viewerIp", { length: 45 }),
+  engagementType: varchar("engagementType", { length: 50 }).notNull(), // 'view', 'click', 'zoom'
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PhotoEngagement = typeof photoEngagement.$inferSelect;
+export type InsertPhotoEngagement = typeof photoEngagement.$inferInsert;
