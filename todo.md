@@ -609,3 +609,8 @@
 ## Navigation Bug Fixes
 - [x] Add back button to profile screen to return to previous screen (changed icon to person.fill)
 - [x] Ensure profile navigation doesn't redirect to external webpage
+
+## Back Button Navigation Issues
+- [x] Add back button to producers screen
+- [x] Add back button to actors screen
+- [x] Ensure all non-tab screens have proper back navigation (Stack.Screen headerShown: true)

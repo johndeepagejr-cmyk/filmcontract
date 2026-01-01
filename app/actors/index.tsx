@@ -109,6 +109,10 @@ export default function ActorsDirectoryScreen() {
       <Stack.Screen
         options={{
           title: "Actor Directory",
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.foreground,
+          headerShadowVisible: false,
         }}
       />
       <ScrollView className="flex-1">

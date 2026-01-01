@@ -112,6 +112,10 @@ export default function ProducersDirectoryScreen() {
       <Stack.Screen
         options={{
           title: "Producer Directory",
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.foreground,
+          headerShadowVisible: false,
         }}
       />
       <ScrollView className="flex-1">
