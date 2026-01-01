@@ -671,3 +671,34 @@
 - [x] Create seed script with sample contracts (various statuses, dates, amounts)
 - [x] Run seed script to populate database (8 producers, 10 actors, 8 contracts)
 - [x] Verify data displays correctly in all screens
+
+## Contract Payment Tracking Feature
+- [x] Create paymentHistory table schema (contractId, amount, date, receipt, notes)
+- [x] Add API endpoint to record payment
+- [x] Add API endpoint to get payment history for contract
+- [x] Build payment timeline UI component showing all payments
+- [x] Display payment progress bar (paid vs total amount)
+- [x] Show receipt thumbnails with tap to view full size
+- [ ] Add "Record Payment" button to contract detail screen
+- [ ] Create payment recording modal with amount, date, receipt upload
+
+## Advanced Multi-Select Filtering Feature
+- [x] Create saved filter presets table schema (userId, name, filters JSON)
+- [x] Add API to save filter preset
+- [x] Add API to load saved filter presets
+- [x] Add multi-select specialty filter (checkboxes for multiple specialties)
+- [x] Add location multi-select filter
+- [x] Add experience range filter (0-20+ years)
+- [x] Build "Save Current Filters" button
+- [x] Build "Load Preset" dropdown menu
+- [x] Add "Clear All Filters" button
+- [ ] Integrate AdvancedFilters component into actors/producers screens
+- [ ] Update actors/producers API to support array filters
+
+## Profile Verification Badge System
+- [x] Add verification fields to user schema (isVerified, verifiedAt, trustScore)
+- [x] Add API endpoint to calculate trust score (contracts completed, ratings, on-time rate)
+- [x] Build verification badge UI component (checkmark icon)
+- [x] Display trust score on profile (0-100 scale with color coding)
+- [ ] Show verification badge on directory cards
+- [ ] Add "Get Verified" button to profile screen

@@ -32,6 +32,10 @@ export const users = mysqlTable("users", {
   pushToken: text("pushToken"),
   /** Verification status for established professionals */
   isVerified: boolean("isVerified").default(false).notNull(),
+  /** Timestamp when user was verified */
+  verifiedAt: timestamp("verifiedAt"),
+  /** Trust score (0-100) based on contracts, ratings, and on-time performance */
+  trustScore: int("trustScore").default(0),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -372,3 +376,36 @@ export const favorites = mysqlTable("favorites", {
 
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = typeof favorites.$inferInsert;
+
+/**
+ * Payment History table - tracks all payments made for contracts
+ */
+export const paymentHistory = mysqlTable("paymentHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  paymentDate: timestamp("paymentDate").notNull(),
+  receiptUrl: text("receiptUrl"), // S3 URL of payment receipt/proof
+  notes: text("notes"),
+  recordedBy: int("recordedBy").notNull(), // User ID who recorded the payment
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PaymentHistory = typeof paymentHistory.$inferSelect;
+export type InsertPaymentHistory = typeof paymentHistory.$inferInsert;
+
+/**
+ * Saved Filter Presets table - stores user's saved search filter combinations
+ */
+export const savedFilterPresets = mysqlTable("savedFilterPresets", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 100 }).notNull(), // User-defined preset name
+  filterType: mysqlEnum("filterType", ["actor", "producer"]).notNull(),
+  filters: text("filters").notNull(), // JSON string of filter values
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SavedFilterPreset = typeof savedFilterPresets.$inferSelect;
+export type InsertSavedFilterPreset = typeof savedFilterPresets.$inferInsert;

@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
-import { contractTemplates, contractNotes, contractAttachments, portfolioViews, contracts, favorites } from "@/drizzle/schema";
+import { contractTemplates, contractNotes, contractAttachments, portfolioViews, contracts, favorites, paymentHistory, savedFilterPresets, users } from "@/drizzle/schema";
 import { getDb } from "./db";
 import { eq, or, sql } from "drizzle-orm";
 import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
@@ -1036,6 +1036,180 @@ export const appRouter = router({
           );
         
         return existing.length > 0;
+      }),
+  }),
+
+  // Payment tracking endpoints
+  payments: router({
+    // Record a payment for a contract
+    recordPayment: protectedProcedure
+      .input(
+        z.object({
+          contractId: z.number(),
+          amount: z.number(),
+          paymentDate: z.string(),
+          receiptUrl: z.string().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const database = getDb();
+        
+        await database.insert(paymentHistory).values({
+          contractId: input.contractId,
+          amount: input.amount.toString(),
+          paymentDate: new Date(input.paymentDate),
+          receiptUrl: input.receiptUrl,
+          notes: input.notes,
+          recordedBy: ctx.user.id,
+        });
+
+        // Update contract paid amount
+        const payments = await database
+          .select()
+          .from(paymentHistory)
+          .where(eq(paymentHistory.contractId, input.contractId));
+        
+        const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
+        
+        await database
+          .update(contracts)
+          .set({ paidAmount: totalPaid.toString() })
+          .where(eq(contracts.id, input.contractId));
+
+        return { success: true };
+      }),
+
+    // Get payment history for a contract
+    getHistory: protectedProcedure
+      .input(z.object({ contractId: z.number() }))
+      .query(async ({ input }) => {
+        const database = getDb();
+        
+        return database
+          .select()
+          .from(paymentHistory)
+          .where(eq(paymentHistory.contractId, input.contractId));
+      }),
+  }),
+
+  // Saved filter presets endpoints
+  filterPresets: router({
+    // Save a filter preset
+    save: protectedProcedure
+      .input(
+        z.object({
+          name: z.string(),
+          filterType: z.enum(["actor", "producer"]),
+          filters: z.string(), // JSON string
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const database = getDb();
+        
+        await database.insert(savedFilterPresets).values({
+          userId: ctx.user.id,
+          name: input.name,
+          filterType: input.filterType,
+          filters: input.filters,
+        });
+
+        return { success: true };
+      }),
+
+    // Get user's saved presets
+    list: protectedProcedure
+      .input(z.object({ filterType: z.enum(["actor", "producer"]) }))
+      .query(async ({ ctx, input }) => {
+        const database = getDb();
+        
+        return database
+          .select()
+          .from(savedFilterPresets)
+          .where(
+            sql`${savedFilterPresets.userId} = ${ctx.user.id} AND ${savedFilterPresets.filterType} = ${input.filterType}`
+          );
+      }),
+
+    // Delete a preset
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const database = getDb();
+        
+        await database
+          .delete(savedFilterPresets)
+          .where(
+            sql`${savedFilterPresets.id} = ${input.id} AND ${savedFilterPresets.userId} = ${ctx.user.id}`
+          );
+
+        return { success: true };
+      }),
+  }),
+
+  // Verification and trust score endpoints
+  verification: router({
+    // Calculate and update user's trust score
+    calculateTrustScore: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const database = getDb();
+        const userId = ctx.user.id;
+        
+        // Get user's contracts
+        const userContracts = await database
+          .select()
+          .from(contracts)
+          .where(
+            sql`${contracts.producerId} = ${userId} OR ${contracts.actorId} = ${userId}`
+          );
+        
+        const completedContracts = userContracts.filter(c => c.status === 'completed').length;
+        const totalContracts = userContracts.length;
+        
+        // Calculate trust score (0-100)
+        let score = 0;
+        
+        // Base score from completed contracts (up to 40 points)
+        if (totalContracts > 0) {
+          const completionRate = completedContracts / totalContracts;
+          score += completionRate * 40;
+        }
+        
+        // Bonus points for volume (up to 30 points)
+        score += Math.min(completedContracts * 3, 30);
+        
+        // Verification bonus (30 points)
+        if (ctx.user.isVerified) {
+          score += 30;
+        }
+        
+        const finalScore = Math.min(Math.round(score), 100);
+        
+        // Update user's trust score
+        await database
+          .update(users)
+          .set({ trustScore: finalScore })
+          .where(eq(users.id, userId));
+        
+        return { trustScore: finalScore };
+      }),
+    
+    // Get user's trust score
+    getTrustScore: protectedProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        const database = getDb();
+        
+        const user = await database
+          .select()
+          .from(users)
+          .where(eq(users.id, input.userId))
+          .limit(1);
+        
+        return {
+          trustScore: user[0]?.trustScore || 0,
+          isVerified: user[0]?.isVerified || false,
+        };
       }),
   }),
 });
