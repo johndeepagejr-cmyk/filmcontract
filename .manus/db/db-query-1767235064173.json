@@ -1,0 +1,67 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7kHNQX9cUeo4guX.root --database 9Ds5MzMMryKSoRAkX3DK9S --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "actorFilms"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "actorPhotos"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "actorProfiles"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "actorReviews"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "contractAttachments"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "contractHistory"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "contractNotes"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "contractReminders"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "contractTemplates"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "contractVersions"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "contracts"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "favorites"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "photoEngagement"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "portfolioPhotos"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "portfolioViews"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "producerProfiles"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "producerReviews"
+    },
+    {
+      "Tables_in_9Ds5MzMMryKSoRAkX3DK9S": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_9Ds5MzMMryKSoRAkX3DK9S\n__drizzle_migrations\nactorFilms\nactorPhotos\nactorProfiles\nactorReviews\ncontractAttachments\ncontractHistory\ncontractNotes\ncontractReminders\ncontractTemplates\ncontractVersions\ncontracts\nfavorites\nphotoEngagement\nportfolioPhotos\nportfolioViews\nproducerProfiles\nproducerReviews\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

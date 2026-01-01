@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO producerReputation (producerId, totalContracts, completedContracts, avgRating, onTimePaymentRate, wouldWorkAgainRate, createdAt, updatedAt)\nSELECT id,\n  FLOOR(10 + (RAND() * 40)) as totalContracts,\n  FLOOR(8 + (RAND() * 32)) as completedContracts,\n  ROUND(3.5 + (RAND() * 1.5), 1) as avgRating,\n  FLOOR(80 + (RAND() * 20)) as onTimePaymentRate,\n  FLOOR(75 + (RAND() * 25)) as wouldWorkAgainRate,\n  NOW(), NOW()\nFROM users WHERE userRole = 'producer' AND openId LIKE 'demo_prod_%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7kHNQX9cUeo4guX.root --database 9Ds5MzMMryKSoRAkX3DK9S --execute INSERT INTO producerReputation (producerId, totalContracts, completedContracts, avgRating, onTimePaymentRate, wouldWorkAgainRate, createdAt, updatedAt)\nSELECT id,\n  FLOOR(10 + (RAND() * 40)) as totalContracts,\n  FLOOR(8 + (RAND() * 32)) as completedContracts,\n  ROUND(3.5 + (RAND() * 1.5), 1) as avgRating,\n  FLOOR(80 + (RAND() * 20)) as onTimePaymentRate,\n  FLOOR(75 + (RAND() * 25)) as wouldWorkAgainRate,\n  NOW(), NOW()\nFROM users WHERE userRole = 'producer' AND openId LIKE 'demo_prod_%';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table '9ds5mzmmryksorakx3dk9s.producerReputation' doesn't exist"
+  ]
+}

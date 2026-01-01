@@ -664,3 +664,10 @@
 - [x] Check if producers/actors screens need different navigation approach (custom header needed)
 - [x] Implement custom back button in screen header if needed (CustomHeader component created)
 - [x] Ensure back button is visible and functional on both screens
+
+## Sample Data Population
+- [x] Create seed script with realistic producer profiles (names, companies, specialties)
+- [x] Create seed script with realistic actor profiles (names, specialties, experience)
+- [x] Create seed script with sample contracts (various statuses, dates, amounts)
+- [x] Run seed script to populate database (8 producers, 10 actors, 8 contracts)
+- [x] Verify data displays correctly in all screens
