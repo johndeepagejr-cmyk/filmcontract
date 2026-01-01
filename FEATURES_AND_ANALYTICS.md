@@ -1,6 +1,6 @@
 # FilmContract - Features and Analytics Documentation
 
-**Author:** Manus AI  
+**Author:** John Dee Page Jr  
 **Last Updated:** December 31, 2025
 
 ## Introduction

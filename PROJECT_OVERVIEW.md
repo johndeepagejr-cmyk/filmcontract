@@ -1,6 +1,6 @@
 # FilmContract - Project Overview
 
-**Author:** Manus AI  
+**Author:** John Dee Page Jr  
 **Project Type:** React Native Mobile Application  
 **Last Updated:** December 31, 2025
 
