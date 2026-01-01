@@ -627,3 +627,8 @@
 - [x] Display favorited actors and producers in separate tabs/sections
 - [x] Add ability to remove favorites from the Favorites section
 - [x] Test adding and removing favorites
+
+## Back Button Still Not Visible
+- [x] Investigate why back button is not showing on Producers/Actors screens
+- [x] Fix navigation configuration to ensure back button appears (added headerBackTitle and presentation: card)
+- [x] Test that back button works correctly

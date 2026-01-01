@@ -119,6 +119,8 @@ export default function ActorsDirectoryScreen() {
           headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.foreground,
           headerShadowVisible: false,
+          headerBackTitle: "Back",
+          presentation: "card",
         }}
       />
       <ScrollView className="flex-1">
