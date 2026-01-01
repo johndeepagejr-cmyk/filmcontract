@@ -1,10 +1,11 @@
-import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, TextInput } from "react-native";
+import { Text, View, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, Platform } from "react-native";
 import { Image } from "expo-image";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { Stack, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { useState, useMemo } from "react";
+import * as Haptics from "expo-haptics";
 
 export default function ProducersDirectoryScreen() {
   const colors = useColors();
@@ -14,6 +15,10 @@ export default function ProducersDirectoryScreen() {
   
   const { data: producers, isLoading } = trpc.reputation.getAllProducers.useQuery();
   const { data: producerProfiles } = trpc.producers.getAllProducers.useQuery();
+  const { data: favorites } = trpc.favorites.list.useQuery();
+  const addFavorite = trpc.favorites.add.useMutation();
+  const removeFavorite = trpc.favorites.remove.useMutation();
+  const utils = trpc.useUtils();
 
   const specialtyOptions = [
     "Feature Films",
@@ -204,9 +209,40 @@ export default function ProducersDirectoryScreen() {
                     )}
 
                     <View className="flex-1 gap-1">
-                      <Text className="text-lg font-semibold text-foreground">
-                        {producer.profile?.companyName || producer.producerName}
-                      </Text>
+                      <View className="flex-row items-center justify-between">
+                        <Text className="text-lg font-semibold text-foreground">
+                          {producer.profile?.companyName || producer.producerName}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={async (e) => {
+                            e.stopPropagation();
+                            if (Platform.OS !== "web") {
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            }
+                            const isFavorited = favorites?.some(
+                              (f) => f.favoritedUserId === producer.producerId
+                            );
+                            if (isFavorited) {
+                              await removeFavorite.mutateAsync({
+                                favoritedUserId: producer.producerId,
+                              });
+                            } else {
+                              await addFavorite.mutateAsync({
+                                favoritedUserId: producer.producerId,
+                                type: "producer",
+                              });
+                            }
+                            utils.favorites.list.invalidate();
+                          }}
+                          className="active:opacity-70 p-2"
+                        >
+                          <Text className="text-2xl">
+                            {favorites?.some((f) => f.favoritedUserId === producer.producerId)
+                              ? "❤️"
+                              : "🤍"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                       {producer.profile?.location && (
                         <Text className="text-sm text-muted">📍 {producer.profile.location}</Text>
                       )}

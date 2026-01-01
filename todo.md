@@ -614,3 +614,16 @@
 - [x] Add back button to producers screen
 - [x] Add back button to actors screen
 - [x] Ensure all non-tab screens have proper back navigation (Stack.Screen headerShown: true)
+
+## Favorites/Bookmarks Feature
+- [x] Create database schema for favorites (user_id, favorited_user_id, type, created_at)
+- [x] Add API endpoint to add favorite (actor or producer)
+- [x] Add API endpoint to remove favorite
+- [x] Add API endpoint to get user's favorites list
+- [x] Add bookmark/heart icon button to actor cards in directory
+- [x] Add bookmark/heart icon button to producer cards in directory
+- [x] Show filled heart icon for already favorited users
+- [x] Create Favorites section in profile screen
+- [x] Display favorited actors and producers in separate tabs/sections
+- [x] Add ability to remove favorites from the Favorites section
+- [x] Test adding and removing favorites

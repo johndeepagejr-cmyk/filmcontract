@@ -412,6 +412,21 @@ export default function ProfileScreen() {
             )}
           </View>
 
+          {/* Favorites Section */}
+          <TouchableOpacity
+            onPress={() => router.push("/profile/favorites")}
+            className="bg-surface rounded-2xl p-6 flex-row items-center justify-between active:opacity-80"
+          >
+            <View className="flex-row items-center gap-3">
+              <Text className="text-3xl">❤️</Text>
+              <View>
+                <Text className="text-lg font-bold text-foreground">My Favorites</Text>
+                <Text className="text-sm text-muted">Bookmarked actors and producers</Text>
+              </View>
+            </View>
+            <Text className="text-2xl text-muted">›</Text>
+          </TouchableOpacity>
+
           {/* Notification Settings */}
           <NotificationSettings />
 

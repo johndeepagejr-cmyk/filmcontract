@@ -169,6 +169,13 @@
       "when": 1767189509119,
       "tag": "0023_flimsy_sabretooth",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1767226831494,
+      "tag": "0024_lame_bushwacker",
+      "breakpoints": true
     }
   ]
 }

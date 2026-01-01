@@ -357,3 +357,18 @@ export const photoEngagement = mysqlTable("photoEngagement", {
 
 export type PhotoEngagement = typeof photoEngagement.$inferSelect;
 export type InsertPhotoEngagement = typeof photoEngagement.$inferInsert;
+
+
+/**
+ * Favorites table - stores user's favorited actors and producers
+ */
+export const favorites = mysqlTable("favorites", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // User who favorited
+  favoritedUserId: int("favoritedUserId").notNull(), // User being favorited (actor or producer)
+  type: mysqlEnum("type", ["actor", "producer"]).notNull(), // Type of user being favorited
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Favorite = typeof favorites.$inferSelect;
+export type InsertFavorite = typeof favorites.$inferInsert;

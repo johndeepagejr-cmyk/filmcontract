@@ -1,9 +1,11 @@
-import { ScrollView, Text, View, ActivityIndicator, TouchableOpacity, TextInput, Image } from "react-native";
+import { Text, View, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { Stack, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { useState, useMemo } from "react";
+import * as Haptics from "expo-haptics";
+import { Platform } from "react-native";
 
 const SPECIALTIES = [
   "Drama",
@@ -23,6 +25,10 @@ const SPECIALTIES = [
 export default function ActorsDirectoryScreen() {
   const colors = useColors();
   const { data: actors, isLoading } = trpc.actorReputation.getAllActors.useQuery();
+  const { data: favorites } = trpc.favorites.list.useQuery();
+  const addFavorite = trpc.favorites.add.useMutation();
+  const removeFavorite = trpc.favorites.remove.useMutation();
+  const utils = trpc.useUtils();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [minExperience, setMinExperience] = useState<string>("");
@@ -232,9 +238,40 @@ export default function ActorsDirectoryScreen() {
                     )}
 
                     <View className="flex-1 gap-1">
-                      <Text className="text-lg font-semibold text-foreground">
-                        {actor.actorName}
-                      </Text>
+                      <View className="flex-row items-center justify-between">
+                        <Text className="text-lg font-semibold text-foreground">
+                          {actor.actorName}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={async (e) => {
+                            e.stopPropagation();
+                            if (Platform.OS !== "web") {
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            }
+                            const isFavorited = favorites?.some(
+                              (f) => f.favoritedUserId === actor.actorId
+                            );
+                            if (isFavorited) {
+                              await removeFavorite.mutateAsync({
+                                favoritedUserId: actor.actorId,
+                              });
+                            } else {
+                              await addFavorite.mutateAsync({
+                                favoritedUserId: actor.actorId,
+                                type: "actor",
+                              });
+                            }
+                            utils.favorites.list.invalidate();
+                          }}
+                          className="active:opacity-70 p-2"
+                        >
+                          <Text className="text-2xl">
+                            {favorites?.some((f) => f.favoritedUserId === actor.actorId)
+                              ? "❤️"
+                              : "🤍"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                       {actor.location && (
                         <Text className="text-sm text-muted">📍 {actor.location}</Text>
                       )}

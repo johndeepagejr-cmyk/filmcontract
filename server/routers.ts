@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
-import { contractTemplates, contractNotes, contractAttachments, portfolioViews, contracts } from "@/drizzle/schema";
+import { contractTemplates, contractNotes, contractAttachments, portfolioViews, contracts, favorites } from "@/drizzle/schema";
 import { getDb } from "./db";
 import { eq, or, sql } from "drizzle-orm";
 import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
@@ -950,6 +950,92 @@ export const appRouter = router({
             .map(([month, amount]) => ({ month, amount }))
             .sort((a, b) => a.month.localeCompare(b.month)),
         };
+      }),
+  }),
+
+  // Favorites
+  favorites: router({
+    // Add a favorite
+    add: protectedProcedure
+      .input(
+        z.object({
+          favoritedUserId: z.number(),
+          type: z.enum(["actor", "producer"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const database = getDb();
+        
+        // Check if already favorited
+        const existing = await database
+          .select()
+          .from(favorites)
+          .where(
+            sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`
+          );
+        
+        if (existing.length > 0) {
+          return { success: true, message: "Already favorited" };
+        }
+        
+        await database.insert(favorites).values({
+          userId: ctx.user.id,
+          favoritedUserId: input.favoritedUserId,
+          type: input.type,
+        });
+        
+        return { success: true };
+      }),
+
+    // Remove a favorite
+    remove: protectedProcedure
+      .input(
+        z.object({
+          favoritedUserId: z.number(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const database = getDb();
+        
+        await database
+          .delete(favorites)
+          .where(
+            sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`
+          );
+        
+        return { success: true };
+      }),
+
+    // Get user's favorites
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const database = getDb();
+      
+      const userFavorites = await database
+        .select()
+        .from(favorites)
+        .where(sql`${favorites.userId} = ${ctx.user.id}`);
+      
+      return userFavorites;
+    }),
+
+    // Check if a user is favorited
+    isFavorited: protectedProcedure
+      .input(
+        z.object({
+          favoritedUserId: z.number(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const database = getDb();
+        
+        const existing = await database
+          .select()
+          .from(favorites)
+          .where(
+            sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`
+          );
+        
+        return existing.length > 0;
       }),
   }),
 });
