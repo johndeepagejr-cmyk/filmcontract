@@ -3,9 +3,11 @@ import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { Stack, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { QuickActionsMenu, type QuickAction } from "@/components/quick-actions-menu";
 
 const SPECIALTIES = [
   "Drama",
@@ -22,6 +24,8 @@ const SPECIALTIES = [
   "Musical",
 ];
 
+const FILTERS_STORAGE_KEY = "@actors_directory_filters";
+
 export default function ActorsDirectoryScreen() {
   const colors = useColors();
   const { data: actors, isLoading } = trpc.actorReputation.getAllActors.useQuery();
@@ -33,6 +37,45 @@ export default function ActorsDirectoryScreen() {
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [minExperience, setMinExperience] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
+  const [filtersLoaded, setFiltersLoaded] = useState(false);
+  const [quickActionsVisible, setQuickActionsVisible] = useState(false);
+  const [selectedActor, setSelectedActor] = useState<any>(null);
+
+  // Load saved filters on mount
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(FILTERS_STORAGE_KEY);
+        if (saved) {
+          const filters = JSON.parse(saved);
+          setSearchQuery(filters.searchQuery || "");
+          setSelectedSpecialties(filters.selectedSpecialties || []);
+          setMinExperience(filters.minExperience || "");
+        }
+      } catch (error) {
+        console.error("Failed to load filters:", error);
+      } finally {
+        setFiltersLoaded(true);
+      }
+    };
+    loadFilters();
+  }, []);
+
+  // Save filters whenever they change
+  useEffect(() => {
+    if (!filtersLoaded) return;
+    const saveFilters = async () => {
+      try {
+        await AsyncStorage.setItem(
+          FILTERS_STORAGE_KEY,
+          JSON.stringify({ searchQuery, selectedSpecialties, minExperience })
+        );
+      } catch (error) {
+        console.error("Failed to save filters:", error);
+      }
+    };
+    saveFilters();
+  }, [searchQuery, selectedSpecialties, minExperience, filtersLoaded]);
 
   const toggleSpecialty = (specialty: string) => {
     if (selectedSpecialties.includes(specialty)) {
@@ -42,10 +85,15 @@ export default function ActorsDirectoryScreen() {
     }
   };
 
-  const clearFilters = () => {
+  const clearFilters = async () => {
     setSearchQuery("");
     setSelectedSpecialties([]);
     setMinExperience("");
+    try {
+      await AsyncStorage.removeItem(FILTERS_STORAGE_KEY);
+    } catch (error) {
+      console.error("Failed to clear filters:", error);
+    }
   };
 
   const filteredActors = useMemo(() => {
@@ -220,9 +268,17 @@ export default function ActorsDirectoryScreen() {
                 <TouchableOpacity
                   key={actor.actorId}
                   onPress={() => router.push(`/actor/${actor.actorId}`)}
+                  onLongPress={() => {
+                    if (Platform.OS !== "web") {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    }
+                    setSelectedActor(actor);
+                    setQuickActionsVisible(true);
+                  }}
                   className="bg-surface rounded-xl p-4 gap-3"
                   style={{ opacity: 1 }}
                   activeOpacity={0.7}
+                  delayLongPress={500}
                 >
                   <View className="flex-row items-center gap-3">
                     {actor.profilePhotoUrl ? (
@@ -351,6 +407,54 @@ export default function ActorsDirectoryScreen() {
           )}
         </View>
       </ScrollView>
+
+      <QuickActionsMenu
+        visible={quickActionsVisible}
+        onClose={() => setQuickActionsVisible(false)}
+        title={selectedActor?.actorName}
+        actions={[
+          {
+            label: "View Profile",
+            icon: "👤",
+            onPress: () => router.push(`/actor/${selectedActor?.actorId}`),
+          },
+          {
+            label: "View Portfolio",
+            icon: "📸",
+            onPress: () => router.push(`/portfolio/${selectedActor?.actorId}`),
+          },
+          {
+            label: "Create Contract",
+            icon: "📝",
+            onPress: () => router.push("/contracts/create"),
+          },
+          {
+            label: favorites?.some((f) => f.favoritedUserId === selectedActor?.actorId)
+              ? "Remove from Favorites"
+              : "Add to Favorites",
+            icon: favorites?.some((f) => f.favoritedUserId === selectedActor?.actorId)
+              ? "💔"
+              : "❤️",
+            onPress: async () => {
+              const isFavorited = favorites?.some(
+                (f) => f.favoritedUserId === selectedActor?.actorId
+              );
+              if (isFavorited) {
+                await removeFavorite.mutateAsync({
+                  favoritedUserId: selectedActor?.actorId,
+                });
+              } else {
+                await addFavorite.mutateAsync({
+                  favoritedUserId: selectedActor?.actorId,
+                  type: "actor",
+                });
+              }
+              utils.favorites.list.invalidate();
+            },
+            destructive: favorites?.some((f) => f.favoritedUserId === selectedActor?.actorId),
+          },
+        ]}
+      />
     </ScreenContainer>
   );
 }

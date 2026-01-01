@@ -4,14 +4,57 @@ import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { Stack, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import * as Haptics from "expo-haptics";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { QuickActionsMenu, type QuickAction } from "@/components/quick-actions-menu";
+
+const FILTERS_STORAGE_KEY = "@producers_directory_filters";
 
 export default function ProducersDirectoryScreen() {
   const colors = useColors();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
+  const [filtersLoaded, setFiltersLoaded] = useState(false);
+  const [quickActionsVisible, setQuickActionsVisible] = useState(false);
+  const [selectedProducer, setSelectedProducer] = useState<any>(null);
+
+  // Load saved filters on mount
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const saved = await AsyncStorage.getItem(FILTERS_STORAGE_KEY);
+        if (saved) {
+          const filters = JSON.parse(saved);
+          setSearchQuery(filters.searchQuery || "");
+          setSelectedSpecialties(filters.selectedSpecialties || []);
+          setLocationFilter(filters.locationFilter || "");
+        }
+      } catch (error) {
+        console.error("Failed to load filters:", error);
+      } finally {
+        setFiltersLoaded(true);
+      }
+    };
+    loadFilters();
+  }, []);
+
+  // Save filters whenever they change
+  useEffect(() => {
+    if (!filtersLoaded) return;
+    const saveFilters = async () => {
+      try {
+        await AsyncStorage.setItem(
+          FILTERS_STORAGE_KEY,
+          JSON.stringify({ searchQuery, selectedSpecialties, locationFilter })
+        );
+      } catch (error) {
+        console.error("Failed to save filters:", error);
+      }
+    };
+    saveFilters();
+  }, [searchQuery, selectedSpecialties, locationFilter, filtersLoaded]);
   
   const { data: producers, isLoading } = trpc.reputation.getAllProducers.useQuery();
   const { data: producerProfiles } = trpc.producers.getAllProducers.useQuery();
@@ -191,9 +234,17 @@ export default function ProducersDirectoryScreen() {
                 <TouchableOpacity
                   key={producer.producerId}
                   onPress={() => router.push(`/producer/${producer.producerId}`)}
+                  onLongPress={() => {
+                    if (Platform.OS !== "web") {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                    }
+                    setSelectedProducer(producer);
+                    setQuickActionsVisible(true);
+                  }}
                   className="bg-surface rounded-xl p-4 gap-3"
                   style={{ opacity: 1 }}
                   activeOpacity={0.7}
+                  delayLongPress={500}
                 >
                   <View className="flex-row items-center gap-3">
                     {producer.profile?.companyLogoUrl ? (
@@ -304,6 +355,49 @@ export default function ProducersDirectoryScreen() {
           )}
         </View>
       </ScrollView>
+
+      <QuickActionsMenu
+        visible={quickActionsVisible}
+        onClose={() => setQuickActionsVisible(false)}
+        title={selectedProducer?.profile?.companyName || selectedProducer?.producerName}
+        actions={[
+          {
+            label: "View Profile",
+            icon: "👤",
+            onPress: () => router.push(`/producer/${selectedProducer?.producerId}`),
+          },
+          {
+            label: "View Projects",
+            icon: "🎬",
+            onPress: () => router.push(`/producer/${selectedProducer?.producerId}`),
+          },
+          {
+            label: favorites?.some((f) => f.favoritedUserId === selectedProducer?.producerId)
+              ? "Remove from Favorites"
+              : "Add to Favorites",
+            icon: favorites?.some((f) => f.favoritedUserId === selectedProducer?.producerId)
+              ? "💔"
+              : "❤️",
+            onPress: async () => {
+              const isFavorited = favorites?.some(
+                (f) => f.favoritedUserId === selectedProducer?.producerId
+              );
+              if (isFavorited) {
+                await removeFavorite.mutateAsync({
+                  favoritedUserId: selectedProducer?.producerId,
+                });
+              } else {
+                await addFavorite.mutateAsync({
+                  favoritedUserId: selectedProducer?.producerId,
+                  type: "producer",
+                });
+              }
+              utils.favorites.list.invalidate();
+            },
+            destructive: favorites?.some((f) => f.favoritedUserId === selectedProducer?.producerId),
+          },
+        ]}
+      />
     </ScreenContainer>
   );
 }

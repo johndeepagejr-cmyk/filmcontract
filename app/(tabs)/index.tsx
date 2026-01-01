@@ -16,6 +16,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { BulkActionsModal } from "@/components/bulk-actions-modal";
 import { UpcomingContracts } from "@/components/upcoming-contracts";
+import { OnboardingTutorial } from "@/components/onboarding-tutorial";
 
 export default function HomeScreen() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -293,6 +294,11 @@ export default function HomeScreen() {
           refetch();
         }}
       />
+
+      {/* Onboarding Tutorial */}
+      {isAuthenticated && user?.userRole && (
+        <OnboardingTutorial onComplete={() => console.log("Onboarding completed")} />
+      )}
     </ScreenContainer>
   );
 }

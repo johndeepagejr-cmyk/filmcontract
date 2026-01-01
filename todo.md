@@ -632,3 +632,29 @@
 - [x] Investigate why back button is not showing on Producers/Actors screens
 - [x] Fix navigation configuration to ensure back button appears (added headerBackTitle and presentation: card)
 - [x] Test that back button works correctly
+
+## Filter Persistence Feature
+- [x] Save actor directory filters to AsyncStorage (search query, specialties, min experience)
+- [x] Load saved filters on actors screen mount
+- [x] Save producer directory filters to AsyncStorage (search query, specialties, location)
+- [x] Load saved filters on producers screen mount
+- [x] Add "Clear Filters" button that also clears AsyncStorage
+- [x] Test filter persistence across app restarts
+
+## Quick Actions Menu Feature
+- [x] Install react-native-menu or use ActionSheet for menu component (created custom QuickActionsMenu)
+- [x] Add long-press handler to actor cards in directory
+- [x] Add long-press handler to producer cards in directory
+- [x] Create menu options: View Portfolio, Send Message, Create Contract, Add/Remove Favorite
+- [x] Implement navigation for each menu action
+- [x] Add haptic feedback on long-press
+- [x] Test quick actions menu on all card types
+
+## Onboarding Tutorial Feature
+- [x] Create onboarding state management (completed steps, skip status)
+- [x] Design onboarding screens with key feature highlights
+- [x] Add interactive tooltips for main features (contracts, directory, profile)
+- [x] Create skip button and "Don't show again" option
+- [x] Show onboarding only on first app launch
+- [x] Store onboarding completion status in AsyncStorage
+- [x] Test onboarding flow from fresh install
