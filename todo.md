@@ -658,3 +658,9 @@
 - [x] Show onboarding only on first app launch
 - [x] Store onboarding completion status in AsyncStorage
 - [x] Test onboarding flow from fresh install
+
+## Back Button Still Missing
+- [x] Investigate why Stack.Screen headerShown configuration is not working (tabs override header)
+- [x] Check if producers/actors screens need different navigation approach (custom header needed)
+- [x] Implement custom back button in screen header if needed (CustomHeader component created)
+- [x] Ensure back button is visible and functional on both screens

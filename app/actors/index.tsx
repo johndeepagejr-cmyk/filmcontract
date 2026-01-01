@@ -1,13 +1,14 @@
 import { Text, View, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { useState, useMemo, useEffect } from "react";
 import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QuickActionsMenu, type QuickAction } from "@/components/quick-actions-menu";
+import { CustomHeader } from "@/components/custom-header";
 
 const SPECIALTIES = [
   "Drama",
@@ -151,26 +152,18 @@ export default function ActorsDirectoryScreen() {
 
   if (isLoading) {
     return (
-      <ScreenContainer className="items-center justify-center">
-        <Stack.Screen options={{ title: "Actor Directory" }} />
-        <ActivityIndicator size="large" color={colors.primary} />
-      </ScreenContainer>
+      <View className="flex-1" style={{ backgroundColor: colors.background }}>
+        <CustomHeader title="Actor Directory" />
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </View>
     );
   }
 
   return (
-    <ScreenContainer>
-      <Stack.Screen
-        options={{
-          title: "Actor Directory",
-          headerShown: true,
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.foreground,
-          headerShadowVisible: false,
-          headerBackTitle: "Back",
-          presentation: "card",
-        }}
-      />
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
+      <CustomHeader title="Actor Directory" />
       <ScrollView className="flex-1">
         <View className="p-6 gap-4">
           <View className="gap-2">
@@ -455,6 +448,6 @@ export default function ActorsDirectoryScreen() {
           },
         ]}
       />
-    </ScreenContainer>
+    </View>
   );
 }
