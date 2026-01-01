@@ -605,3 +605,7 @@
 - [x] Add statistics cards for key metrics (total views, total contracts, total payments)
 - [x] Add date range filter (7 days, 30 days, 90 days)
 - [x] Test all analytics calculations with real data
+
+## Navigation Bug Fixes
+- [x] Add back button to profile screen to return to previous screen (changed icon to person.fill)
+- [x] Ensure profile navigation doesn't redirect to external webpage
