@@ -1,6 +1,8 @@
 # FilmContract - Demo Video Script
 
 **Author:** John Dee Page Jr  
+**Last Updated:** December 31, 2025  
+**Key Message:** The Industry's First Dedicated Film Contract Mobile App  
 **Duration:** 2 minutes 30 seconds  
 **Target Platform:** App Store and Google Play Store
 
