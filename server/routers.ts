@@ -462,8 +462,7 @@ export const appRouter = router({
   }),
 
   // Actor profile management
-  actorProfile: router({
-    // Get actor profile by user ID
+  profilesDetail: router({    // Get actor profile by user ID
     get: publicProcedure
       .input(z.object({ userId: z.number() }))
       .query(async ({ input }) => {
@@ -1039,8 +1038,8 @@ export const appRouter = router({
       }),
   }),
 
-  // Payment tracking endpoints
-  payments: router({
+  // Payment tracking endpoints (moved to separate router)
+  paymentTracking: router({
     // Record a payment for a contract
     recordPayment: protectedProcedure
       .input(

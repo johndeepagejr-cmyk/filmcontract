@@ -409,3 +409,92 @@ export const savedFilterPresets = mysqlTable("savedFilterPresets", {
 
 export type SavedFilterPreset = typeof savedFilterPresets.$inferSelect;
 export type InsertSavedFilterPreset = typeof savedFilterPresets.$inferInsert;
+
+
+export const actorReels = mysqlTable("actorReels", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 100 }).notNull(),
+  description: text("description"),
+  videoUrl: text("videoUrl").notNull(), // S3 URL of video
+  duration: int("duration"), // Duration in seconds
+  isPrimary: boolean("isPrimary").default(false), // Primary reel for profile
+  views: int("views").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorReel = typeof actorReels.$inferSelect;
+export type InsertActorReel = typeof actorReels.$inferInsert;
+
+/**
+ * Actor Resumes table - resume/CV documents
+ */
+export const actorResumes = mysqlTable("actorResumes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 100 }).notNull(),
+  resumeUrl: text("resumeUrl").notNull(), // S3 URL of PDF/document
+  isPrimary: boolean("isPrimary").default(false),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorResume = typeof actorResumes.$inferSelect;
+export type InsertActorResume = typeof actorResumes.$inferInsert;
+
+/**
+ * Actor Credits table - past film/TV credits
+ */
+export const actorCredits = mysqlTable("actorCredits", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(), // Film/TV title
+  role: varchar("role", { length: 100 }).notNull(), // Character name or role type
+  creditType: mysqlEnum("creditType", ["film", "tv", "theater", "commercial", "web"]).notNull(),
+  year: int("year"),
+  director: varchar("director", { length: 100 }),
+  description: text("description"),
+  imdbUrl: text("imdbUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorCredit = typeof actorCredits.$inferSelect;
+export type InsertActorCredit = typeof actorCredits.$inferInsert;
+
+/**
+ * Actor Unions table - union memberships
+ */
+export const actorUnions = mysqlTable("actorUnions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  union: mysqlEnum("union", ["SAG-AFTRA", "EQUITY", "AGVA", "OTHER"]).notNull(),
+  membershipNumber: varchar("membershipNumber", { length: 50 }),
+  joinDate: timestamp("joinDate"),
+  isVerified: boolean("isVerified").default(false),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorUnion = typeof actorUnions.$inferSelect;
+export type InsertActorUnion = typeof actorUnions.$inferInsert;
+
+/**
+ * Actor Availability table - availability calendar and blocks
+ */
+export const actorAvailability = mysqlTable("actorAvailability", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate").notNull(),
+  availabilityStatus: mysqlEnum("availabilityStatus", ["available", "unavailable", "tentative"]).notNull(),
+  reason: varchar("reason", { length: 255 }), // e.g., "On set", "Vacation", "Audition"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ActorAvailability = typeof actorAvailability.$inferSelect;
+export type InsertActorAvailability = typeof actorAvailability.$inferInsert;
+
+
