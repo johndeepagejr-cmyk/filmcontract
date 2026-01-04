@@ -846,3 +846,40 @@
 - [ ] Implement booking analytics
 - [ ] Build response rate analytics for directors
 - [ ] Add trend analysis and insights
+
+
+## Phase 3: Advanced Features
+
+### 2. Social Feed & Networking Feature
+- [ ] Create posts table (userId, content, likes, comments)
+- [ ] Create follows table (followerId, followingId)
+- [ ] Create groups table (name, genre, location, members)
+- [ ] Build API endpoints for posts (create, read, like, comment)
+- [ ] Build API endpoints for follows (follow, unfollow, get followers)
+- [ ] Build API endpoints for groups (create, join, leave)
+- [ ] Create social feed UI screen
+- [ ] Create post creation modal
+- [ ] Create groups discovery screen
+- [ ] Add follow/unfollow buttons to profiles
+
+### 3. Job & Casting Board Feature
+- [ ] Create casting_calls table (producerId, title, description, roles, deadline)
+- [ ] Create submissions table (actorId, castingCallId, videoUrl, notes)
+- [ ] Build API endpoints for casting calls (create, read, update)
+- [ ] Build API endpoints for submissions (create, read, update status)
+- [ ] Create casting board screen for directors
+- [ ] Create role posting form
+- [ ] Create submissions management interface
+- [ ] Create actor-side casting board with submissions
+- [ ] Add video submission upload
+- [ ] Add submission status tracking
+
+### 4. AI Smart Matching Feature
+- [ ] Create matching algorithm based on skills, experience, availability
+- [ ] Build recommendation API endpoint
+- [ ] Create recommendations screen for directors
+- [ ] Create recommendations screen for actors
+- [ ] Add recommendation cards with match score
+- [ ] Implement filtering by match strength
+- [ ] Add one-click contact from recommendations
+- [ ] Track recommendation engagement metrics

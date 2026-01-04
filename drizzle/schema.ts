@@ -498,3 +498,115 @@ export type ActorAvailability = typeof actorAvailability.$inferSelect;
 export type InsertActorAvailability = typeof actorAvailability.$inferInsert;
 
 
+
+/**
+ * Social Posts table - for social feed
+ */
+export const socialPosts = mysqlTable("socialPosts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  content: text("content").notNull(),
+  imageUrl: text("imageUrl"),
+  likesCount: int("likesCount").default(0),
+  commentsCount: int("commentsCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SocialPost = typeof socialPosts.$inferSelect;
+export type InsertSocialPost = typeof socialPosts.$inferInsert;
+
+/**
+ * Social Follows table - for following relationships
+ */
+export const socialFollows = mysqlTable("socialFollows", {
+  id: int("id").autoincrement().primaryKey(),
+  followerId: int("followerId").notNull(),
+  followingId: int("followingId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SocialFollow = typeof socialFollows.$inferSelect;
+export type InsertSocialFollow = typeof socialFollows.$inferInsert;
+
+/**
+ * Social Groups table - for genre/location based communities
+ */
+export const socialGroups = mysqlTable("socialGroups", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  genre: varchar("genre", { length: 50 }),
+  location: varchar("location", { length: 100 }),
+  membersCount: int("membersCount").default(0),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SocialGroup = typeof socialGroups.$inferSelect;
+export type InsertSocialGroup = typeof socialGroups.$inferInsert;
+
+/**
+ * Group Members table - tracks group memberships
+ */
+export const groupMembers = mysqlTable("groupMembers", {
+  id: int("id").autoincrement().primaryKey(),
+  groupId: int("groupId").notNull(),
+  userId: int("userId").notNull(),
+  joinedAt: timestamp("joinedAt").defaultNow().notNull(),
+});
+
+export type GroupMember = typeof groupMembers.$inferSelect;
+export type InsertGroupMember = typeof groupMembers.$inferInsert;
+
+/**
+ * Casting Calls table - job postings by producers
+ */
+export const castingCalls = mysqlTable("castingCalls", {
+  id: int("id").autoincrement().primaryKey(),
+  producerId: int("producerId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  roles: text("roles"), // JSON array of roles
+  budget: decimal("budget", { precision: 10, scale: 2 }),
+  deadline: timestamp("deadline"),
+  status: mysqlEnum("status", ["open", "closed", "filled"]).default("open"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CastingCall = typeof castingCalls.$inferSelect;
+export type InsertCastingCall = typeof castingCalls.$inferInsert;
+
+/**
+ * Casting Submissions table - actor submissions for casting calls
+ */
+export const castingSubmissions = mysqlTable("castingSubmissions", {
+  id: int("id").autoincrement().primaryKey(),
+  castingCallId: int("castingCallId").notNull(),
+  actorId: int("actorId").notNull(),
+  videoUrl: text("videoUrl"),
+  notes: text("notes"),
+  status: mysqlEnum("status", ["submitted", "reviewing", "shortlisted", "rejected", "hired"]).default("submitted"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CastingSubmission = typeof castingSubmissions.$inferSelect;
+export type InsertCastingSubmission = typeof castingSubmissions.$inferInsert;
+
+/**
+ * AI Recommendations table - smart matching suggestions
+ */
+export const aiRecommendations = mysqlTable("aiRecommendations", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Director/Producer
+  recommendedUserId: int("recommendedUserId").notNull(), // Actor
+  matchScore: int("matchScore"), // 0-100 score
+  reason: text("reason"), // Why they match
+  status: mysqlEnum("status", ["pending", "viewed", "contacted", "hired"]).default("pending"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AiRecommendation = typeof aiRecommendations.$inferSelect;
+export type InsertAiRecommendation = typeof aiRecommendations.$inferInsert;
