@@ -21,7 +21,8 @@ export function CustomHeader({ title, onBack }: CustomHeaderProps) {
     if (onBack) {
       onBack();
     } else {
-      router.back();
+      // Navigate back to home tab
+      router.push("/");
     }
   };
 
