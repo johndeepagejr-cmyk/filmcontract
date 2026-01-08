@@ -1,4 +1,5 @@
 import { Text, View, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Image } from "expo-image";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";

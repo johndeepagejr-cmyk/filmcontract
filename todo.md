@@ -883,3 +883,7 @@
 - [ ] Implement filtering by match strength
 - [ ] Add one-click contact from recommendations
 - [ ] Track recommendation engagement metrics
+
+
+## Bug Fixes - Navigation & Actors Screen
+- [x] Fix error that appears when navigating to actors screen (Fixed: Added missing Image import from expo-image)
