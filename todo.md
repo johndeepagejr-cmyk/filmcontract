@@ -887,3 +887,65 @@
 
 ## Bug Fixes - Navigation & Actors Screen
 - [x] Fix error that appears when navigating to actors screen (Fixed: Added missing Image import from expo-image)
+
+
+## Deployment to Vercel
+- [ ] Configure Vercel deployment settings
+- [ ] Deploy web app to Vercel free tier
+- [ ] Set up permanent Vercel subdomain
+- [ ] Configure environment variables on Vercel
+- [ ] Test deployed app functionality
+
+## Social Features - Phase 1 (Core)
+### Follow System
+- [ ] Create follows table in database
+- [ ] Add follow/unfollow API endpoints
+- [ ] Add follow button to actor/producer profiles
+- [ ] Display follower/following counts on profiles
+- [ ] Add followers list screen
+
+### Activity Feed
+- [ ] Create activity_feed table in database
+- [ ] Add activity logging for key events (new contract, contract signed, review posted)
+- [ ] Build activity feed screen showing recent activity
+- [ ] Add filters for activity types
+- [ ] Display user avatars and action descriptions
+
+### Messaging System
+- [ ] Create messages table in database
+- [ ] Add send message API endpoint
+- [ ] Build direct message screen
+- [ ] Add message list/conversations screen
+- [ ] Display unread message count
+- [ ] Add real-time message notifications
+
+
+## Deployment to Vercel
+- [x] Configure Vercel deployment settings (vercel.json created)
+- [ ] Deploy web app to Vercel free tier
+- [ ] Set up permanent Vercel subdomain
+- [ ] Configure environment variables on Vercel
+- [ ] Test deployed app functionality
+
+## Social Features - Phase 1 (Core)
+### Follow System
+- [x] Create follows table in database (already exists in schema)
+- [x] Add follow/unfollow API endpoints (implemented in social-router.ts)
+- [ ] Add follow button to actor/producer profiles
+- [x] Display follower/following counts on profiles (API endpoints created)
+- [ ] Add followers list screen (created at app/social/followers.tsx)
+
+### Activity Feed
+- [x] Create activity_feed table in database (socialPosts table exists)
+- [x] Add activity logging for key events (implemented in social-router.ts)
+- [x] Build activity feed screen showing recent activity (created at app/social/feed.tsx)
+- [ ] Add filters for activity types
+- [ ] Display user avatars and action descriptions
+
+### Messaging System
+- [x] Create messages table in database (schema ready)
+- [x] Add send message API endpoint (implemented in social-router.ts)
+- [x] Build direct message screen (created at app/social/messages.tsx)
+- [ ] Add message list/conversations screen (partial implementation)
+- [ ] Display unread message count
+- [ ] Add real-time message notifications

@@ -1,0 +1,25 @@
+{
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "framework": "other",
+  "env": {
+    "NODE_ENV": "production",
+    "DATABASE_URL": "@database_url",
+    "STRIPE_PUBLISHABLE_KEY": "@stripe_publishable_key",
+    "STRIPE_SECRET_KEY": "@stripe_secret_key"
+  },
+  "functions": {
+    "server/_core/index.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/server/_core/index.ts"
+    }
+  ]
+}
