@@ -189,7 +189,7 @@ export const socialRouter = router({
       .select({
         type: sql<string>`'review'`,
         id: actorReviews.id,
-        userId: actorReviews.reviewerId,
+        userId: actorReviews.producerId,
         userName: users.name,
         userRole: users.userRole,
         action: sql<string>`'left a review'`,
@@ -197,8 +197,8 @@ export const socialRouter = router({
         createdAt: actorReviews.createdAt,
       })
       .from(actorReviews)
-      .innerJoin(users, eq(actorReviews.reviewerId, users.id))
-      .where(sql`${actorReviews.reviewerId} IN (${sql.raw(followingIds.join(","))})`)
+      .innerJoin(users, eq(actorReviews.producerId, users.id))
+      .where(sql`${actorReviews.producerId} IN (${sql.raw(followingIds.join(","))})`)
       .orderBy(desc(actorReviews.createdAt))
       .limit(50);
 
