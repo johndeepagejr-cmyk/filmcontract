@@ -729,3 +729,127 @@ export const auditionInvitations = mysqlTable("audition_invitations", {
 
 export type AuditionInvitation = typeof auditionInvitations.$inferSelect;
 export type InsertAuditionInvitation = typeof auditionInvitations.$inferInsert;
+
+
+/**
+ * Self-Tapes table - stores recorded video auditions from actors
+ * Similar to WeAudition/coldRead style self-tape submissions
+ */
+export const selfTapes = mysqlTable("self_tapes", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Actor who created the self-tape */
+  actorId: int("actorId").notNull(),
+  /** Optional producer who requested the tape */
+  producerId: int("producerId"),
+  /** Optional contract/project reference */
+  contractId: int("contractId"),
+  /** Project title for this audition */
+  projectTitle: varchar("projectTitle", { length: 255 }).notNull(),
+  /** Role description being auditioned for */
+  roleDescription: text("roleDescription"),
+  /** Character name if applicable */
+  characterName: varchar("characterName", { length: 100 }),
+  /** Video file URL (S3 or local storage) */
+  videoUrl: text("videoUrl").notNull(),
+  /** Thumbnail image URL */
+  thumbnailUrl: text("thumbnailUrl"),
+  /** Video duration in seconds */
+  durationSeconds: int("durationSeconds"),
+  /** File size in bytes */
+  fileSizeBytes: int("fileSizeBytes"),
+  /** Slate text overlay (actor name, role, etc.) */
+  slateText: text("slateText"),
+  /** Whether slate overlay is enabled */
+  slateEnabled: boolean("slateEnabled").default(true),
+  /** Trim start time in seconds */
+  trimStart: int("trimStart").default(0),
+  /** Trim end time in seconds (null = end of video) */
+  trimEnd: int("trimEnd"),
+  /** Self-tape status */
+  status: mysqlEnum("status", ["draft", "submitted", "under_review", "approved", "rejected", "revision_requested"]).default("draft").notNull(),
+  /** Actor's notes about the performance */
+  actorNotes: text("actorNotes"),
+  /** Whether this is a revision of a previous tape */
+  isRevision: boolean("isRevision").default(false),
+  /** Reference to original tape if this is a revision */
+  originalTapeId: int("originalTapeId"),
+  /** Revision number (1, 2, 3, etc.) */
+  revisionNumber: int("revisionNumber").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  submittedAt: timestamp("submittedAt"),
+});
+
+export type SelfTape = typeof selfTapes.$inferSelect;
+export type InsertSelfTape = typeof selfTapes.$inferInsert;
+
+/**
+ * Self-Tape Feedback table - timestamped notes from producers
+ */
+export const selfTapeFeedback = mysqlTable("self_tape_feedback", {
+  id: int("id").autoincrement().primaryKey(),
+  selfTapeId: int("selfTapeId").notNull(),
+  producerId: int("producerId").notNull(),
+  /** Timestamp in video (seconds) where feedback applies */
+  timestampSeconds: int("timestampSeconds"),
+  /** The feedback note */
+  note: text("note").notNull(),
+  /** Type of feedback */
+  feedbackType: mysqlEnum("feedbackType", ["positive", "constructive", "question", "general"]).default("general").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SelfTapeFeedback = typeof selfTapeFeedback.$inferSelect;
+export type InsertSelfTapeFeedback = typeof selfTapeFeedback.$inferInsert;
+
+/**
+ * Self-Tape Ratings table - multi-criteria ratings from producers
+ */
+export const selfTapeRatings = mysqlTable("self_tape_ratings", {
+  id: int("id").autoincrement().primaryKey(),
+  selfTapeId: int("selfTapeId").notNull(),
+  producerId: int("producerId").notNull(),
+  /** Fit for the role (1-10) */
+  fitScore: int("fitScore"),
+  /** Energy/presence (1-10) */
+  energyScore: int("energyScore"),
+  /** Delivery/performance (1-10) */
+  deliveryScore: int("deliveryScore"),
+  /** Technical quality (1-10) */
+  technicalScore: int("technicalScore"),
+  /** Overall impression (1-10) */
+  overallScore: int("overallScore"),
+  /** Written summary */
+  summary: text("summary"),
+  /** Would consider for role */
+  wouldConsider: boolean("wouldConsider"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SelfTapeRating = typeof selfTapeRatings.$inferSelect;
+export type InsertSelfTapeRating = typeof selfTapeRatings.$inferInsert;
+
+/**
+ * Self-Tape Revision Requests table - producer requests for changes
+ */
+export const selfTapeRevisions = mysqlTable("self_tape_revisions", {
+  id: int("id").autoincrement().primaryKey(),
+  selfTapeId: int("selfTapeId").notNull(),
+  producerId: int("producerId").notNull(),
+  /** What changes are requested */
+  requestedChanges: text("requestedChanges").notNull(),
+  /** Priority level */
+  priority: mysqlEnum("priority", ["low", "medium", "high"]).default("medium").notNull(),
+  /** Deadline for revision */
+  deadline: timestamp("deadline"),
+  /** Status of the revision request */
+  status: mysqlEnum("status", ["pending", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
+  /** ID of the new tape if revision was submitted */
+  newTapeId: int("newTapeId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SelfTapeRevision = typeof selfTapeRevisions.$inferSelect;
+export type InsertSelfTapeRevision = typeof selfTapeRevisions.$inferInsert;

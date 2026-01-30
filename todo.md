@@ -1007,3 +1007,66 @@
 - [ ] Test video call functionality in development build
 - [ ] Add recording playback screen
 - [ ] Add audition reminders before scheduled time
+
+
+## Self-Tape Audition Feature
+### Database Schema
+- [x] Create self_tapes table (id, actorId, projectTitle, roleDescription, videoUrl, thumbnailUrl, duration, status, createdAt)
+- [x] Create self_tape_feedback table (id, selfTapeId, producerId, timestamp, note, createdAt)
+- [x] Create self_tape_ratings table (id, selfTapeId, producerId, fitScore, energyScore, deliveryScore, overallScore, createdAt)
+- [x] Create self_tape_revisions table (id, selfTapeId, producerId, requestedChanges, status, createdAt)
+
+### Backend API (tRPC)
+- [x] Create self-tape router with CRUD endpoints
+- [x] Upload self-tape endpoint (with video file handling)
+- [x] Get self-tapes for actor endpoint
+- [x] Get self-tapes for producer review endpoint
+- [x] Add timestamped feedback endpoint
+- [x] Submit rating endpoint
+- [x] Request revision endpoint
+- [x] Mark revision complete endpoint
+
+### Recording UI (Actor)
+- [x] Create self-tape recording screen with camera preview
+- [x] Add record/stop/pause controls
+- [x] Add front/back camera toggle
+- [x] Add timer display during recording
+- [x] Add countdown before recording starts
+- [x] Preview recorded video before submission
+
+### Video Editing
+- [x] Add trim start/end functionality
+- [x] Create slate overlay with actor name and role
+- [x] Add slate at beginning of video
+- [x] Preview edited video before final submission
+
+### Upload & Submission
+- [x] Create self-tape submission form (project title, role description)
+- [x] Upload video to storage (S3/local)
+- [x] Generate thumbnail from video
+- [x] Link self-tape to contract/project if applicable
+
+### Producer Review Interface
+- [x] Create self-tapes inbox screen for producers
+- [x] Video player with timestamp display
+- [x] Add note at current timestamp feature
+- [x] Display all timestamped notes as markers on timeline
+- [x] Rating form with multiple criteria (fit, energy, delivery, overall)
+- [x] Request revision button with notes field
+
+### Actor Feedback View
+- [x] Show producer feedback on self-tape detail screen
+- [x] Display timestamped notes synced with video playback
+- [x] Show ratings received
+- [x] Show revision requests with ability to resubmit
+
+### Push Notifications
+- [x] Notify producer when new self-tape is submitted
+- [x] Notify actor when feedback is added
+- [x] Notify actor when revision is requested
+- [x] Notify producer when revision is submitted
+
+### Integration
+- [x] Add self-tapes link to profile screen
+- [ ] Add "Submit Self-Tape" option in actors quick actions
+- [ ] Link self-tapes to messaging for discussion
