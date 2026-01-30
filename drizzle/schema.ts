@@ -245,6 +245,7 @@ export const actorProfiles = mysqlTable("actorProfiles", {
   hairColor: varchar("hairColor", { length: 50 }),
   website: varchar("website", { length: 500 }),
   imdbUrl: varchar("imdbUrl", { length: 500 }),
+  phoneNumber: varchar("phoneNumber", { length: 20 }), // Contact phone number
   portfolioTheme: mysqlEnum("portfolioTheme", ["grid", "masonry", "carousel"]).default("grid").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -285,6 +286,7 @@ export const producerProfiles = mysqlTable("producerProfiles", {
   website: varchar("website", { length: 500 }),
   notableProjects: text("notableProjects"), // JSON array of notable projects
   awards: text("awards"), // JSON array of awards
+  phoneNumber: varchar("phoneNumber", { length: 20 }), // Contact phone number
   portfolioTheme: mysqlEnum("portfolioTheme", ["grid", "masonry", "carousel"]).default("grid").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

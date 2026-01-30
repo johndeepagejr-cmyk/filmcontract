@@ -42,6 +42,7 @@ export default function EditProfileScreen() {
   const [hairColor, setHairColor] = useState("");
   const [website, setWebsite] = useState("");
   const [imdbUrl, setImdbUrl] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [profilePhotoUrl, setProfilePhotoUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -74,6 +75,7 @@ export default function EditProfileScreen() {
       setHairColor(profile.hairColor || "");
       setWebsite(profile.website || "");
       setImdbUrl(profile.imdbUrl || "");
+      setPhoneNumber(profile.phoneNumber || "");
       setProfilePhotoUrl(profile.profilePhotoUrl || "");
       setLoading(false);
     } else {
@@ -136,6 +138,7 @@ export default function EditProfileScreen() {
       hairColor,
       website,
       imdbUrl,
+      phoneNumber: phoneNumber || undefined,
       profilePhotoUrl: profilePhotoUrl || undefined,
     });
   };
@@ -349,6 +352,24 @@ export default function EditProfileScreen() {
                 keyboardType="url"
                 className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
               />
+            </View>
+          </View>
+
+          {/* Contact Info */}
+          <View className="gap-4">
+            <Text className="text-lg font-bold text-foreground">Contact Information</Text>
+            
+            <View className="gap-2">
+              <Text className="text-base font-semibold text-foreground">Phone Number</Text>
+              <TextInput
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                placeholder="e.g., (555) 123-4567"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="phone-pad"
+                className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
+              />
+              <Text className="text-xs text-muted">This will be visible to producers who want to contact you</Text>
             </View>
           </View>
 

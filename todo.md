@@ -959,3 +959,12 @@
 - [x] Add call button with phone integration
 - [x] Add message/call buttons to actor profiles
 - [x] Add messages link to profile screen
+
+
+## Push Notifications & Phone Number Features
+- [x] Add phone number field to actor profiles database
+- [x] Add phone number field to producer profiles database
+- [x] Update actor profile edit screen with phone number input
+- [x] Update producer profile edit screen with phone number input
+- [x] Implement push notifications for new messages
+- [x] Update call button to dial phone numbers

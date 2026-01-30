@@ -3,6 +3,7 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
 import { conversations, messages, users } from "@/drizzle/schema";
 import { eq, or, and, desc, sql } from "drizzle-orm";
+import { notifyNewMessage } from "./notification-service";
 
 export const messagingRouter = router({
   // Get all conversations for current user
@@ -195,6 +196,22 @@ export const messagingRouter = router({
           lastMessagePreview: input.content.substring(0, 255),
         })
         .where(eq(conversations.id, conversationId));
+
+      // Get recipient ID and sender name for push notification
+      const [conversation] = await db
+        .select()
+        .from(conversations)
+        .where(eq(conversations.id, conversationId));
+      
+      if (conversation) {
+        const recipientId = conversation.participant1Id === userId 
+          ? conversation.participant2Id 
+          : conversation.participant1Id;
+        const senderName = ctx.user.name || "Someone";
+        
+        // Send push notification to recipient
+        await notifyNewMessage(recipientId, senderName, input.content);
+      }
 
       return { id: newMessage.id, conversationId };
     }),

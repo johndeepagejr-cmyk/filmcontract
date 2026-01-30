@@ -121,3 +121,18 @@ export async function savePushToken(userId: number, pushToken: string) {
     return false;
   }
 }
+
+/**
+ * Notify user when they receive a new message
+ */
+export async function notifyNewMessage(recipientId: number, senderName: string, messagePreview: string) {
+  const pushToken = await getUserPushToken(recipientId);
+  if (!pushToken) return;
+
+  await sendPushNotification({
+    to: pushToken,
+    title: "New Message",
+    body: `${senderName}: ${messagePreview.substring(0, 100)}${messagePreview.length > 100 ? '...' : ''}`,
+    data: { type: "new_message", recipientId, senderName },
+  });
+}

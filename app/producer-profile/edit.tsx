@@ -41,6 +41,7 @@ export default function EditProducerProfileScreen() {
   const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null);
   const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
   const [notableProjects, setNotableProjects] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     if (profile) {
@@ -67,6 +68,7 @@ export default function EditProducerProfileScreen() {
           setNotableProjects("");
         }
       }
+      setPhoneNumber(profile.phoneNumber || "");
     }
   }, [profile]);
 
@@ -168,6 +170,7 @@ export default function EditProducerProfileScreen() {
         companyLogoUrl: companyLogoUrl || undefined,
         specialties: selectedSpecialties.length > 0 ? selectedSpecialties : undefined,
         notableProjects: projectsArray.length > 0 ? projectsArray : undefined,
+        phoneNumber: phoneNumber.trim() || undefined,
       },
       {
         onSuccess: () => {
@@ -395,6 +398,20 @@ export default function EditProducerProfileScreen() {
               placeholderTextColor="#9CA3AF"
               style={{ minHeight: 80, textAlignVertical: "top" }}
             />
+          </View>
+
+          {/* Contact Information */}
+          <View className="gap-2">
+            <Text className="text-sm font-medium text-foreground">Phone Number</Text>
+            <TextInput
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              placeholder="e.g., (555) 123-4567"
+              keyboardType="phone-pad"
+              className="bg-surface border border-border rounded-xl px-4 py-3 text-foreground"
+              placeholderTextColor="#9CA3AF"
+            />
+            <Text className="text-xs text-muted">This will be visible to actors who want to contact you</Text>
           </View>
 
           {/* Save Button */}

@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { useState, useMemo, useEffect } from "react";
 import * as Haptics from "expo-haptics";
-import { Platform } from "react-native";
+import { Platform, Linking, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QuickActionsMenu, type QuickAction } from "@/components/quick-actions-menu";
 import { CustomHeader } from "@/components/custom-header";
@@ -428,10 +428,24 @@ export default function ActorsDirectoryScreen() {
           {
             label: "Call Actor",
             icon: "📞",
-            onPress: () => {
-              // Open phone dialer with actor's phone number if available
-              // For now, show a message that phone number is not available
-              alert("Phone number not available. Use messaging instead.");
+            onPress: async () => {
+              // Get actor's phone number from their profile
+              const actorPhone = selectedActor?.phoneNumber;
+              if (actorPhone) {
+                const phoneUrl = `tel:${actorPhone.replace(/[^0-9+]/g, '')}`;
+                const canOpen = await Linking.canOpenURL(phoneUrl);
+                if (canOpen) {
+                  await Linking.openURL(phoneUrl);
+                } else {
+                  Alert.alert("Cannot Open Phone", "Unable to open phone dialer on this device.");
+                }
+              } else {
+                Alert.alert(
+                  "Phone Number Not Available",
+                  "This actor hasn't added their phone number yet. Try sending them a message instead.",
+                  [{ text: "OK" }]
+                );
+              }
             },
           },
           {
