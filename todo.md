@@ -968,3 +968,12 @@
 - [x] Update producer profile edit screen with phone number input
 - [x] Implement push notifications for new messages
 - [x] Update call button to dial phone numbers
+
+
+## Development Build (EAS Build)
+- [x] Set up EAS Build configuration (eas.json)
+- [x] Configure app for development build (expo-dev-client added)
+- [x] Create development build guide
+- [ ] Create Expo account and link project (user action required)
+- [ ] Build Android APK for testing (user action required)
+- [ ] Build iOS app for testing (requires Apple Developer account)
