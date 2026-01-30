@@ -449,6 +449,14 @@ export default function ActorsDirectoryScreen() {
             },
           },
           {
+            label: "Schedule Video Audition",
+            icon: "🎬",
+            onPress: () => router.push({
+              pathname: "/auditions/schedule",
+              params: { actorId: selectedActor?.actorId?.toString() },
+            }),
+          },
+          {
             label: "View Profile",
             icon: "👤",
             onPress: () => router.push(`/actor/${selectedActor?.actorId}`),

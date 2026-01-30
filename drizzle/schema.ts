@@ -641,3 +641,91 @@ export const messages = mysqlTable("messages", {
 });
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = typeof messages.$inferInsert;
+
+
+/**
+ * Video Auditions table - stores scheduled video call auditions between producers and actors
+ * Integrated with Daily.co for live video calls
+ */
+export const videoAuditions = mysqlTable("video_auditions", {
+  id: int("id").autoincrement().primaryKey(),
+  /** The project this audition is for */
+  projectId: int("projectId").notNull(),
+  /** The role being auditioned for */
+  roleId: int("roleId"),
+  /** Producer who created the audition */
+  producerId: int("producerId").notNull(),
+  /** Actor being auditioned */
+  actorId: int("actorId").notNull(),
+  /** Daily.co room name/URL */
+  roomName: varchar("roomName", { length: 255 }).notNull(),
+  /** Daily.co room URL */
+  roomUrl: text("roomUrl"),
+  /** Scheduled start time */
+  scheduledAt: timestamp("scheduledAt").notNull(),
+  /** Duration in minutes */
+  durationMinutes: int("durationMinutes").default(30),
+  /** Audition status */
+  status: mysqlEnum("status", ["scheduled", "in_progress", "completed", "cancelled", "no_show"]).default("scheduled").notNull(),
+  /** Optional notes from producer */
+  notes: text("notes"),
+  /** Recording URL if recorded */
+  recordingUrl: text("recordingUrl"),
+  /** Whether recording is enabled */
+  recordingEnabled: boolean("recordingEnabled").default(false),
+  /** Actual start time */
+  startedAt: timestamp("startedAt"),
+  /** Actual end time */
+  endedAt: timestamp("endedAt"),
+  /** Producer's rating of the audition (1-5) */
+  rating: int("rating"),
+  /** Producer's feedback */
+  feedback: text("feedback"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type VideoAudition = typeof videoAuditions.$inferSelect;
+export type InsertVideoAudition = typeof videoAuditions.$inferInsert;
+
+/**
+ * Audition Participants - tracks who joined the video call
+ */
+export const auditionParticipants = mysqlTable("audition_participants", {
+  id: int("id").autoincrement().primaryKey(),
+  auditionId: int("auditionId").notNull(),
+  userId: int("userId").notNull(),
+  /** Role in the call */
+  role: mysqlEnum("role", ["producer", "actor", "guest"]).notNull(),
+  /** When they joined */
+  joinedAt: timestamp("joinedAt"),
+  /** When they left */
+  leftAt: timestamp("leftAt"),
+  /** Duration in seconds */
+  durationSeconds: int("durationSeconds"),
+});
+
+export type AuditionParticipant = typeof auditionParticipants.$inferSelect;
+export type InsertAuditionParticipant = typeof auditionParticipants.$inferInsert;
+
+/**
+ * Audition Invitations - tracks invitations sent to actors
+ */
+export const auditionInvitations = mysqlTable("audition_invitations", {
+  id: int("id").autoincrement().primaryKey(),
+  auditionId: int("auditionId").notNull(),
+  actorId: int("actorId").notNull(),
+  /** Invitation status */
+  status: mysqlEnum("status", ["pending", "accepted", "declined", "expired"]).default("pending").notNull(),
+  /** Message from producer */
+  message: text("message"),
+  /** When invitation was sent */
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+  /** When actor responded */
+  respondedAt: timestamp("respondedAt"),
+  /** Expiration time */
+  expiresAt: timestamp("expiresAt"),
+});
+
+export type AuditionInvitation = typeof auditionInvitations.$inferSelect;
+export type InsertAuditionInvitation = typeof auditionInvitations.$inferInsert;

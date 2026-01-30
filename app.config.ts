@@ -33,6 +33,9 @@ const config: ExpoConfig = {
   newArchEnabled: true,
   extra: {
     apiUrl: process.env.API_URL || "https://3000-ia6sbgycqgi78h1m3wxmm-268d213c.us2.manus.computer",
+    eas: {
+      projectId: "9e393577-c465-4442-ae8b-b77e7e3e7614",
+    },
   },
   ios: {
     supportsTablet: true,

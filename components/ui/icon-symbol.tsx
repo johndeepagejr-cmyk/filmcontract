@@ -18,9 +18,22 @@ const MAPPING = {
   "paperplane.fill": "send",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
+  "chevron.left": "chevron-left",
   "chart.bar": "bar-chart",
   "person.fill": "person",
   "magnifyingglass": "search",
+  // Video audition icons
+  "video": "videocam",
+  "video.fill": "videocam",
+  "video.slash": "videocam-off",
+  "clock": "schedule",
+  "timer": "timer",
+  "record.circle": "fiber-manual-record",
+  "plus": "add",
+  "bell": "notifications",
+  "phone.down.fill": "call-end",
+  "xmark": "close",
+  "exclamationmark.triangle": "warning",
 } as IconMapping;
 
 /**

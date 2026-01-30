@@ -16,12 +16,14 @@ import { storagePut } from "./storage";
 import { savePushToken, notifyContractCreated as pushNotifyContractCreated, notifyContractSigned as pushNotifyContractSigned } from "./notification-service";
 import { socialRouter } from "./social-router";
 import { messagingRouter } from "./messaging-router";
+import { videoAuditionRouter } from "./video-audition-router";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   social: socialRouter,
   messaging: messagingRouter,
+  videoAudition: videoAuditionRouter,
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

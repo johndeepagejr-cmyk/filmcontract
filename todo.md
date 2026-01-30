@@ -977,3 +977,33 @@
 - [ ] Create Expo account and link project (user action required)
 - [ ] Build Android APK for testing (user action required)
 - [ ] Build iOS app for testing (requires Apple Developer account)
+
+
+## Video Audition Feature
+- [ ] Research and select video call SDK (Agora/Twilio/Daily.co)
+- [ ] Create audition_calls database table (participants, scheduled_time, status, recording_url)
+- [ ] Create video call API endpoints (create room, join room, end call)
+- [ ] Build video call UI screen with camera/mic controls
+- [ ] Implement audition scheduling and invitation flow
+- [ ] Add push notifications for audition reminders
+- [ ] Add call recording option for self-tape reviews
+- [ ] Integrate with existing messaging system for call invites
+
+
+## Video Audition Feature (Daily.co Integration)
+- [x] Create database schema for video auditions (video_auditions, audition_participants, audition_invitations tables)
+- [x] Create video audition tRPC router with endpoints (scheduleAudition, getAudition, getMyAuditions, joinAudition, leaveAudition, endAudition, cancelAudition, respondToInvitation, getMyInvitations)
+- [x] Create auditions list screen (/app/auditions/index.tsx) with status filters and invitation display
+- [x] Create audition details screen (/app/auditions/[id]/index.tsx) with full audition info
+- [x] Create video call screen (/app/auditions/[id]/call.tsx) with Daily.co WebView integration
+- [x] Create schedule audition screen (/app/auditions/schedule.tsx) for producers
+- [x] Create invitation response screen (/app/auditions/invitation/[id].tsx) for actors
+- [x] Add video auditions link to profile screen
+- [x] Add "Schedule Video Audition" to actors quick actions menu
+- [x] Install required packages (date-fns, react-native-webview, expo-screen-orientation, @react-native-community/datetimepicker)
+- [x] Add new icons to icon-symbol.tsx for video features
+- [x] Push notifications for audition invitations and responses
+- [ ] Request Daily.co API key from user (DAILY_API_KEY)
+- [ ] Test video call functionality in development build
+- [ ] Add recording playback screen
+- [ ] Add audition reminders before scheduled time
