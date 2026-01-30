@@ -610,3 +610,32 @@ export const aiRecommendations = mysqlTable("aiRecommendations", {
 
 export type AiRecommendation = typeof aiRecommendations.$inferSelect;
 export type InsertAiRecommendation = typeof aiRecommendations.$inferInsert;
+
+
+/**
+ * Conversations table - tracks message threads between users
+ */
+export const conversations = mysqlTable("conversations", {
+  id: int("id").autoincrement().primaryKey(),
+  participant1Id: int("participant1Id").notNull(), // First user in conversation
+  participant2Id: int("participant2Id").notNull(), // Second user in conversation
+  lastMessageAt: timestamp("lastMessageAt").defaultNow().notNull(),
+  lastMessagePreview: varchar("lastMessagePreview", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type Conversation = typeof conversations.$inferSelect;
+export type InsertConversation = typeof conversations.$inferInsert;
+
+/**
+ * Messages table - individual messages in conversations
+ */
+export const messages = mysqlTable("messages", {
+  id: int("id").autoincrement().primaryKey(),
+  conversationId: int("conversationId").notNull(),
+  senderId: int("senderId").notNull(),
+  content: text("content").notNull(),
+  isRead: boolean("isRead").default(false),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;

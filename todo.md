@@ -949,3 +949,13 @@
 - [ ] Add message list/conversations screen (partial implementation)
 - [ ] Display unread message count
 - [ ] Add real-time message notifications
+
+
+## Messaging & Calling Features
+- [x] Create messages database table
+- [x] Create messaging API endpoints
+- [x] Build conversations list screen
+- [x] Build chat/message screen
+- [x] Add call button with phone integration
+- [x] Add message/call buttons to actor profiles
+- [x] Add messages link to profile screen

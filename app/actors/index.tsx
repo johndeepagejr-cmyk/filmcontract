@@ -342,22 +342,30 @@ export default function ActorsDirectoryScreen() {
                   </View>
 
                   {/* Specialties */}
-                  {actor.specialties && actor.specialties.length > 0 && (
-                    <View className="flex-row flex-wrap gap-2">
-                      {actor.specialties.slice(0, 3).map((specialty, idx) => (
-                        <View key={idx} className="bg-primary/10 px-2 py-1 rounded-full">
-                          <Text className="text-xs font-semibold text-primary">{specialty}</Text>
+                  {actor.specialties && (() => {
+                    try {
+                      const specialtiesArray = typeof actor.specialties === 'string' ? JSON.parse(actor.specialties) : actor.specialties;
+                      if (!Array.isArray(specialtiesArray) || specialtiesArray.length === 0) return null;
+                      return (
+                        <View className="flex-row flex-wrap gap-2">
+                          {specialtiesArray.slice(0, 3).map((specialty, idx) => (
+                            <View key={idx} className="bg-primary/10 px-2 py-1 rounded-full">
+                              <Text className="text-xs font-semibold text-primary">{specialty}</Text>
+                            </View>
+                          ))}
+                          {specialtiesArray.length > 3 && (
+                            <View className="bg-border px-2 py-1 rounded-full">
+                              <Text className="text-xs font-semibold text-muted">
+                                +{specialtiesArray.length - 3} more
+                              </Text>
+                            </View>
+                          )}
                         </View>
-                      ))}
-                      {actor.specialties.length > 3 && (
-                        <View className="bg-border px-2 py-1 rounded-full">
-                          <Text className="text-xs font-semibold text-muted">
-                            +{actor.specialties.length - 3} more
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
+                      );
+                    } catch {
+                      return null;
+                    }
+                  })()}
 
                   <View className="flex-row gap-4">
                     <View className="flex-1">
@@ -407,6 +415,25 @@ export default function ActorsDirectoryScreen() {
         onClose={() => setQuickActionsVisible(false)}
         title={selectedActor?.actorName}
         actions={[
+          {
+            label: "Send Message",
+            icon: "💬",
+            onPress: () => {
+              router.push({
+                pathname: "/messages/new",
+                params: { recipientId: selectedActor?.actorId?.toString(), name: selectedActor?.actorName || "Actor" },
+              });
+            },
+          },
+          {
+            label: "Call Actor",
+            icon: "📞",
+            onPress: () => {
+              // Open phone dialer with actor's phone number if available
+              // For now, show a message that phone number is not available
+              alert("Phone number not available. Use messaging instead.");
+            },
+          },
           {
             label: "View Profile",
             icon: "👤",
