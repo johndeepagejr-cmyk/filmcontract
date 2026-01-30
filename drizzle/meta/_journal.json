@@ -232,6 +232,13 @@
       "when": 1769801337293,
       "tag": "0032_closed_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1769802044297,
+      "tag": "0033_luxuriant_vance_astro",
+      "breakpoints": true
     }
   ]
 }

@@ -20,6 +20,7 @@ const MAPPING = {
   "chevron.right": "chevron-right",
   "chevron.left": "chevron-left",
   "chart.bar": "bar-chart",
+  "chart.bar.fill": "bar-chart",
   "person.fill": "person",
   "magnifyingglass": "search",
   // Video audition icons
@@ -30,10 +31,14 @@ const MAPPING = {
   "timer": "timer",
   "record.circle": "fiber-manual-record",
   "plus": "add",
+  "plus.circle.fill": "add-circle",
   "bell": "notifications",
   "phone.down.fill": "call-end",
   "xmark": "close",
   "exclamationmark.triangle": "warning",
+  "play.fill": "play-arrow",
+  "pause.fill": "pause",
+  "stop.fill": "stop",
 } as IconMapping;
 
 /**

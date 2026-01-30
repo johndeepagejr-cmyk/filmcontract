@@ -18,6 +18,8 @@ import { socialRouter } from "./social-router";
 import { messagingRouter } from "./messaging-router";
 import { videoAuditionRouter } from "./video-audition-router";
 import { selfTapeRouter } from "./self-tape-router";
+import { selfTapeTemplatesRouter } from "./self-tape-templates-router";
+import { selfTapeAnalyticsRouter } from "./self-tape-analytics-router";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -26,6 +28,8 @@ export const appRouter = router({
   messaging: messagingRouter,
   videoAudition: videoAuditionRouter,
   selfTape: selfTapeRouter,
+  selfTapeTemplates: selfTapeTemplatesRouter,
+  selfTapeAnalytics: selfTapeAnalyticsRouter,
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

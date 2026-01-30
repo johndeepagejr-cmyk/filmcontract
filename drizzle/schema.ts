@@ -853,3 +853,65 @@ export const selfTapeRevisions = mysqlTable("self_tape_revisions", {
 
 export type SelfTapeRevision = typeof selfTapeRevisions.$inferSelect;
 export type InsertSelfTapeRevision = typeof selfTapeRevisions.$inferInsert;
+
+
+/**
+ * Self-Tape Templates table - reusable templates for requesting self-tapes
+ */
+export const selfTapeTemplates = mysqlTable("self_tape_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Producer who created the template */
+  producerId: int("producerId").notNull(),
+  /** Template name */
+  name: varchar("name", { length: 255 }).notNull(),
+  /** Template description */
+  description: text("description"),
+  /** Project title template */
+  projectTitle: varchar("projectTitle", { length: 255 }).notNull(),
+  /** Role description template */
+  roleDescription: text("roleDescription"),
+  /** Character name template */
+  characterName: varchar("characterName", { length: 100 }),
+  /** Specific requirements for the self-tape */
+  requirements: text("requirements"),
+  /** Suggested duration in seconds */
+  suggestedDuration: int("suggestedDuration"),
+  /** Whether to include slate overlay */
+  requireSlate: boolean("requireSlate").default(true),
+  /** Number of times this template has been used */
+  usageCount: int("usageCount").default(0),
+  /** Whether template is active */
+  isActive: boolean("isActive").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SelfTapeTemplate = typeof selfTapeTemplates.$inferSelect;
+export type InsertSelfTapeTemplate = typeof selfTapeTemplates.$inferInsert;
+
+/**
+ * Self-Tape Analytics table - aggregated metrics for dashboard
+ */
+export const selfTapeAnalytics = mysqlTable("self_tape_analytics", {
+  id: int("id").autoincrement().primaryKey(),
+  /** Producer ID for analytics */
+  producerId: int("producerId").notNull(),
+  /** Date of the analytics snapshot */
+  date: timestamp("date").notNull(),
+  /** Total submissions on this date */
+  submissionsCount: int("submissionsCount").default(0),
+  /** Average rating received */
+  averageRating: decimal("averageRating", { precision: 3, scale: 2 }),
+  /** Total revisions requested */
+  revisionsRequested: int("revisionsRequested").default(0),
+  /** Average response time in hours */
+  averageResponseTime: decimal("averageResponseTime", { precision: 5, scale: 2 }),
+  /** Number of approved tapes */
+  approvalsCount: int("approvalsCount").default(0),
+  /** Number of rejected tapes */
+  rejectionsCount: int("rejectionsCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SelfTapeAnalytic = typeof selfTapeAnalytics.$inferSelect;
+export type InsertSelfTapeAnalytic = typeof selfTapeAnalytics.$inferInsert;

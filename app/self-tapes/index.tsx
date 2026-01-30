@@ -207,7 +207,11 @@ export default function SelfTapesScreen() {
             <IconSymbol name="plus.circle.fill" size={28} color={colors.primary} />
           </TouchableOpacity>
         )}
-        {isProducer && <View style={{ width: 28 }} />}
+        {isProducer && (
+          <TouchableOpacity onPress={() => router.push("/self-tapes/analytics")}>
+            <IconSymbol name="chart.bar.fill" size={24} color={colors.primary} />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Status Filter */}

@@ -1070,3 +1070,34 @@
 - [x] Add self-tapes link to profile screen
 - [ ] Add "Submit Self-Tape" option in actors quick actions
 - [ ] Link self-tapes to messaging for discussion
+
+
+## Self-Tape Enhancements
+
+### S3 Video Storage Integration
+- [x] Create S3 upload utility function
+- [x] Add AWS SDK configuration
+- [ ] Update self-tape router to upload videos to S3
+- [x] Generate presigned URLs for video access
+- [ ] Add video URL validation and expiration handling
+- [ ] Update edit screen to show upload progress
+- [ ] Store S3 URLs in database instead of local URIs
+
+### Self-Tape Templates
+- [x] Create self_tape_templates database table
+- [x] Create template management tRPC router
+- [ ] Build template creation screen for producers
+- [ ] Build template list screen with edit/delete
+- [ ] Add template selection when recording self-tape
+- [ ] Auto-populate fields from template
+- [ ] Display template requirements during recording
+
+### Producer Analytics Dashboard
+- [x] Create analytics data aggregation functions
+- [x] Build dashboard screen with key metrics
+- [x] Add submission trends chart (submissions over time)
+- [x] Add rating distribution visualization
+- [x] Add actor performance rankings
+- [x] Add revision request patterns
+- [x] Add response time analytics
+- [ ] Export analytics reports
