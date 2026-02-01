@@ -156,7 +156,7 @@ describe("Push Notifications", () => {
   });
 
   it("should register push token", async () => {
-    const caller = appRouter.createCaller({ user: testActor });
+    const caller = appRouter.createCaller({ user: testActor } as any);
 
     const result = await caller.notifications.registerToken({
       pushToken: "ExponentPushToken[test-token-123]",
@@ -167,7 +167,7 @@ describe("Push Notifications", () => {
   });
 
   it("should update existing push token", async () => {
-    const caller = appRouter.createCaller({ user: testActor });
+    const caller = appRouter.createCaller({ user: testActor } as any);
 
     // Register first token
     await caller.notifications.registerToken({
