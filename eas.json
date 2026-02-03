@@ -10,20 +10,35 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleDebug",
-        "credentialsSource": "local"
+        "credentialsSource": "local",
+        "ndk": "25.1.8937393"
       },
       "ios": {
         "simulator": true
+      },
+      "cache": {
+        "disabled": false
       }
     },
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "ndk": "25.1.8937393"
+      },
+      "cache": {
+        "disabled": false
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk",
+        "ndk": "25.1.8937393"
+      },
+      "cache": {
+        "disabled": false
+      }
     }
   },
   "submit": {
