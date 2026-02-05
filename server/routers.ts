@@ -10,7 +10,7 @@ import { eq, or, sql } from "drizzle-orm";
 import { notifyContractCreated, notifyContractSigned, notifyPaymentReceived, notifyStatusChanged } from "./email-service";
 import { getProducerReputation, getProducerReviews, createProducerReview, getAllProducersWithReputation } from "./reputation-service";
 import { getActorReputation, getActorReviews, createActorReview, getAllActorsWithReputation } from "./actor-reputation-service";
-import { createContractPaymentIntent, createDonationPaymentIntent, verifyPaymentIntent } from "./stripe-service";
+// Stripe removed for lightweight build
 import { sendPaymentReceiptEmail } from "./receipt-generator";
 import { storagePut } from "./storage";
 import { savePushToken, notifyContractCreated as pushNotifyContractCreated, notifyContractSigned as pushNotifyContractSigned } from "./notification-service";
