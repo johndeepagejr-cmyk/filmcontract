@@ -30,6 +30,8 @@ export const users = mysqlTable("users", {
   userRole: mysqlEnum("userRole", ["producer", "actor"]),
   /** Push notification token for mobile notifications */
   pushToken: text("pushToken"),
+  /** Profile picture URL for actors */
+  profilePictureUrl: text("profilePictureUrl"),
   /** Verification status for established professionals */
   isVerified: boolean("isVerified").default(false).notNull(),
   /** Timestamp when user was verified */
