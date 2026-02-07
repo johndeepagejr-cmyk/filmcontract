@@ -1154,3 +1154,13 @@
 - [x] Fix actorProfile tRPC router reference (changed to profilesDetail)
 - [x] Fix rowsAffected property error in server/db.ts
 - [x] Verify zero TypeScript errors with tsc --noEmit
+
+## Build Timeout Fix - Publish Blocker
+- [x] Investigate actual build/publish process causing timeout
+- [x] Optimize build configuration to complete within time limit
+- [x] Remove unused heavy dependencies (date-fns 33MB, expo-auth-session, expo-dev-client)
+- [x] Remove expo-dev-client from app.config.ts plugins
+- [x] Test build locally - web export completes successfully (23 static routes)
+- [x] Server build completes in 15ms
+- [x] TypeScript check passes with zero errors
+- [ ] Successfully publish app
