@@ -1,0 +1,13 @@
+# Exclude files not needed for native Android/iOS builds
+drizzle/
+tests/
+docs/
+todo.md
+design.md
+.manus/
+.manus-logs/
+dist/
+*.test.ts
+*.test.tsx
+*.md
+!README.md

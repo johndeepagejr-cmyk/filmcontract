@@ -9,35 +9,31 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:assembleDebug",
-        "credentialsSource": "local",
-        "ndk": "25.1.8937393"
+        "gradleCommand": ":app:assembleDebug"
       },
       "ios": {
         "simulator": true
       },
       "cache": {
-        "disabled": false
+        "key": "filmcontract-v1"
       }
     },
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk",
-        "ndk": "25.1.8937393"
+        "buildType": "apk"
       },
       "cache": {
-        "disabled": false
+        "key": "filmcontract-v1"
       }
     },
     "production": {
       "autoIncrement": true,
       "android": {
-        "buildType": "apk",
-        "ndk": "25.1.8937393"
+        "buildType": "apk"
       },
       "cache": {
-        "disabled": false
+        "key": "filmcontract-v1"
       }
     }
   },

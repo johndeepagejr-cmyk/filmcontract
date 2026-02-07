@@ -1169,3 +1169,10 @@
 - [x] Clean pnpm install (remove node_modules + reinstall)
 - [x] Simplify tab layout - remove references to missing routes (analytics, create)
 - [x] Verify build completes successfully (web export + server build + tsc all pass)
+
+## Android APK Build Timeout Fix
+- [x] Remove unused native dependencies (react-native-svg, react-native-worklets)
+- [x] Optimize eas.json - removed NDK requirement, added cache keys
+- [x] Created .easignore to exclude drizzle/, tests/, docs/ from build upload
+- [x] app.config.ts plugins already minimal (router, splash, build-properties)
+- [x] Verify project still runs - tsc zero errors, web export works
