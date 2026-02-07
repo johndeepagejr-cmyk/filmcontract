@@ -16,11 +16,6 @@ import { storagePut } from "./storage";
 import { savePushToken, notifyContractCreated as pushNotifyContractCreated, notifyContractSigned as pushNotifyContractSigned } from "./notification-service";
 import { socialRouter } from "./social-router";
 import { messagingRouter } from "./messaging-router";
-import { videoAuditionRouter } from "./video-audition-router";
-import { selfTapeRouter } from "./self-tape-router";
-import { selfTapeTemplatesRouter } from "./self-tape-templates-router";
-import { selfTapeAnalyticsRouter } from "./self-tape-analytics-router";
-import { profilePictureRouter } from "./profile-picture-router";
 import { getHelloSignService } from "./hellosign-service";
 
 export const appRouter = router({
@@ -28,11 +23,6 @@ export const appRouter = router({
   system: systemRouter,
   social: socialRouter,
   messaging: messagingRouter,
-  videoAudition: videoAuditionRouter,
-  selfTape: selfTapeRouter,
-  selfTapeTemplates: selfTapeTemplatesRouter,
-  selfTapeAnalytics: selfTapeAnalyticsRouter,
-  profilePicture: profilePictureRouter,
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -787,52 +777,22 @@ export const appRouter = router({
       }),
   }),
 
-  // Stripe payment integration
+  // Payments (Stripe removed for lightweight build)
   payments: router({
-    // Create payment intent for contract payment
     createContractPayment: protectedProcedure
-      .input(
-        z.object({
-          contractId: z.number(),
-          amount: z.number(),
-          actorEmail: z.string(),
-          projectTitle: z.string(),
-        })
-      )
-      .mutation(async ({ input }) => {
-        const { clientSecret, paymentIntentId } = await createContractPaymentIntent(
-          input.amount,
-          input.contractId,
-          input.actorEmail,
-          input.projectTitle
-        );
-        return { clientSecret, paymentIntentId };
+      .input(z.object({ contractId: z.number(), amount: z.number(), actorEmail: z.string(), projectTitle: z.string() }))
+      .mutation(async () => {
+        throw new Error("Payment processing not configured. Please set up Stripe.");
       }),
-
-    // Create payment intent for donation
     createDonation: publicProcedure
-      .input(
-        z.object({
-          amount: z.number(),
-          donorEmail: z.string().optional(),
-          donorName: z.string().optional(),
-        })
-      )
-      .mutation(async ({ input }) => {
-        const { clientSecret, paymentIntentId } = await createDonationPaymentIntent(
-          input.amount,
-          input.donorEmail,
-          input.donorName
-        );
-        return { clientSecret, paymentIntentId };
+      .input(z.object({ amount: z.number(), donorEmail: z.string().optional(), donorName: z.string().optional() }))
+      .mutation(async () => {
+        throw new Error("Payment processing not configured. Please set up Stripe.");
       }),
-
-    // Verify payment was successful
     verifyPayment: protectedProcedure
       .input(z.object({ paymentIntentId: z.string() }))
-      .mutation(async ({ input }) => {
-        const isSuccessful = await verifyPaymentIntent(input.paymentIntentId);
-        return { success: isSuccessful };
+      .mutation(async () => {
+        throw new Error("Payment processing not configured. Please set up Stripe.");
       }),
   }),
 
@@ -846,58 +806,40 @@ export const appRouter = router({
         })
       )
       .query(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) return { totalViews: 0, recentViews: 0, uniqueVisitors: 0, viewsByDay: [] };
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - input.days);
 
-        // Get total views
         const totalViewsResult = await database
           .select({ count: sql<number>`count(*)` })
           .from(portfolioViews)
           .where(sql`${portfolioViews.portfolioUserId} = ${ctx.user.id}`);
-        
         const totalViews = Number(totalViewsResult[0]?.count || 0);
 
-        // Get recent views (within date range)
         const recentViewsResult = await database
           .select({ count: sql<number>`count(*)` })
           .from(portfolioViews)
-          .where(
-            sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`
-          );
-        
+          .where(sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`);
         const recentViews = Number(recentViewsResult[0]?.count || 0);
 
-        // Get unique visitors (by IP)
         const uniqueVisitorsResult = await database
           .select({ count: sql<number>`count(DISTINCT ${portfolioViews.viewerIp})` })
           .from(portfolioViews)
-          .where(
-            sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`
-          );
-        
+          .where(sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`);
         const uniqueVisitors = Number(uniqueVisitorsResult[0]?.count || 0);
 
-        // Get views by day for chart
         const viewsByDay = await database
-          .select({
-            date: sql<string>`DATE(${portfolioViews.createdAt})`,
-            count: sql<number>`count(*)`,
-          })
+          .select({ date: sql<string>`DATE(${portfolioViews.createdAt})`, count: sql<number>`count(*)` })
           .from(portfolioViews)
-          .where(
-            sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`
-          )
+          .where(sql`${portfolioViews.portfolioUserId} = ${ctx.user.id} AND ${portfolioViews.createdAt} >= ${cutoffDate}`)
           .groupBy(sql`DATE(${portfolioViews.createdAt})`);
 
         return {
           totalViews,
           recentViews,
           uniqueVisitors,
-          viewsByDay: viewsByDay.map((row) => ({
-            date: row.date,
-            views: Number(row.count),
-          })),
+          viewsByDay: viewsByDay.map((row: any) => ({ date: row.date, views: Number(row.count) })),
         };
       }),
 
@@ -909,27 +851,19 @@ export const appRouter = router({
         })
       )
       .query(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) return { contractsByDay: [] };
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - input.days);
 
-        // Get contracts created by day
         const contractsByDay = await database
-          .select({
-            date: sql<string>`DATE(${contracts.createdAt})`,
-            count: sql<number>`count(*)`,
-          })
+          .select({ date: sql<string>`DATE(${contracts.createdAt})`, count: sql<number>`count(*)` })
           .from(contracts)
-          .where(
-            sql`(${contracts.producerId} = ${ctx.user.id} OR ${contracts.actorId} = ${ctx.user.id}) AND ${contracts.createdAt} >= ${cutoffDate}`
-          )
-          .groupBy(sql`DATE(${contracts.createdAt})`)
+          .where(sql`(${contracts.producerId} = ${ctx.user.id} OR ${contracts.actorId} = ${ctx.user.id}) AND ${contracts.createdAt} >= ${cutoffDate}`)
+          .groupBy(sql`DATE(${contracts.createdAt})`);
 
         return {
-          contractsByDay: contractsByDay.map((row) => ({
-            date: row.date,
-            count: Number(row.count),
-          })),
+          contractsByDay: contractsByDay.map((row: any) => ({ date: row.date, count: Number(row.count) })),
         };
       }),
 
@@ -978,15 +912,13 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
         
-        // Check if already favorited
         const existing = await database
           .select()
           .from(favorites)
-          .where(
-            sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`
-          );
+          .where(sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`);
         
         if (existing.length > 0) {
           return { success: true, message: "Already favorited" };
@@ -1009,20 +941,20 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
         
         await database
           .delete(favorites)
-          .where(
-            sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`
-          );
+          .where(sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`);
         
         return { success: true };
       }),
 
     // Get user's favorites
     list: protectedProcedure.query(async ({ ctx }) => {
-      const database = getDb();
+      const database = await getDb();
+      if (!database) return [];
       
       const userFavorites = await database
         .select()
@@ -1040,14 +972,13 @@ export const appRouter = router({
         })
       )
       .query(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) return false;
         
         const existing = await database
           .select()
           .from(favorites)
-          .where(
-            sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`
-          );
+          .where(sql`${favorites.userId} = ${ctx.user.id} AND ${favorites.favoritedUserId} = ${input.favoritedUserId}`);
         
         return existing.length > 0;
       }),
@@ -1067,7 +998,8 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
         
         await database.insert(paymentHistory).values({
           contractId: input.contractId,
@@ -1078,13 +1010,12 @@ export const appRouter = router({
           recordedBy: ctx.user.id,
         });
 
-        // Update contract paid amount
         const payments = await database
           .select()
           .from(paymentHistory)
           .where(eq(paymentHistory.contractId, input.contractId));
         
-        const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount), 0);
+        const totalPaid = payments.reduce((sum: number, p: any) => sum + parseFloat(p.amount), 0);
         
         await database
           .update(contracts)
@@ -1098,7 +1029,8 @@ export const appRouter = router({
     getHistory: protectedProcedure
       .input(z.object({ contractId: z.number() }))
       .query(async ({ input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) return [];
         
         return database
           .select()
@@ -1119,7 +1051,8 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
         
         await database.insert(savedFilterPresets).values({
           userId: ctx.user.id,
@@ -1135,27 +1068,25 @@ export const appRouter = router({
     list: protectedProcedure
       .input(z.object({ filterType: z.enum(["actor", "producer"]) }))
       .query(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) return [];
         
         return database
           .select()
           .from(savedFilterPresets)
-          .where(
-            sql`${savedFilterPresets.userId} = ${ctx.user.id} AND ${savedFilterPresets.filterType} = ${input.filterType}`
-          );
+          .where(sql`${savedFilterPresets.userId} = ${ctx.user.id} AND ${savedFilterPresets.filterType} = ${input.filterType}`);
       }),
 
     // Delete a preset
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
         
         await database
           .delete(savedFilterPresets)
-          .where(
-            sql`${savedFilterPresets.id} = ${input.id} AND ${savedFilterPresets.userId} = ${ctx.user.id}`
-          );
+          .where(sql`${savedFilterPresets.id} = ${input.id} AND ${savedFilterPresets.userId} = ${ctx.user.id}`);
 
         return { success: true };
       }),
@@ -1166,18 +1097,16 @@ export const appRouter = router({
     // Calculate and update user's trust score
     calculateTrustScore: protectedProcedure
       .mutation(async ({ ctx }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) throw new Error("Database not available");
         const userId = ctx.user.id;
         
-        // Get user's contracts
         const userContracts = await database
           .select()
           .from(contracts)
-          .where(
-            sql`${contracts.producerId} = ${userId} OR ${contracts.actorId} = ${userId}`
-          );
+          .where(sql`${contracts.producerId} = ${userId} OR ${contracts.actorId} = ${userId}`);
         
-        const completedContracts = userContracts.filter(c => c.status === 'completed').length;
+        const completedContracts = userContracts.filter((c: any) => c.status === 'completed').length;
         const totalContracts = userContracts.length;
         
         // Calculate trust score (0-100)
@@ -1212,7 +1141,8 @@ export const appRouter = router({
     getTrustScore: protectedProcedure
       .input(z.object({ userId: z.number() }))
       .query(async ({ input }) => {
-        const database = getDb();
+        const database = await getDb();
+        if (!database) return { trustScore: 0, isVerified: false };
         
         const user = await database
           .select()

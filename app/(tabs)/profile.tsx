@@ -17,7 +17,7 @@ export default function ProfileScreen() {
     }
   );
 
-  const { data: actorProfile } = trpc.actorProfile.getMy.useQuery(undefined, {
+  const { data: actorProfile } = trpc.profilesDetail.getMy.useQuery(undefined, {
     enabled: isAuthenticated && user?.userRole === "actor",
   });
 
@@ -25,7 +25,7 @@ export default function ProfileScreen() {
     enabled: isAuthenticated && user?.userRole === "producer",
   });
 
-  const { data: films } = trpc.actorProfile.getFilms.useQuery(
+  const { data: films } = trpc.profilesDetail.getFilms.useQuery(
     { userId: user?.id || 0 },
     { enabled: isAuthenticated && user?.userRole === "actor" && !!user?.id }
   );
@@ -79,7 +79,7 @@ export default function ProfileScreen() {
             <View className="flex-1 gap-2">
               <View className="flex-row items-center gap-2">
                 <Text className="text-2xl font-bold text-foreground">{user?.name}</Text>
-                {user?.isVerified && (
+                {(user as any)?.isVerified && (
                   <View className="bg-primary rounded-full px-2 py-1">
                     <Text className="text-white text-xs font-bold">✓ VERIFIED</Text>
                   </View>
@@ -89,7 +89,7 @@ export default function ProfileScreen() {
             </View>
             <View className="flex-row gap-2">
               <TouchableOpacity
-                onPress={() => router.push("/profile/qr-code")}
+                onPress={() => router.push("/profile/qr-code" as any)}
                 className="bg-surface px-4 py-2 rounded-full active:opacity-80 border border-border"
               >
                 <Text className="text-foreground font-semibold">QR Code</Text>
@@ -107,7 +107,7 @@ export default function ProfileScreen() {
           <View className="bg-surface rounded-2xl p-6 gap-4">
             {user?.userRole === "actor" && (
               <TouchableOpacity
-                onPress={() => router.push("/profile/edit")}
+                onPress={() => router.push("/profile/edit" as any)}
                 className="absolute top-4 right-4 bg-primary px-4 py-2 rounded-full active:opacity-80"
               >
                 <Text className="text-white font-semibold text-sm">Edit Profile</Text>
@@ -115,7 +115,7 @@ export default function ProfileScreen() {
             )}
             {user?.userRole === "producer" && (
               <TouchableOpacity
-                onPress={() => router.push("/producer-profile/edit")}
+                onPress={() => router.push("/producer-profile/edit" as any)}
                 className="absolute top-4 right-4 bg-primary px-4 py-2 rounded-full active:opacity-80"
               >
                 <Text className="text-white font-semibold text-sm">Edit Profile</Text>
@@ -174,7 +174,7 @@ export default function ProfileScreen() {
               <View className="flex-row items-center justify-between">
                 <Text className="text-lg font-bold text-foreground">About Me</Text>
                 <TouchableOpacity
-                  onPress={() => router.push("/profile/edit")}
+                  onPress={() => router.push("/profile/edit" as any)}
                   className="active:opacity-70"
                 >
                   <Text className="text-sm text-primary font-semibold">Edit</Text>
@@ -240,7 +240,7 @@ export default function ProfileScreen() {
               <View className="flex-row items-center justify-between">
                 <Text className="text-lg font-bold text-foreground">Company Info</Text>
                 <TouchableOpacity
-                  onPress={() => router.push("/producer-profile/edit")}
+                  onPress={() => router.push("/producer-profile/edit" as any)}
                   className="active:opacity-70"
                 >
                   <Text className="text-sm text-primary font-semibold">Edit</Text>
@@ -355,7 +355,7 @@ export default function ProfileScreen() {
                   Filmography ({films?.length || 0})
                 </Text>
                 <TouchableOpacity
-                  onPress={() => router.push("/profile/filmography")}
+                  onPress={() => router.push("/profile/filmography" as any)}
                   className="bg-primary px-4 py-2 rounded-full active:opacity-80"
                 >
                   <Text className="text-white font-semibold text-sm">Manage</Text>
@@ -364,7 +364,7 @@ export default function ProfileScreen() {
 
               {films && films.length > 0 ? (
                 <View className="gap-3">
-                  {films.slice(0, 3).map((film) => (
+                  {films.slice(0, 3).map((film: any) => (
                     <View key={film.id} className="gap-1">
                       <Text className="text-base font-semibold text-foreground">{film.title}</Text>
                       <Text className="text-sm text-muted">
@@ -374,7 +374,7 @@ export default function ProfileScreen() {
                   ))}
                   {films.length > 3 && (
                     <TouchableOpacity
-                      onPress={() => router.push("/profile/filmography")}
+                      onPress={() => router.push("/profile/filmography" as any)}
                       className="active:opacity-70"
                     >
                       <Text className="text-sm text-primary font-semibold">
@@ -414,7 +414,7 @@ export default function ProfileScreen() {
 
           {/* Messages Section */}
           <TouchableOpacity
-            onPress={() => router.push("/messages")}
+            onPress={() => router.push("/messages" as any)}
             className="bg-surface rounded-2xl p-6 flex-row items-center justify-between active:opacity-80"
           >
             <View className="flex-row items-center gap-3">
@@ -429,7 +429,7 @@ export default function ProfileScreen() {
 
           {/* Video Auditions Section */}
           <TouchableOpacity
-            onPress={() => router.push("/auditions")}
+            onPress={() => router.push("/auditions" as any)}
             className="bg-surface rounded-2xl p-6 flex-row items-center justify-between active:opacity-80"
           >
             <View className="flex-row items-center gap-3">
@@ -444,7 +444,7 @@ export default function ProfileScreen() {
 
           {/* Self-Tapes Section */}
           <TouchableOpacity
-            onPress={() => router.push("/self-tapes")}
+            onPress={() => router.push("/self-tapes" as any)}
             className="bg-surface rounded-2xl p-6 flex-row items-center justify-between active:opacity-80"
           >
             <View className="flex-row items-center gap-3">
@@ -459,7 +459,7 @@ export default function ProfileScreen() {
 
           {/* Favorites Section */}
           <TouchableOpacity
-            onPress={() => router.push("/profile/favorites")}
+            onPress={() => router.push("/profile/favorites" as any)}
             className="bg-surface rounded-2xl p-6 flex-row items-center justify-between active:opacity-80"
           >
             <View className="flex-row items-center gap-3">

@@ -628,7 +628,7 @@ export async function deletePortfolioPhoto(photoId: number, userId: number) {
     .delete(portfolioPhotos)
     .where(and(eq(portfolioPhotos.id, photoId), eq(portfolioPhotos.userId, userId)));
 
-  return { success: true, deletedCount: result.rowsAffected || 0 };
+  return { success: true, deletedCount: (result as any)[0]?.affectedRows || 0 };
 }
 
 /**
