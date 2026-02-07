@@ -1164,3 +1164,8 @@
 - [x] Server build completes in 15ms
 - [x] TypeScript check passes with zero errors
 - [ ] Successfully publish app
+
+## Build Timeout Fix - Round 2
+- [x] Clean pnpm install (remove node_modules + reinstall)
+- [x] Simplify tab layout - remove references to missing routes (analytics, create)
+- [x] Verify build completes successfully (web export + server build + tsc all pass)
