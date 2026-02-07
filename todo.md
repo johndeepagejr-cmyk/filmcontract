@@ -1101,3 +1101,47 @@
 - [x] Add revision request patterns
 - [x] Add response time analytics
 - [ ] Export analytics reports
+
+
+## HelloSign E-Signature Integration
+
+### Step 1: SDK Installation & Configuration
+- [ ] Install @hellosign/sdk package
+- [ ] Add HelloSign API key to environment variables
+- [ ] Configure HelloSign service initialization
+
+### Step 2: HelloSign Service Layer
+- [ ] Create hellosign-service.ts file
+- [ ] Implement sendSignatureRequest method
+- [ ] Implement getSignatureStatus method
+- [ ] Implement downloadSignedDocument method
+
+### Step 3: Database Schema Updates
+- [ ] Add hellosignSignatureId field to contracts table
+- [ ] Add hellosignRequestId field to contracts table
+- [ ] Add signatureStatus field to contracts table
+- [ ] Add signedDocumentUrl field to contracts table
+
+### Step 4: Update signContract Mutation
+- [ ] Modify signContract to call HelloSign API
+- [ ] Store HelloSign signature IDs in database
+- [ ] Return signature request URL to client
+- [ ] Handle signature request errors
+
+### Step 5: Webhook Handler
+- [ ] Create webhook endpoint for HelloSign events
+- [ ] Handle signature_request_signed event
+- [ ] Update contract status when signed
+- [ ] Send notifications to parties
+
+### Step 6: PDF Generation & Certificates
+- [ ] Generate PDF from contract data
+- [ ] Add signature certificate to PDF
+- [ ] Store signed PDF in storage
+- [ ] Provide download link to users
+
+### Step 7: Testing & Delivery
+- [ ] Test signature request flow
+- [ ] Test webhook handling
+- [ ] Test PDF generation
+- [ ] Verify legal enforceability

@@ -70,6 +70,16 @@ export const contracts = mysqlTable("contracts", {
   actorSignature: text("actorSignature"), // Base64 encoded signature image
   producerSignedAt: timestamp("producerSignedAt"),
   actorSignedAt: timestamp("actorSignedAt"),
+  /** HelloSign signature request ID for legally binding e-signatures */
+  hellosignSignatureId: varchar("hellosignSignatureId", { length: 255 }),
+  /** HelloSign request ID for tracking */
+  hellosignRequestId: varchar("hellosignRequestId", { length: 255 }),
+  /** Current status of HelloSign signature request (pending/signed/declined/expired) */
+  signatureStatus: mysqlEnum("signatureStatus", ["pending", "signed", "declined", "expired"]),
+  /** URL to download the fully signed PDF from HelloSign */
+  signedDocumentUrl: text("signedDocumentUrl"),
+  /** Timestamp when contract was fully signed by all parties */
+  fullySignedAt: timestamp("fullySignedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
