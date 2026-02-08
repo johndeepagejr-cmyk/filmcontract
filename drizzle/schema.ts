@@ -927,3 +927,37 @@ export const selfTapeAnalytics = mysqlTable("self_tape_analytics", {
 
 export type SelfTapeAnalytic = typeof selfTapeAnalytics.$inferSelect;
 export type InsertSelfTapeAnalytic = typeof selfTapeAnalytics.$inferInsert;
+
+
+/**
+ * Subscriptions table - tracks user subscription plans (Free, Pro, Studio)
+ */
+export const subscriptions = mysqlTable("subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  plan: mysqlEnum("plan", ["free", "pro", "studio"]).default("free").notNull(),
+  /** Stripe customer ID */
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  /** Stripe subscription ID */
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  /** Current billing period start */
+  currentPeriodStart: timestamp("currentPeriodStart"),
+  /** Current billing period end */
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  /** Number of contracts used this month */
+  contractsUsedThisMonth: int("contractsUsedThisMonth").default(0).notNull(),
+  /** Month/year for contract count reset (YYYY-MM format) */
+  contractCountMonth: varchar("contractCountMonth", { length: 7 }),
+  /** Subscription status */
+  status: mysqlEnum("status", ["active", "canceled", "past_due", "trialing"]).default("active").notNull(),
+  /** Whether user is on a trial */
+  isTrial: boolean("isTrial").default(false).notNull(),
+  /** Trial end date */
+  trialEndsAt: timestamp("trialEndsAt"),
+  canceledAt: timestamp("canceledAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type InsertSubscription = typeof subscriptions.$inferInsert;

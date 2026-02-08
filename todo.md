@@ -1205,6 +1205,12 @@
 - [ ] Deliver APK file to user
 
 ## Push to GitHub + GitHub Actions Build
-- [ ] Create GitHub Actions workflow for Android AAB build
-- [ ] Push code to GitHub repository
-- [ ] Provide repo link and build instructions to user
+- [x] Create GitHub Actions workflow for Android AAB build
+- [x] Push code to GitHub repository (github.com/johndeepagejr-cmyk/filmcontract)
+- [x] Provide repo link and build instructions to user
+
+## Landing Page, Social Media & Subscriptions
+- [x] Build professional landing page (filmcontract-landing/index.html)
+- [x] Write social media posts (Facebook, Reddit, Instagram, TikTok, LinkedIn) - docs/social-media-posts.md
+- [x] Implement freemium subscription system (subscription-router.ts + app/subscription/index.tsx)
+- [ ] Save checkpoint and deliver
