@@ -1203,3 +1203,8 @@
 - [ ] Install EAS CLI
 - [ ] Run local EAS build for Android APK
 - [ ] Deliver APK file to user
+
+## Push to GitHub + GitHub Actions Build
+- [ ] Create GitHub Actions workflow for Android AAB build
+- [ ] Push code to GitHub repository
+- [ ] Provide repo link and build instructions to user
