@@ -1176,3 +1176,23 @@
 - [x] Created .easignore to exclude drizzle/, tests/, docs/ from build upload
 - [x] app.config.ts plugins already minimal (router, splash, build-properties)
 - [x] Verify project still runs - tsc zero errors, web export works
+
+## Android APK Build Timeout Fix - Round 3
+- [ ] Check EAS build logs to find exact failure point
+- [ ] Cancel stuck build if possible
+- [ ] Apply targeted fix based on actual build logs
+
+## Google Play Store Preparation
+- [x] Generate phone screenshots (5 screenshots at 1080x1920)
+- [ ] Generate 7-inch tablet screenshot (optional, skipped)
+- [x] Generate feature graphic (1024x500)
+- [x] Verify app icon meets Google Play specs (512x512 PNG) - regenerated professional icon
+- [x] Write short description (max 80 chars)
+- [x] Write full description (max 4000 chars)
+- [x] Write release notes / changelog
+- [x] Privacy policy already exists in-app at /legal/privacy
+- [x] Configure eas.json for AAB production build
+- [x] Version set to 1.0.0 with autoIncrement for versionCode
+- [x] Android permissions reviewed (POST_NOTIFICATIONS only)
+- [x] Create content rating questionnaire answers
+- [x] Create Google Play submission guide document
