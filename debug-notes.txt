@@ -1,0 +1,40 @@
+Bug Analysis: Producer Login Shows Success But App Is Stuck
+
+CONFIRMED ROOT CAUSES:
+
+1. Home screen (app/(tabs)/index.tsx) is COMPLETELY STATIC
+   - Shows "Welcome" + "Sign in with your account" text
+   - Does NOT import useAuth, LoginScreen, or RoleSelectionScreen
+   - Does NOT check authentication state
+   - Does NOT show contracts, quick actions, or any interactive content
+   - After login, user sees the exact same static page - looks "stuck"
+
+2. LoginScreen component EXISTS but is NEVER USED
+   - Located at components/auth/login-screen.tsx
+   - Has proper getLoginUrl() and OAuth flow
+   - But no screen imports or renders it
+
+3. RoleSelectionScreen component EXISTS but is NEVER USED
+   - Located at components/auth/role-selection-screen.tsx
+   - Has proper role selection (Producer/Actor) with updateRole mutation
+   - But no screen imports or renders it
+
+4. After OAuth login, user is redirected to /(tabs) which shows the static home screen
+   - The OAuth callback (app/oauth/callback.tsx) redirects to /(tabs) after success
+   - But /(tabs)/index.tsx doesn't check auth or show anything useful
+
+5. The web preview uses cookie-based auth (Manus platform handles login)
+   - User logs in via the Manus platform's OAuth
+   - Cookie is set on the 3000-xxx domain
+   - useAuth() fetches user from /api/auth/me
+   - But the home screen never calls useAuth()!
+
+FIX:
+Rebuild the Home screen to:
+1. Check auth state with useAuth()
+2. If not authenticated: show LoginScreen (sign in button)
+3. If authenticated but no role: show RoleSelectionScreen
+4. If authenticated with role: show full dashboard
+   - Contracts list
+   - Quick action buttons (Create Contract, Browse Actors, Messages, etc.)
+   - Recent activity

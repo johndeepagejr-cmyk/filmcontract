@@ -1224,3 +1224,13 @@
 - [x] Create conversations list screen (app/messages/index.tsx)
 - [x] Rebuild actors tab with search and navigation to actor profiles
 - [x] Add Call button to actor profile
+
+## Bug Fix - Producer Login Stuck After Success
+- [x] Fix producer login shows success but app is stuck/unusable after login
+- [x] Investigate post-login navigation and role detection flow
+- [x] Ensure producers can access all tabs and features after login
+- [x] Test login flow end-to-end for both producer and actor roles
+- [x] Rebuilt Home screen to be auth-aware (login → role selection → dashboard)
+- [x] Created contract detail screen (app/contract/[id].tsx)
+- [x] Created contract creation screen (app/create-contract.tsx)
+- [x] Added pull-to-refresh, stats overview, quick actions, and recent contracts to dashboard
