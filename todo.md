@@ -1214,3 +1214,13 @@
 - [x] Write social media posts (Facebook, Reddit, Instagram, TikTok, LinkedIn) - docs/social-media-posts.md
 - [x] Implement freemium subscription system (subscription-router.ts + app/subscription/index.tsx)
 - [ ] Save checkpoint and deliver
+
+## Facebook-Style Direct Messaging from Actor Profiles
+- [x] Add "Message" button to actor profile screen (app/actor/[id].tsx)
+- [x] Create or find conversation when producer taps Message (uses startConversation)
+- [x] Navigate to chat screen with the actor (app/messages/[conversationId].tsx)
+- [x] Ensure producers can send first message without prior conversation
+- [x] Add visual feedback (Facebook Messenger style bubbles, send button)
+- [x] Create conversations list screen (app/messages/index.tsx)
+- [x] Rebuild actors tab with search and navigation to actor profiles
+- [x] Add Call button to actor profile

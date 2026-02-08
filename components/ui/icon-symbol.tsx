@@ -39,6 +39,12 @@ const MAPPING = {
   "play.fill": "play-arrow",
   "pause.fill": "pause",
   "stop.fill": "stop",
+  // Messaging icons
+  "message.fill": "chat",
+  "message": "chat-bubble-outline",
+  "bubble.left.fill": "chat-bubble",
+  "phone.fill": "phone",
+  "arrow.left": "arrow-back",
 } as IconMapping;
 
 /**
