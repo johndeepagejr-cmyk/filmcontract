@@ -1196,3 +1196,10 @@
 - [x] Android permissions reviewed (POST_NOTIFICATIONS only)
 - [x] Create content rating questionnaire answers
 - [x] Create Google Play submission guide document
+
+## Local APK Build in Sandbox
+- [ ] Install Java JDK 17
+- [ ] Install Android SDK (command-line tools)
+- [ ] Install EAS CLI
+- [ ] Run local EAS build for Android APK
+- [ ] Deliver APK file to user
