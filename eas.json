@@ -23,6 +23,9 @@
       "android": {
         "buildType": "apk"
       },
+      "ios": {
+        "distribution": "internal"
+      },
       "cache": {
         "key": "filmcontract-v1"
       }
@@ -32,12 +35,21 @@
       "android": {
         "buildType": "app-bundle"
       },
+      "ios": {
+        "distribution": "store"
+      },
       "cache": {
         "key": "filmcontract-v1"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "j.page1@lafilm.edu",
+        "ascAppId": "",
+        "appleTeamId": ""
+      }
+    }
   }
 }
