@@ -24,7 +24,7 @@ const config: ExpoConfig = {
   icon: "./assets/images/icon.png",
   scheme: env.scheme,
   userInterfaceStyle: "automatic",
-  newArchEnabled: false,
+  newArchEnabled: true,
   extra: {
     apiUrl: process.env.API_URL || "https://3000-ia6sbgycqgi78h1m3wxmm-268d213c.us2.manus.computer",
     eas: {
@@ -53,6 +53,7 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    "expo-font",
     [
       "expo-splash-screen",
       {

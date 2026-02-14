@@ -1242,3 +1242,7 @@
 - [ ] Fix actor login - says successful but doesn't navigate to actor platform/home screen
 - [ ] Fix Submit Review button - nothing happens when pressed
 - [ ] Fix Call button - nothing happens when pressed
+- [ ] Set up EAS Build for iOS
+- [ ] Create iOS signing certificates and provisioning profiles
+- [ ] Create App Store Connect listing
+- [ ] Build iOS IPA and submit to App Store
