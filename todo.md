@@ -1235,8 +1235,6 @@
 - [x] Created contract creation screen (app/create-contract.tsx)
 - [x] Added pull-to-refresh, stats overview, quick actions, and recent contracts to dashboard
 
-## Version Bump & Website
-- [x] Bump app version to 1.0.11 (versionCode 11) for Google Play approval
-- [x] Create a landing page website for FilmContract app with privacy policy
-- [x] Fix pnpm version in GitHub Actions workflow
-- [ ] Push version changes to GitHub to trigger new AAB build
+## YouTube Upload & Play Store Screenshots
+- [ ] Upload promo video to YouTube as unlisted
+- [ ] Generate Google Play Store screenshots (phone mockups)

@@ -90,7 +90,7 @@ export default function DonateScreen() {
           <View className="bg-surface rounded-2xl p-6 gap-3">
             <Text className="text-lg font-bold text-foreground">About the Creator</Text>
             <Text className="text-base text-foreground leading-relaxed">
-              We're <Text className="font-semibold">DeePage Studios</Text>, the creators of
+              We are <Text className="font-semibold">DeePage Studios</Text>, the creators of
               FilmContract. This app was built to make contract management transparent and easy for
               film professionals.
             </Text>
