@@ -32,7 +32,7 @@ export default function TermsOfServiceScreen() {
             <View className="gap-3">
               <Text className="text-lg font-bold text-foreground">2. Proprietary Rights</Text>
               <Text className="text-base text-foreground leading-6">
-                FilmContract is proprietary software owned by John Dee Page Jr. All rights,
+                FilmContract is proprietary software owned by DeePage Studios. All rights,
                 title, and interest in and to the App, including all intellectual property rights,
                 are and will remain the exclusive property of the owner.
               </Text>
@@ -149,7 +149,7 @@ export default function TermsOfServiceScreen() {
                 ⚠️ Copyright Notice
               </Text>
               <Text className="text-sm text-foreground leading-6">
-                © {new Date().getFullYear()} John Dee Page Jr. All Rights Reserved.{"\n\n"}
+                © {new Date().getFullYear()} DeePage Studios. All Rights Reserved.{"\n\n"}
                 FilmContract is proprietary software. Unauthorized copying, distribution,
                 modification, or use of this software or its design is strictly prohibited and
                 may result in legal action.

@@ -52,13 +52,13 @@ export default function DonateScreen() {
       setProcessing(false);
       if (Platform.OS === "web") {
         alert(
-          `Thank you for your generous donation of $${amount}!\n\nYour support helps keep FilmContract running and improving.\n\n- John Dee Page Jr`
+          `Thank you for your generous donation of $${amount}!\n\nYour support helps keep FilmContract running and improving.\n\n- DeePage Studios`
         );
         router.back();
       } else {
         Alert.alert(
           "Thank You! 🎉",
-          `Thank you for your generous donation of $${amount}!\n\nYour support helps keep FilmContract running and improving.\n\n- John Dee Page Jr`,
+          `Thank you for your generous donation of $${amount}!\n\nYour support helps keep FilmContract running and improving.\n\n- DeePage Studios`,
           [
             {
               text: "Done",
@@ -90,7 +90,7 @@ export default function DonateScreen() {
           <View className="bg-surface rounded-2xl p-6 gap-3">
             <Text className="text-lg font-bold text-foreground">About the Creator</Text>
             <Text className="text-base text-foreground leading-relaxed">
-              Hi! I'm <Text className="font-semibold">John Dee Page Jr</Text>, the creator of
+              We're <Text className="font-semibold">DeePage Studios</Text>, the creators of
               FilmContract. This app was built to make contract management transparent and easy for
               film professionals.
             </Text>

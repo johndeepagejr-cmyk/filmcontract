@@ -5,7 +5,7 @@ export function AppFooter() {
   return (
     <View className="py-6 items-center gap-3">
       <Text className="text-xs text-muted text-center">
-        Created by John Dee Page Jr
+        Created by DeePage Studios
       </Text>
       <Text className="text-xs text-muted text-center font-semibold">
         © {new Date().getFullYear()} FilmContract. All Rights Reserved.

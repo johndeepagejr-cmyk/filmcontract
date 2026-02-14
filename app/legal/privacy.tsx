@@ -186,7 +186,7 @@ export default function PrivacyPolicyScreen() {
 
             <View className="bg-surface border border-border rounded-xl p-4 mt-2">
               <Text className="text-xs text-muted leading-5">
-                © {new Date().getFullYear()} John Dee Page Jr. All Rights Reserved.{"\n"}
+                © {new Date().getFullYear()} DeePage Studios. All Rights Reserved.{"\n"}
                 FilmContract is proprietary software protected by copyright and other intellectual
                 property laws.
               </Text>

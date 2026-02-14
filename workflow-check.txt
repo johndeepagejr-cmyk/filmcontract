@@ -1,0 +1,10 @@
+Workflow file check:
+- Line 22-23: Setup pnpm uses: pnpm/action-setup@v4
+- Lines 24-25 are BLANK (no with: version: line)
+- The pnpm version fix was already applied from the earlier edit
+- The workflow should work correctly now
+
+All 3 changes are committed:
+1. app.config.ts - version: "1.0.11", versionCode: 11 ✓
+2. package.json - version: "1.0.11" ✓  
+3. build-android.yml - pnpm version removed (already done) ✓
