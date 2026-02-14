@@ -8,6 +8,7 @@ import {
   Alert,
   Platform,
   StyleSheet,
+  Linking,
 } from "react-native";
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
@@ -67,8 +68,15 @@ export default function ActorDetailScreen() {
     if (Platform.OS !== "web") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    // On native, this would open the phone dialer
-    Alert.alert("Call", `Call ${profile.name || "Actor"} at ${profile.phoneNumber}?`);
+    // Open the phone dialer
+    const phoneUrl = `tel:${profile.phoneNumber}`;
+    if (Platform.OS === "web") {
+      window.open(phoneUrl, "_blank");
+    } else {
+      Linking.openURL(phoneUrl).catch(() => {
+        Alert.alert("Error", "Unable to open phone dialer.");
+      });
+    }
   };
 
   if (profileLoading) {

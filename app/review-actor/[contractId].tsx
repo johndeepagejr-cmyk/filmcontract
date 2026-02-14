@@ -86,10 +86,10 @@ export default function ReviewActorScreen() {
       <TouchableOpacity
         key={starNumber}
         onPress={() => setValue(starNumber)}
-        style={{ opacity: 1 }}
         activeOpacity={0.7}
+        style={{ padding: 4 }}
       >
-        <Text className="text-5xl" style={{ color: isFilled ? colors.warning : colors.muted }}>
+        <Text style={{ fontSize: 40, color: isFilled ? colors.warning : colors.muted }}>
           {isFilled ? "★" : "☆"}
         </Text>
       </TouchableOpacity>
@@ -177,21 +177,31 @@ export default function ReviewActorScreen() {
 
             <TouchableOpacity
               onPress={() => setWouldHireAgain(!wouldHireAgain)}
-              className="flex-row items-center gap-3 p-4 bg-background rounded-lg"
-              style={{ opacity: 1 }}
               activeOpacity={0.7}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 12,
+                padding: 16,
+                backgroundColor: colors.background,
+                borderRadius: 8,
+              }}
             >
               <View
-                className="w-6 h-6 rounded items-center justify-center"
                 style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 4,
+                  alignItems: "center",
+                  justifyContent: "center",
                   backgroundColor: wouldHireAgain ? colors.success : colors.background,
                   borderWidth: 2,
                   borderColor: wouldHireAgain ? colors.success : colors.border,
                 }}
               >
-                {wouldHireAgain && <Text className="text-background font-bold">✓</Text>}
+                {wouldHireAgain && <Text style={{ color: colors.background, fontWeight: "bold" }}>✓</Text>}
               </View>
-              <Text className="flex-1 text-foreground">
+              <Text style={{ flex: 1, color: colors.foreground }}>
                 Would you hire this actor again?
               </Text>
             </TouchableOpacity>
@@ -201,16 +211,19 @@ export default function ReviewActorScreen() {
           <TouchableOpacity
             onPress={handleSubmit}
             disabled={submitReviewMutation.isPending}
-            className="bg-primary rounded-full p-4 items-center"
+            activeOpacity={0.8}
             style={{
+              backgroundColor: colors.primary,
+              borderRadius: 9999,
+              padding: 16,
+              alignItems: "center",
               opacity: submitReviewMutation.isPending ? 0.5 : 1,
             }}
-            activeOpacity={0.8}
           >
             {submitReviewMutation.isPending ? (
               <ActivityIndicator color={colors.background} />
             ) : (
-              <Text className="text-background font-semibold text-lg">Submit Review</Text>
+              <Text style={{ color: colors.background, fontWeight: "600", fontSize: 18 }}>Submit Review</Text>
             )}
           </TouchableOpacity>
 

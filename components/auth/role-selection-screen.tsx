@@ -21,13 +21,21 @@ export function RoleSelectionScreen() {
       // Wait a bit for the database to update
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log("[RoleSelection] Role selection complete");
+      // Refresh user data so the app picks up the new role
+      await refresh();
       
-      // Force a full page reload to ensure fresh user data is loaded
-      // This is the most reliable method for mobile browsers
-      if (typeof window !== 'undefined') {
-        console.log("[RoleSelection] Reloading page...");
+      console.log("[RoleSelection] Role selection complete, refreshed user data");
+      
+      // On web, reload the page for a clean state
+      // On native, the refresh() call above will update the user state
+      // which causes the HomeScreen to re-render and show the main UI
+      if (Platform.OS === "web" && typeof window !== "undefined") {
+        console.log("[RoleSelection] Web: Reloading page...");
         window.location.reload();
+      } else {
+        // On native, navigate to the home tab to force a fresh render
+        console.log("[RoleSelection] Native: Navigating to home...");
+        router.replace("/(tabs)/" as any);
       }
     } catch (error) {
       console.error("[RoleSelection] Role selection error:", error);
@@ -61,9 +69,18 @@ export function RoleSelectionScreen() {
               handleRoleSelect("producer");
             }}
             disabled={loading}
-            className="bg-surface border-2 border-primary px-6 py-6 rounded-xl items-center active:opacity-70"
+            style={{
+              backgroundColor: loading ? "#e5e7eb" : undefined,
+              opacity: loading ? 0.6 : 1,
+              borderWidth: 2,
+              borderColor: "#0a7ea4",
+              borderRadius: 12,
+              paddingHorizontal: 24,
+              paddingVertical: 24,
+              alignItems: "center",
+            }}
           >
-            <Text className="text-2xl mb-2">🎬</Text>
+            <Text style={{ fontSize: 24, marginBottom: 8 }}>🎬</Text>
             <Text className="text-xl font-bold text-foreground">Producer</Text>
             <Text className="text-sm text-muted text-center mt-2">
               Create and manage contracts with actors
@@ -76,9 +93,18 @@ export function RoleSelectionScreen() {
               handleRoleSelect("actor");
             }}
             disabled={loading}
-            className="bg-surface border-2 border-primary px-6 py-6 rounded-xl items-center active:opacity-70"
+            style={{
+              backgroundColor: loading ? "#e5e7eb" : undefined,
+              opacity: loading ? 0.6 : 1,
+              borderWidth: 2,
+              borderColor: "#0a7ea4",
+              borderRadius: 12,
+              paddingHorizontal: 24,
+              paddingVertical: 24,
+              alignItems: "center",
+            }}
           >
-            <Text className="text-2xl mb-2">🎭</Text>
+            <Text style={{ fontSize: 24, marginBottom: 8 }}>🎭</Text>
             <Text className="text-xl font-bold text-foreground">Actor</Text>
             <Text className="text-sm text-muted text-center mt-2">
               View and track your contracts with producers
@@ -87,8 +113,18 @@ export function RoleSelectionScreen() {
         </View>
 
         {loading && (
-          <View className="absolute inset-0 bg-background/80 items-center justify-center">
-            <ActivityIndicator size="large" color="#1E40AF" />
+          <View style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255,255,255,0.8)",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            <ActivityIndicator size="large" color="#0a7ea4" />
+            <Text className="text-base text-muted mt-4">Setting up your account...</Text>
           </View>
         )}
       </View>

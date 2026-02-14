@@ -107,72 +107,70 @@ export default function HomeScreen() {
               {isProducer && (
                 <TouchableOpacity
                   onPress={() => router.push("/create-contract" as any)}
-                  className="bg-primary px-5 py-4 rounded-xl flex-row items-center gap-3 active:opacity-80"
+                  style={[styles.quickActionBtn, { backgroundColor: colors.primary }]}
                 >
-                  <Text className="text-2xl">📝</Text>
-                  <View className="flex-1">
-                    <Text className="text-white text-base font-semibold">Create New Contract</Text>
-                    <Text className="text-white/70 text-sm">Draft a contract with an actor</Text>
+                  <Text style={styles.quickActionIcon}>📝</Text>
+                  <View style={styles.quickActionContent}>
+                    <Text style={[styles.quickActionTitle, { color: "#fff" }]}>Create New Contract</Text>
+                    <Text style={[styles.quickActionSub, { color: "rgba(255,255,255,0.7)" }]}>Draft a contract with an actor</Text>
                   </View>
-                  <Text className="text-white text-xl">›</Text>
+                  <Text style={{ color: "#fff", fontSize: 20 }}>›</Text>
                 </TouchableOpacity>
               )}
 
               <TouchableOpacity
                 onPress={() => router.push("/messages" as any)}
-                className="bg-surface px-5 py-4 rounded-xl flex-row items-center gap-3 active:opacity-80 border border-border"
+                style={[styles.quickActionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
               >
-                <Text className="text-2xl">💬</Text>
-                <View className="flex-1">
-                  <Text className="text-foreground text-base font-semibold">Messages</Text>
-                  <Text className="text-muted text-sm">
+                <Text style={styles.quickActionIcon}>💬</Text>
+                <View style={styles.quickActionContent}>
+                  <Text style={[styles.quickActionTitle, { color: colors.foreground }]}>Messages</Text>
+                  <Text style={[styles.quickActionSub, { color: colors.muted }]}>
                     {unreadMessages > 0 ? `${unreadMessages} unread message${unreadMessages > 1 ? "s" : ""}` : "Chat with actors and producers"}
                   </Text>
                 </View>
                 {unreadMessages > 0 && (
-                  <View className="bg-error px-2 py-1 rounded-full min-w-[24px] items-center">
-                    <Text className="text-white text-xs font-bold">{unreadMessages}</Text>
+                  <View style={[styles.unreadBadge, { backgroundColor: colors.error }]}>
+                    <Text style={styles.unreadText}>{unreadMessages}</Text>
                   </View>
                 )}
-                <Text className="text-muted text-xl">›</Text>
+                <Text style={{ color: colors.muted, fontSize: 20 }}>›</Text>
               </TouchableOpacity>
 
               {isProducer && (
                 <TouchableOpacity
                   onPress={() => router.push("/templates" as any)}
-                  className="bg-surface px-5 py-4 rounded-xl flex-row items-center gap-3 active:opacity-80 border border-border"
+                  style={[styles.quickActionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
                 >
-                  <Text className="text-2xl">📋</Text>
-                  <View className="flex-1">
-                    <Text className="text-foreground text-base font-semibold">Contract Templates</Text>
-                    <Text className="text-muted text-sm">Use pre-built contract templates</Text>
+                  <Text style={styles.quickActionIcon}>📋</Text>
+                  <View style={styles.quickActionContent}>
+                    <Text style={[styles.quickActionTitle, { color: colors.foreground }]}>Contract Templates</Text>
+                    <Text style={[styles.quickActionSub, { color: colors.muted }]}>Use pre-built contract templates</Text>
                   </View>
-                  <Text className="text-muted text-xl">›</Text>
+                  <Text style={{ color: colors.muted, fontSize: 20 }}>›</Text>
                 </TouchableOpacity>
               )}
 
               <TouchableOpacity
                 onPress={() => {
                   if (isProducer) {
-                    // Navigate to actors tab
                     router.push("/(tabs)/actors" as any);
                   } else {
-                    // Navigate to producers tab
                     router.push("/(tabs)/producers" as any);
                   }
                 }}
-                className="bg-surface px-5 py-4 rounded-xl flex-row items-center gap-3 active:opacity-80 border border-border"
+                style={[styles.quickActionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
               >
-                <Text className="text-2xl">{isProducer ? "🎭" : "🎬"}</Text>
-                <View className="flex-1">
-                  <Text className="text-foreground text-base font-semibold">
+                <Text style={styles.quickActionIcon}>{isProducer ? "🎭" : "🎬"}</Text>
+                <View style={styles.quickActionContent}>
+                  <Text style={[styles.quickActionTitle, { color: colors.foreground }]}>
                     {isProducer ? "Browse Actors" : "Browse Producers"}
                   </Text>
-                  <Text className="text-muted text-sm">
+                  <Text style={[styles.quickActionSub, { color: colors.muted }]}>
                     {isProducer ? "Find talent for your projects" : "Discover producers and opportunities"}
                   </Text>
                 </View>
-                <Text className="text-muted text-xl">›</Text>
+                <Text style={{ color: colors.muted, fontSize: 20 }}>›</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -184,9 +182,9 @@ export default function HomeScreen() {
               {totalContracts > 0 && (
                 <TouchableOpacity
                   onPress={() => router.push("/(tabs)/analytics-old" as any)}
-                  className="active:opacity-70"
+                  style={{ opacity: 1 }}
                 >
-                  <Text className="text-sm text-primary font-semibold">View All →</Text>
+                  <Text style={{ fontSize: 14, color: colors.primary, fontWeight: "600" }}>View All →</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -201,7 +199,7 @@ export default function HomeScreen() {
                   <TouchableOpacity
                     key={contract.id}
                     onPress={() => router.push(`/contract/${contract.id}` as any)}
-                    className="bg-surface rounded-xl p-4 border border-border active:opacity-80"
+                    style={[styles.contractCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                   >
                     <View className="flex-row items-start justify-between gap-2">
                       <View className="flex-1 gap-1">
@@ -272,9 +270,9 @@ export default function HomeScreen() {
                 {isProducer && (
                   <TouchableOpacity
                     onPress={() => router.push("/create-contract" as any)}
-                    className="bg-primary px-5 py-3 rounded-full mt-2 active:opacity-80"
+                    style={[styles.createBtn, { backgroundColor: colors.primary }]}
                   >
-                    <Text className="text-white font-semibold">Create Contract</Text>
+                    <Text style={styles.createBtnText}>Create Contract</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -304,6 +302,54 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
+    fontWeight: "600",
+  },
+  quickActionBtn: {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  quickActionIcon: {
+    fontSize: 24,
+  },
+  quickActionContent: {
+    flex: 1,
+  },
+  quickActionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  quickActionSub: {
+    fontSize: 14,
+  },
+  unreadBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    minWidth: 24,
+    alignItems: "center" as const,
+  },
+  unreadText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  contractCard: {
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+  },
+  createBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 999,
+    marginTop: 8,
+  },
+  createBtnText: {
+    color: "#fff",
     fontWeight: "600",
   },
 });

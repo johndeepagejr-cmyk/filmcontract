@@ -146,15 +146,15 @@ export default function CreateContractScreen() {
                       setSelectedActorId(null);
                       setShowActorPicker(true);
                     }}
-                    className="active:opacity-70"
+                    style={{ opacity: 1 }}
                   >
-                    <Text className="text-sm text-primary font-semibold">Change</Text>
+                    <Text style={{ fontSize: 14, color: colors.primary, fontWeight: '600' }}>Change</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
                 <TouchableOpacity
                   onPress={() => setShowActorPicker(!showActorPicker)}
-                  className="bg-surface rounded-xl p-4 border border-border active:opacity-80"
+                  style={{ backgroundColor: colors.surface, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: colors.border }}
                 >
                   <Text className="text-base text-muted">
                     {showActorPicker ? "Search below..." : "Tap to select an actor"}
@@ -186,7 +186,6 @@ export default function CreateContractScreen() {
                               setActorSearch("");
                             }}
                             style={[styles.actorOption, { borderBottomColor: colors.border }]}
-                            className="active:opacity-70"
                           >
                             <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: colors.primary + "20" }}>
                               <Text style={{ color: colors.primary, fontWeight: "600", fontSize: 14 }}>
@@ -284,13 +283,12 @@ export default function CreateContractScreen() {
             <TouchableOpacity
               onPress={handleSubmit}
               disabled={isSubmitting}
-              className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80 mt-2"
-              style={{ opacity: isSubmitting ? 0.6 : 1 }}
+              style={[styles.submitBtn, { backgroundColor: colors.primary, opacity: isSubmitting ? 0.6 : 1 }]}
             >
               {isSubmitting ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
-                <Text className="text-white text-lg font-semibold">Create Contract</Text>
+                <Text style={styles.submitBtnText}>Create Contract</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -318,11 +316,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   actorOption: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     gap: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderBottomWidth: 0.5,
+  },
+  submitBtn: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center" as const,
+    marginTop: 8,
+  },
+  submitBtnText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600" as const,
   },
 });

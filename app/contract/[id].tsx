@@ -65,8 +65,11 @@ export default function ContractDetailScreen() {
         <Text className="text-4xl mb-4">📄</Text>
         <Text className="text-lg font-semibold text-foreground">Contract Not Found</Text>
         <Text className="text-sm text-muted mt-2">This contract may have been deleted.</Text>
-        <TouchableOpacity onPress={() => router.back()} className="mt-6 bg-primary px-6 py-3 rounded-full active:opacity-80">
-          <Text className="text-white font-semibold">Go Back</Text>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={styles.goBackBtn}
+        >
+          <Text style={styles.goBackText}>Go Back</Text>
         </TouchableOpacity>
       </ScreenContainer>
     );
@@ -223,9 +226,9 @@ export default function ContractDetailScreen() {
             {isProducer && contract.paymentStatus !== "paid" && contract.paymentAmount && (
               <TouchableOpacity
                 onPress={() => router.push(`/payment/${contract.id}` as any)}
-                className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80"
+                style={[styles.actionBtn, { backgroundColor: colors.primary }]}
               >
-                <Text className="text-white text-base font-semibold">Make Payment</Text>
+                <Text style={styles.actionBtnText}>Make Payment</Text>
               </TouchableOpacity>
             )}
 
@@ -234,34 +237,31 @@ export default function ContractDetailScreen() {
               <TouchableOpacity
                 onPress={() => handleStatusUpdate("pending")}
                 disabled={updatingStatus}
-                className="bg-warning px-6 py-4 rounded-xl items-center active:opacity-80"
-                style={{ opacity: updatingStatus ? 0.6 : 1 }}
+                style={[styles.actionBtn, { backgroundColor: colors.warning, opacity: updatingStatus ? 0.6 : 1 }]}
               >
                 {updatingStatus ? (
                   <ActivityIndicator color="#ffffff" />
                 ) : (
-                  <Text className="text-white text-base font-semibold">Send to Actor</Text>
+                  <Text style={styles.actionBtnText}>Send to Actor</Text>
                 )}
               </TouchableOpacity>
             )}
 
             {isActor && contract.status === "pending" && (
-              <View className="flex-row gap-3">
+              <View style={styles.rowBtns}>
                 <TouchableOpacity
                   onPress={() => handleStatusUpdate("active")}
                   disabled={updatingStatus}
-                  className="flex-1 bg-success px-4 py-4 rounded-xl items-center active:opacity-80"
-                  style={{ opacity: updatingStatus ? 0.6 : 1 }}
+                  style={[styles.actionBtn, styles.flexBtn, { backgroundColor: colors.success, opacity: updatingStatus ? 0.6 : 1 }]}
                 >
-                  <Text className="text-white text-base font-semibold">Accept</Text>
+                  <Text style={styles.actionBtnText}>Accept</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleStatusUpdate("cancelled")}
                   disabled={updatingStatus}
-                  className="flex-1 bg-error px-4 py-4 rounded-xl items-center active:opacity-80"
-                  style={{ opacity: updatingStatus ? 0.6 : 1 }}
+                  style={[styles.actionBtn, styles.flexBtn, { backgroundColor: colors.error, opacity: updatingStatus ? 0.6 : 1 }]}
                 >
-                  <Text className="text-white text-base font-semibold">Decline</Text>
+                  <Text style={styles.actionBtnText}>Decline</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -270,13 +270,12 @@ export default function ContractDetailScreen() {
               <TouchableOpacity
                 onPress={() => handleStatusUpdate("completed")}
                 disabled={updatingStatus}
-                className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80"
-                style={{ opacity: updatingStatus ? 0.6 : 1 }}
+                style={[styles.actionBtn, { backgroundColor: colors.primary, opacity: updatingStatus ? 0.6 : 1 }]}
               >
                 {updatingStatus ? (
                   <ActivityIndicator color="#ffffff" />
                 ) : (
-                  <Text className="text-white text-base font-semibold">Mark as Completed</Text>
+                  <Text style={styles.actionBtnText}>Mark as Completed</Text>
                 )}
               </TouchableOpacity>
             )}
@@ -285,18 +284,18 @@ export default function ContractDetailScreen() {
             {contract.status === "completed" && isProducer && (
               <TouchableOpacity
                 onPress={() => router.push(`/review-actor/${contract.id}` as any)}
-                className="bg-surface px-6 py-4 rounded-xl items-center border border-border active:opacity-80"
+                style={[styles.actionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
               >
-                <Text className="text-foreground text-base font-semibold">Review Actor</Text>
+                <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Review Actor</Text>
               </TouchableOpacity>
             )}
 
             {contract.status === "completed" && isActor && (
               <TouchableOpacity
                 onPress={() => router.push(`/review/${contract.id}` as any)}
-                className="bg-surface px-6 py-4 rounded-xl items-center border border-border active:opacity-80"
+                style={[styles.actionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
               >
-                <Text className="text-foreground text-base font-semibold">Review Producer</Text>
+                <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Review Producer</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -319,5 +318,34 @@ const styles = StyleSheet.create({
   divider: {
     height: 0.5,
     width: "100%",
+  },
+  goBackBtn: {
+    marginTop: 24,
+    backgroundColor: "#0a7ea4",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 999,
+  },
+  goBackText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  actionBtn: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center" as const,
+  },
+  actionBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  rowBtns: {
+    flexDirection: "row" as const,
+    gap: 12,
+  },
+  flexBtn: {
+    flex: 1,
   },
 });

@@ -1238,3 +1238,7 @@
 ## YouTube Upload & Play Store Screenshots
 - [ ] Upload promo video to YouTube as unlisted
 - [ ] Generate Google Play Store screenshots (phone mockups)
+- [ ] Fix Create button - pressing it does nothing, no contract is created
+- [ ] Fix actor login - says successful but doesn't navigate to actor platform/home screen
+- [ ] Fix Submit Review button - nothing happens when pressed
+- [ ] Fix Call button - nothing happens when pressed
