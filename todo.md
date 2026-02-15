@@ -1249,4 +1249,20 @@
 
 ## Version Number Alignment
 - [x] Align iOS and Android version numbers to match (both 1.0.0)
-- [ ] Build new Android AAB with v1.0.0 version number
+- [x] Build new Android AAB with v1.0.0 version number (build submitted to EAS)
+
+## Remove Donation Page
+- [x] Remove donation screen and all references
+- [x] Remove donation-related API endpoints
+- [x] Replace with professional About/Credits screen
+
+## Freemium Subscription System
+- [x] Create subscription context/provider with state management (using existing backend)
+- [x] Build paywall screen with subscription options ($4.99/month)
+- [x] Implement free tier limit (3 contracts max)
+- [x] Gate premium features behind subscription (PDF export, signatures, analytics, versioning, all templates)
+- [x] Add subscription status to user profile
+- [x] Add "Upgrade to Premium" prompts when free users hit limits
+- [x] Add manage subscription screen (existing subscription screen updated)
+- [ ] Integrate expo-in-app-purchases for Apple/Google subscriptions (future: requires App Store/Play Store product setup)
+- [x] Test subscription flow end-to-end (14/14 tests passing)

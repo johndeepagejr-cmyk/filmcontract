@@ -475,12 +475,20 @@ export default function ProfileScreen() {
           {/* Notification Settings */}
           <NotificationSettings />
 
-          {/* Support Developer Button */}
+          {/* Subscription / Upgrade */}
           <TouchableOpacity
-            onPress={() => router.push("/donate")}
-            className="bg-success px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
+            onPress={() => router.push("/subscription")}
+            className="bg-primary px-6 py-4 rounded-xl items-center active:opacity-80 mt-4"
           >
-            <Text className="text-white text-lg font-semibold">☕ Support Developer</Text>
+            <Text className="text-white text-lg font-semibold">Manage Subscription</Text>
+          </TouchableOpacity>
+
+          {/* About */}
+          <TouchableOpacity
+            onPress={() => router.push("/about" as any)}
+            className="bg-surface border border-border px-6 py-4 rounded-xl items-center active:opacity-80"
+          >
+            <Text className="text-foreground text-lg font-semibold">About FilmContract</Text>
           </TouchableOpacity>
 
           {/* Logout Button */}

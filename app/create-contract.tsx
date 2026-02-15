@@ -33,6 +33,8 @@ export default function CreateContractScreen() {
 
   const { data: actors, isLoading: actorsLoading } = trpc.user.getActors.useQuery();
   const createContractMutation = trpc.contracts.create.useMutation();
+  const { data: canCreate, isLoading: checkingLimit } = trpc.subscription.canCreateContract.useQuery();
+  const incrementUsage = trpc.subscription.incrementContractUsage.useMutation();
 
   const filteredActors = actors?.filter((a: any) => {
     if (!actorSearch.trim()) return true;
@@ -46,6 +48,23 @@ export default function CreateContractScreen() {
   const selectedActor = actors?.find((a: any) => a.id === selectedActorId);
 
   const handleSubmit = async () => {
+    // Check subscription limit
+    if (canCreate && !canCreate.allowed) {
+      if (Platform.OS === "web") {
+        alert(canCreate.reason || "You've reached your contract limit. Upgrade to Pro for unlimited contracts.");
+      } else {
+        Alert.alert(
+          "Contract Limit Reached",
+          canCreate.reason || "You've reached your monthly contract limit on the Free plan.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Upgrade to Pro", onPress: () => router.push("/subscription") },
+          ]
+        );
+      }
+      return;
+    }
+
     if (!projectTitle.trim()) {
       const msg = "Please enter a project title.";
       Platform.OS === "web" ? alert(msg) : Alert.alert("Missing Info", msg);
@@ -74,6 +93,9 @@ export default function CreateContractScreen() {
         deliverables: deliverables.trim() || undefined,
         status: "draft",
       });
+
+      // Increment subscription usage count
+      try { await incrementUsage.mutateAsync(); } catch {}
 
       const successMsg = "Contract created successfully!";
       if (Platform.OS === "web") {

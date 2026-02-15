@@ -2,9 +2,66 @@ import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator } from "rea
 import { ScreenContainer } from "@/components/screen-container";
 import { trpc } from "@/lib/trpc";
 import { Stack, router } from "expo-router";
+import { Pressable } from "react-native";
+import { useColors } from "@/hooks/use-colors";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function TemplatesScreen() {
-  const { data: templates, isLoading } = trpc.templates.list.useQuery();
+  const colors = useColors();
+  const { isAuthenticated } = useAuth();
+  const { data: currentSub } = trpc.subscription.getCurrent.useQuery(
+    undefined,
+    { enabled: isAuthenticated }
+  );
+  const { data: templates, isLoading } = trpc.templates.list.useQuery(
+    undefined,
+    { enabled: currentSub?.limits?.templates === true }
+  );
+
+  // Show upgrade prompt for free users
+  if (currentSub && !currentSub.limits.templates) {
+    return (
+      <ScreenContainer className="p-6">
+        <Stack.Screen options={{ title: "Contract Templates" }} />
+        <View className="flex-1 items-center justify-center gap-6">
+          <View
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              backgroundColor: colors.surface,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <MaterialIcons name="description" size={40} color={colors.primary} />
+          </View>
+          <Text className="text-2xl font-bold text-foreground text-center">
+            Contract Templates
+          </Text>
+          <Text className="text-base text-muted text-center leading-relaxed px-4">
+            Access professional contract templates for feature films, commercials, TV series, and more.
+            Available on the Pro plan.
+          </Text>
+          <Pressable
+            onPress={() => router.push("/subscription")}
+            style={({ pressed }) => [{
+              backgroundColor: colors.primary,
+              paddingHorizontal: 32,
+              paddingVertical: 14,
+              borderRadius: 12,
+              opacity: pressed ? 0.8 : 1,
+            }]}
+          >
+            <Text style={{ color: colors.background, fontWeight: "700", fontSize: 16 }}>
+              Upgrade to Pro — $4.99/mo
+            </Text>
+          </Pressable>
+        </View>
+      </ScreenContainer>
+    );
+  }
 
   const getCategoryLabel = (category: string) => {
     switch (category) {

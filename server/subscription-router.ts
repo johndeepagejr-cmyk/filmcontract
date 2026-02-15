@@ -7,9 +7,10 @@ import { eq, sql } from "drizzle-orm";
 /** Plan limits configuration */
 const PLAN_LIMITS = {
   free: {
-    contractsPerMonth: 2,
+    contractsPerMonth: 3,
     templates: false,
-    hellosign: false,
+    pdfExport: false,
+    signatures: false,
     analytics: false,
     prioritySupport: false,
     featuredProfile: false,
@@ -17,19 +18,21 @@ const PLAN_LIMITS = {
     storageGB: 1,
   },
   pro: {
-    contractsPerMonth: 25,
+    contractsPerMonth: -1, // unlimited
     templates: true,
-    hellosign: true,
+    pdfExport: true,
+    signatures: true,
     analytics: true,
     prioritySupport: false,
     featuredProfile: false,
-    teamMembers: 1,
-    storageGB: 10,
+    teamMembers: 3,
+    storageGB: 25,
   },
   studio: {
     contractsPerMonth: -1, // unlimited
     templates: true,
-    hellosign: true,
+    pdfExport: true,
+    signatures: true,
     analytics: true,
     prioritySupport: true,
     featuredProfile: true,
@@ -40,8 +43,8 @@ const PLAN_LIMITS = {
 
 const PLAN_PRICES = {
   free: { monthly: 0, yearly: 0 },
-  pro: { monthly: 1499, yearly: 14990 }, // in cents
-  studio: { monthly: 4999, yearly: 49990 },
+  pro: { monthly: 499, yearly: 4990 }, // in cents ($4.99/mo, $49.90/yr)
+  studio: { monthly: 1499, yearly: 14990 }, // in cents ($14.99/mo, $149.90/yr)
 } as const;
 
 function getCurrentMonth() {
@@ -195,9 +198,9 @@ export const subscriptionRouter = router({
           monthlyPrice: 0,
           yearlyPrice: 0,
           features: [
-            "2 contracts per month",
-            "Basic contract templates",
-            "In-app signatures",
+            "3 contracts per month",
+            "View and manage contracts",
+            "Basic contract creation",
             "1 GB storage",
             "Community support",
           ],
@@ -207,15 +210,16 @@ export const subscriptionRouter = router({
           id: "pro",
           name: "Pro",
           description: "For working actors and independent producers",
-          monthlyPrice: 14.99,
-          yearlyPrice: 149.90,
+          monthlyPrice: 4.99,
+          yearlyPrice: 49.90,
           features: [
-            "25 contracts per month",
+            "Unlimited contracts",
             "All contract templates",
-            "HelloSign legal e-signatures",
+            "PDF export",
+            "Digital signatures",
             "Analytics dashboard",
-            "10 GB storage",
-            "Email support",
+            "25 GB storage",
+            "Up to 3 team members",
           ],
           limits: PLAN_LIMITS.pro,
           popular: true,
@@ -224,11 +228,10 @@ export const subscriptionRouter = router({
           id: "studio",
           name: "Studio",
           description: "For production companies and agencies",
-          monthlyPrice: 49.99,
-          yearlyPrice: 499.90,
+          monthlyPrice: 14.99,
+          yearlyPrice: 149.90,
           features: [
-            "Unlimited contracts",
-            "All Pro features",
+            "Everything in Pro",
             "Featured profile listing",
             "Priority support",
             "Up to 10 team members",

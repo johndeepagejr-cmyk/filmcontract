@@ -7,11 +7,67 @@ import {
 import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
+import { Pressable } from "react-native";
+import { useRouter } from "expo-router";
+import { useColors } from "@/hooks/use-colors";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function AnalyticsScreen() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const colors = useColors();
 
-  const { data: contracts, isLoading } = trpc.contracts.list.useQuery();
+  const { data: currentSub } = trpc.subscription.getCurrent.useQuery(
+    undefined,
+    { enabled: isAuthenticated }
+  );
+  const { data: contracts, isLoading } = trpc.contracts.list.useQuery(
+    undefined,
+    { enabled: isAuthenticated && currentSub?.limits?.analytics === true }
+  );
+
+  // Show upgrade prompt for free users
+  if (currentSub && !currentSub.limits.analytics) {
+    return (
+      <ScreenContainer className="p-6">
+        <View className="flex-1 items-center justify-center gap-6">
+          <View
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              backgroundColor: colors.surface,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <MaterialIcons name="bar-chart" size={40} color={colors.primary} />
+          </View>
+          <Text className="text-2xl font-bold text-foreground text-center">
+            Analytics Dashboard
+          </Text>
+          <Text className="text-base text-muted text-center leading-relaxed px-4">
+            Get detailed insights into your contracts, payments, and career performance.
+            Available on the Pro plan.
+          </Text>
+          <Pressable
+            onPress={() => router.push("/subscription")}
+            style={({ pressed }) => [{
+              backgroundColor: colors.primary,
+              paddingHorizontal: 32,
+              paddingVertical: 14,
+              borderRadius: 12,
+              opacity: pressed ? 0.8 : 1,
+            }]}
+          >
+            <Text style={{ color: colors.background, fontWeight: "700", fontSize: 16 }}>
+              Upgrade to Pro — $4.99/mo
+            </Text>
+          </Pressable>
+        </View>
+      </ScreenContainer>
+    );
+  }
 
   // Calculate statistics
   const stats = contracts

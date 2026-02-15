@@ -24,6 +24,11 @@ export default function HomeScreen() {
     { enabled: isAuthenticated && !!user?.userRole }
   );
 
+  const { data: currentSub } = trpc.subscription.getCurrent.useQuery(
+    undefined,
+    { enabled: isAuthenticated && !!user?.userRole }
+  );
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await refresh();
@@ -80,6 +85,41 @@ export default function HomeScreen() {
               {isProducer ? "Manage your contracts and find talent" : "Track your contracts and opportunities"}
             </Text>
           </View>
+
+          {/* Upgrade Banner for Free Users */}
+          {currentSub && currentSub.plan === "free" && (
+            <TouchableOpacity
+              onPress={() => router.push("/subscription")}
+              style={{
+                backgroundColor: colors.primary,
+                borderRadius: 16,
+                padding: 16,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+              activeOpacity={0.8}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+                  Upgrade to Pro
+                </Text>
+                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, marginTop: 2 }}>
+                  Unlimited contracts, templates, PDF export & more — $4.99/mo
+                </Text>
+              </View>
+              <Text style={{ color: "#fff", fontSize: 24 }}>›</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Contract Usage for Free Users */}
+          {currentSub && currentSub.plan === "free" && (
+            <View className="bg-surface rounded-2xl p-4 border border-border">
+              <Text className="text-sm text-muted">Monthly Contracts</Text>
+              <Text className="text-lg font-bold text-foreground">
+                {currentSub.contractsUsedThisMonth} / {currentSub.limits.contractsPerMonth} used
+              </Text>
+            </View>
+          )}
 
           {/* Stats Overview */}
           <View className="flex-row gap-3">
