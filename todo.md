@@ -1249,3 +1249,4 @@
 
 ## Version Number Alignment
 - [x] Align iOS and Android version numbers to match (both 1.0.0)
+- [ ] Build new Android AAB with v1.0.0 version number
