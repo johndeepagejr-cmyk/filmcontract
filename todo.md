@@ -1246,3 +1246,6 @@
 - [ ] Create iOS signing certificates and provisioning profiles
 - [ ] Create App Store Connect listing
 - [ ] Build iOS IPA and submit to App Store
+
+## Version Number Alignment
+- [x] Align iOS and Android version numbers to match (both 1.0.0)

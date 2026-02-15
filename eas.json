@@ -45,10 +45,12 @@
   },
   "submit": {
     "production": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
+      },
       "ios": {
-        "appleId": "j.page1@lafilm.edu",
-        "ascAppId": "",
-        "appleTeamId": ""
+        "appleId": "j.page1@lafilm.edu"
       }
     }
   }
