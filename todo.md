@@ -1246,3 +1246,12 @@
 - [ ] Create iOS signing certificates and provisioning profiles
 - [ ] Create App Store Connect listing
 - [ ] Build iOS IPA and submit to App Store
+
+## App Store Submissions
+- [x] Fix iOS build error (newArchEnabled)
+- [x] Upload IPA to App Store Connect
+- [x] Fill out App Store metadata
+- [x] Set App Privacy declaration
+- [x] Submit iOS app for Apple review
+- [ ] Check Android build status on EAS
+- [ ] Check Google Play readiness and submission status
