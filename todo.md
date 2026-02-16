@@ -1266,3 +1266,6 @@
 - [x] Add manage subscription screen (existing subscription screen updated)
 - [ ] Integrate expo-in-app-purchases for Apple/Google subscriptions (future: requires App Store/Play Store product setup)
 - [x] Test subscription flow end-to-end (14/14 tests passing)
+
+## Promotional Landing Page
+- [x] Create standalone HTML landing page for Film Contract
