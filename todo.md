@@ -1288,5 +1288,25 @@
 - [x] Update backend auth endpoints for email/password
 - [x] Update useAuth hook to use email/password flow
 - [x] Test login and signup flows end-to-end
-- [ ] Rebuild Android AAB (version code 10)
-- [ ] Upload new AAB to Google Play internal testing
+- [x] Rebuild Android AAB (version code 11)
+- [x] Upload new AAB to Google Play internal testing (published Feb 17, 1:38 AM)
+
+## iOS Build with Email/Password Auth
+- [x] Build iOS version with email/password auth via EAS (build number 5)
+- [x] Submit to App Store Connect to replace version in review (submitted successfully)
+
+## Bug Fix - Role Selection Not Sticking (Production Build)
+- [ ] Fix role selection (Actor/Producer) not persisting in production build - shows "role not selected"
+- [ ] Rebuild Android AAB and submit to Google Play
+- [ ] Rebuild iOS IPA and submit to App Store
+
+## Production API Migration + Offline Architecture
+- [x] Environment config system (dev/staging/prod) with .env validation
+- [x] API service layer with automatic JWT refresh on 401
+- [x] Request queue for offline actions (contracts, messages, signatures)
+- [x] Background sync when connection returns
+- [x] Retry with exponential backoff
+- [x] Global error boundary with network status banner
+- [x] Health check on app launch with maintenance mode screen
+- [x] NetworkContext provider for global network state
+- [x] Integrate all services into app layout

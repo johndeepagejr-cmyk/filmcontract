@@ -58,8 +58,15 @@ async function startServer() {
   registerOAuthRoutes(app);
   registerEmailAuthRoutes(app);
 
+  // Health check endpoint with version info
   app.get("/api/health", (_req, res) => {
-    res.json({ ok: true, timestamp: Date.now() });
+    res.json({
+      ok: true,
+      status: "healthy",
+      version: "1.0.0",
+      timestamp: Date.now(),
+      uptime: process.uptime(),
+    });
   });
 
   app.use(

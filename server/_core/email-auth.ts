@@ -94,6 +94,60 @@ export function registerEmailAuthRoutes(app: Express) {
     }
   });
 
+  // Refresh session token
+  app.post("/api/auth/refresh", async (req: Request, res: Response) => {
+    try {
+      // Extract token from Authorization header
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+      if (!token) {
+        res.status(401).json({ error: "No token provided" });
+        return;
+      }
+
+      // Verify current token
+      let session;
+      try {
+        session = await sdk.verifySession(token);
+      } catch {
+        res.status(401).json({ error: "Invalid or expired token" });
+        return;
+      }
+
+      const openId = session?.openId;
+      if (!openId) {
+        res.status(401).json({ error: "Invalid session" });
+        return;
+      }
+
+      // Get user
+      const user = await getUserByOpenId(openId);
+      if (!user) {
+        res.status(401).json({ error: "User not found" });
+        return;
+      }
+
+      // Issue new token
+      const newToken = await sdk.createSessionToken(openId, {
+        name: user.name || "",
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      // Set cookie for web
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, newToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      res.json({
+        app_session_id: newToken,
+        user: buildUserResponse(user),
+      });
+    } catch (error) {
+      console.error("[Auth] Token refresh failed:", error);
+      res.status(500).json({ error: "Token refresh failed" });
+    }
+  });
+
   // Login with email/password
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
