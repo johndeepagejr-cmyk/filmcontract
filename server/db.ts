@@ -222,6 +222,14 @@ export async function getUserById(userId: number) {
 /**
  * Search users by role (for finding actors when creating contracts)
  */
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function getUsersByRole(userRole: "producer" | "actor") {
   const db = await getDb();
   if (!db) return [];

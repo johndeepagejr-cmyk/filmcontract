@@ -43,7 +43,7 @@ const config: ExpoConfig = {
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
     package: env.androidPackage,
-    versionCode: 9,
+    versionCode: 10,
     permissions: ["POST_NOTIFICATIONS"],
   },
   web: {

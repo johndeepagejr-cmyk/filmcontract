@@ -1271,12 +1271,22 @@
 - [x] Create standalone HTML landing page for Film Contract
 
 ## Bug Fix - Login Not Working on Android App
-- [ ] Fix "Sign In with Manus" button not working on Android app from Google Play internal testing
+- [x] Fix "Sign In with Manus" button not working on Android app from Google Play internal testing
 
 ## Bug Fix - Android Production OAuth Login
 - [x] Diagnose OAuth login not working on production Android build
 - [x] Set EAS production environment variables for OAuth
 - [x] Add hardcoded fallback values in constants/oauth.ts for production builds
 - [x] Bump Android versionCode to 9
-- [ ] Rebuild Android AAB with fixed OAuth configuration
+- [x] Rebuild Android AAB with fixed OAuth configuration
+- [x] Upload new AAB to Google Play internal testing
+
+## Replace Manus OAuth with Email/Password Auth
+- [x] Remove Manus OAuth login flow entirely
+- [x] Create email/password login screen
+- [x] Create email/password signup screen
+- [x] Update backend auth endpoints for email/password
+- [x] Update useAuth hook to use email/password flow
+- [x] Test login and signup flows end-to-end
+- [ ] Rebuild Android AAB (version code 10)
 - [ ] Upload new AAB to Google Play internal testing
