@@ -7,13 +7,23 @@ const bundleId = "space.manus.filmcontract.t20251225042755";
 const timestamp = bundleId.split(".").pop()?.replace(/^t/, "") ?? "";
 const schemeFromBundleId = `manus${timestamp}`;
 
+// Production fallback values - these are used when EXPO_PUBLIC_* env vars
+// are not available (e.g., in EAS production builds where env vars may not
+// be injected into the JS bundle at build time)
+const FALLBACK_PORTAL = "https://manus.im";
+const FALLBACK_SERVER = "https://api.manus.im";
+const FALLBACK_APP_ID = "9Ds5MzMMryKSoRAkX3DK9S";
+const FALLBACK_OWNER_ID = "R729Ru8Hn3QNLeTJitmgkD";
+const FALLBACK_OWNER_NAME = "John Doeknow";
+const FALLBACK_API_BASE_URL = "https://3000-itzz2mez36esf7r2wm53a-41c31b39.us1.manus.computer";
+
 const env = {
-  portal: process.env.EXPO_PUBLIC_OAUTH_PORTAL_URL ?? "",
-  server: process.env.EXPO_PUBLIC_OAUTH_SERVER_URL ?? "",
-  appId: process.env.EXPO_PUBLIC_APP_ID ?? "",
-  ownerId: process.env.EXPO_PUBLIC_OWNER_OPEN_ID ?? "",
-  ownerName: process.env.EXPO_PUBLIC_OWNER_NAME ?? "",
-  apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? "",
+  portal: process.env.EXPO_PUBLIC_OAUTH_PORTAL_URL || FALLBACK_PORTAL,
+  server: process.env.EXPO_PUBLIC_OAUTH_SERVER_URL || FALLBACK_SERVER,
+  appId: process.env.EXPO_PUBLIC_APP_ID || FALLBACK_APP_ID,
+  ownerId: process.env.EXPO_PUBLIC_OWNER_OPEN_ID || FALLBACK_OWNER_ID,
+  ownerName: process.env.EXPO_PUBLIC_OWNER_NAME || FALLBACK_OWNER_NAME,
+  apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL || FALLBACK_API_BASE_URL,
   deepLinkScheme: schemeFromBundleId,
 };
 
@@ -45,8 +55,8 @@ export function getApiBaseUrl(): string {
     }
   }
 
-  // Fallback to empty (will use relative URL)
-  return "";
+  // Fallback to the hardcoded production URL
+  return FALLBACK_API_BASE_URL;
 }
 
 export const SESSION_TOKEN_KEY = "app_session_token";

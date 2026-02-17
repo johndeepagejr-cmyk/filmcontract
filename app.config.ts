@@ -26,7 +26,7 @@ const config: ExpoConfig = {
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   extra: {
-    apiUrl: process.env.API_URL || "https://3000-ia6sbgycqgi78h1m3wxmm-268d213c.us2.manus.computer",
+    apiUrl: process.env.API_URL || "https://3000-itzz2mez36esf7r2wm53a-41c31b39.us1.manus.computer",
     eas: {
       projectId: "9e393577-c465-4442-ae8b-b77e7e3e7614",
     },
@@ -43,7 +43,7 @@ const config: ExpoConfig = {
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
     package: env.androidPackage,
-    versionCode: 8,
+    versionCode: 9,
     permissions: ["POST_NOTIFICATIONS"],
   },
   web: {

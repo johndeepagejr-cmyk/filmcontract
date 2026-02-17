@@ -1269,3 +1269,14 @@
 
 ## Promotional Landing Page
 - [x] Create standalone HTML landing page for Film Contract
+
+## Bug Fix - Login Not Working on Android App
+- [ ] Fix "Sign In with Manus" button not working on Android app from Google Play internal testing
+
+## Bug Fix - Android Production OAuth Login
+- [x] Diagnose OAuth login not working on production Android build
+- [x] Set EAS production environment variables for OAuth
+- [x] Add hardcoded fallback values in constants/oauth.ts for production builds
+- [x] Bump Android versionCode to 9
+- [ ] Rebuild Android AAB with fixed OAuth configuration
+- [ ] Upload new AAB to Google Play internal testing
