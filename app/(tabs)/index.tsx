@@ -64,7 +64,7 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() => router.push("/payments" as any)}
+              onPress={() => router.push("/earnings" as any)}
               style={[styles.iconBtn, { backgroundColor: colors.surface, marginRight: 8 }]}
             >
               <IconSymbol name="dollarsign.circle" size={20} color={colors.primary} />

@@ -119,6 +119,8 @@ export default function CreateCastingWizard() {
   const [publishTiming, setPublishTiming] = useState<"now" | "schedule" | "draft">("now");
   const [scheduleDate, setScheduleDate] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [boostEnabled, setBoostEnabled] = useState(false);
+  const [boostDuration, setBoostDuration] = useState<7 | 14 | 30>(7);
 
   const createMutation = trpc.casting.create.useMutation({
     onSuccess: () => {
@@ -952,6 +954,58 @@ export default function CreateCastingWizard() {
         ))}
       </View>
 
+      {/* Featured Boost */}
+      <View style={[s.reqSection, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <View style={{ flex: 1 }}>
+            <Text style={[s.reqSectionTitle, { color: colors.foreground, marginBottom: 0 }]}>⚡ Boost This Casting</Text>
+            <Text style={[s.stepDesc, { color: colors.muted, marginTop: 4, marginBottom: 0 }]}>
+              Featured castings appear at the top of search results and get 3-5x more applicants.
+            </Text>
+          </View>
+          <Switch
+            value={boostEnabled}
+            onValueChange={setBoostEnabled}
+            trackColor={{ false: colors.border, true: colors.primary + "60" }}
+            thumbColor={boostEnabled ? colors.primary : "#f4f3f4"}
+          />
+        </View>
+        {boostEnabled && (
+          <View style={{ marginTop: 16 }}>
+            <View style={s.timingRow}>
+              {([
+                { days: 7 as const, price: "$29", label: "7 Days" },
+                { days: 14 as const, price: "$49", label: "14 Days" },
+                { days: 30 as const, price: "$79", label: "30 Days" },
+              ]).map((opt) => (
+                <TouchableOpacity
+                  key={opt.days}
+                  onPress={() => setBoostDuration(opt.days)}
+                  style={[
+                    s.timingOption,
+                    { borderColor: boostDuration === opt.days ? colors.primary : colors.border, flex: 1 },
+                    boostDuration === opt.days && { backgroundColor: colors.primary + "12" },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[s.timingLabel, { color: boostDuration === opt.days ? colors.primary : colors.foreground, fontWeight: "700", fontSize: 15 }]}>
+                    {opt.label}
+                  </Text>
+                  <Text style={[s.timingLabel, { color: boostDuration === opt.days ? colors.primary : colors.muted, fontSize: 13 }]}>
+                    {opt.price}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={[s.boostNote, { backgroundColor: colors.primary + "08", borderColor: colors.primary + "20" }]}>
+              <Text style={{ fontSize: 12, color: colors.muted, lineHeight: 18 }}>
+                Payment will be processed after publishing. Your casting will be marked with a ⚡ Featured badge and pinned to the top of actor feeds.
+              </Text>
+            </View>
+          </View>
+        )}
+      </View>
+
       {/* Timing */}
       <View style={[s.reqSection, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <Text style={[s.reqSectionTitle, { color: colors.foreground }]}>When to Publish</Text>
@@ -1298,4 +1352,5 @@ const s = StyleSheet.create({
   navBtnText: { fontSize: 15, fontWeight: "600" },
   navBtnPrimary: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: 14 },
   navBtnPrimaryText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  boostNote: { marginTop: 12, padding: 12, borderRadius: 10, borderWidth: 1 },
 });

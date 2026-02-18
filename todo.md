@@ -1543,3 +1543,52 @@
 - [x] Privacy data collection table
 - [x] Age rating, release notes, review notes for Apple
 - [x] Full APP_STORE_METADATA.md document
+
+## Production Deployment + Stripe Integration + Launch
+
+### 1. Stripe Connect Integration
+- [x] Backend: Create Express account for actors (onboarding URL)
+- [x] Backend: Retrieve account status (charges_enabled, payouts_enabled)
+- [x] Backend: Webhook handlers (account.updated, payment_intent.succeeded, subscription events)
+- [x] Backend: Escrow charge - hold funds in platform account with metadata
+- [x] Backend: Release to actor Connect account minus 7.5% platform fee
+- [x] Backend: Platform fees dashboard endpoint (total, monthly, projections)
+- [x] Frontend: Actor Stripe Connect onboarding screen with redirect handling
+- [ ] Frontend: Producer payment with Stripe Elements (card/ACH) — needs Stripe publishable key
+- [x] Frontend: Escrow UI with fund/release/dispute actions
+- [x] Frontend: Earnings dashboard (available, pending, lifetime, instant payout, tax info)
+- [ ] Environment: STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET — needs user keys
+
+### 2. Subscription Gating
+- [x] Free tier enforcement: 3 contracts/month, 5 castings/month, 10 self-tapes/month
+- [x] Limit modal: "Upgrade to Pro for unlimited" with Alert + router.push
+- [x] Feature gates: canUseFeature, checkFeatureAccess, checkUsageLimit
+- [x] Stripe Billing: Pro ($49/mo), Studio ($199/mo) via Checkout sessions
+- [x] Checkout sessions: Monthly/annual toggle in subscription screen
+- [x] Customer portal: createPortalSession endpoint
+- [x] Webhooks: customer.subscription.created/updated/deleted handled
+
+### 3. Featured Casting Payment
+- [x] Step 4 boost option in CreateCastingWizard with 7/14/30-day options ($19/$29/$49)
+- [x] Backend: purchaseBoost endpoint with PaymentIntent creation
+- [x] Backend: confirmBoost endpoint to activate featured status
+- [x] castingCall.isFeatured + featuredUntil columns in schema
+- [ ] Feed sorting: Featured first (by featuredUntil desc) — needs query update
+- [ ] Email receipt confirmation with boost details
+
+### 4. Production Deployment
+- [x] Database migrations for production (isFeatured, featuredUntil, stripeConnectAccountId)
+- [ ] Environment: NODE_ENV=production, secure secrets — needs deployment
+- [x] Rate limiting: 100/min API, 10/min auth, 20/min payments, 5/min uploads
+- [x] Security: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- [x] Request logging and global error handler
+- [x] Content type validation
+- [ ] Monitoring: Sentry error tracking setup — needs Sentry DSN
+- [ ] Build: Production build configuration
+- [ ] App Store submission package with test accounts
+
+### 5. Post-Launch Monitoring
+- [x] Revenue dashboard: getPlatformFees endpoint (total, monthly breakdown)
+- [ ] Error tracking (Sentry integration) — needs Sentry DSN
+- [ ] Database analytics (active users, contract volume)
+- [ ] Alert setup for payment failures, error rate, downtime

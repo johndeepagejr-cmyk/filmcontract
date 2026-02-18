@@ -32,6 +32,10 @@ export const users = mysqlTable("users", {
   userRole: mysqlEnum("userRole", ["producer", "actor"]),
   /** Push notification token for mobile notifications */
   pushToken: text("pushToken"),
+  /** Stripe Connect Express account ID for actor payouts */
+  stripeConnectAccountId: varchar("stripeConnectAccountId", { length: 255 }),
+  /** Whether Stripe Connect account is fully onboarded */
+  stripeConnectOnboarded: boolean("stripeConnectOnboarded").default(false),
   /** Profile picture URL for actors */
   profilePictureUrl: text("profilePictureUrl"),
   /** Verification status for established professionals */
@@ -589,6 +593,12 @@ export const castingCalls = mysqlTable("castingCalls", {
   status: mysqlEnum("status", ["open", "closed", "filled"]).default("open"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  /** Whether this casting is featured (boosted) */
+  isFeatured: boolean("isFeatured").default(false).notNull(),
+  /** When the featured boost expires */
+  featuredUntil: timestamp("featuredUntil"),
+  /** Stripe PaymentIntent ID for the boost payment */
+  boostPaymentIntentId: varchar("boostPaymentIntentId", { length: 255 }),
 });
 
 export type CastingCall = typeof castingCalls.$inferSelect;
