@@ -22,7 +22,8 @@ function getStripe() {
   return new Stripe(key, { apiVersion: "2024-12-18.acacia" });
 }
 
-const PLATFORM_FEE_PERCENT = 7.5; // 7.5% platform fee
+const PLATFORM_FEE_PERCENT = 7.5; // 7.5% platform fee (display)
+const PLATFORM_FEE_RATE = 0.075; // 7.5% as decimal (calculation)
 const BOOST_PRICE_CENTS = 1900; // $19.00 for featured casting
 const BOOST_DURATION_DAYS = 7;
 
@@ -365,7 +366,7 @@ export const stripeConnectRouter = router({
       }
 
       const grossAmount = parseFloat(escrow.amount);
-      const platformFee = Math.round(grossAmount * PLATFORM_FEE_PERCENT) / 100;
+      const platformFee = Math.round(grossAmount * PLATFORM_FEE_RATE * 100) / 100;
       const netToActor = grossAmount - platformFee;
       const netToActorCents = Math.round(netToActor * 100);
 
@@ -491,7 +492,7 @@ export const stripeConnectRouter = router({
 
     for (const e of released) {
       const gross = parseFloat(e.amount) || 0;
-      const fee = Math.round(gross * PLATFORM_FEE_PERCENT) / 100;
+      const fee = Math.round(gross * PLATFORM_FEE_RATE * 100) / 100;
       totalFees += fee;
 
       if (e.releasedAt) {
@@ -797,7 +798,7 @@ export const stripeConnectRouter = router({
     const transactions = await Promise.all(
       escrows.map(async (e) => {
         const gross = parseFloat(e.amount) || 0;
-        const fee = Math.round(gross * PLATFORM_FEE_PERCENT) / 100;
+        const fee = Math.round(gross * PLATFORM_FEE_RATE * 100) / 100;
         const net = gross - fee;
 
         if (e.status === "funded") available += net;

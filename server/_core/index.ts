@@ -8,6 +8,8 @@ import { registerEmailAuthRoutes } from "./email-auth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { handleStripeWebhook } from "../stripe-webhooks";
+import { logStripeStatus } from "../stripe-config";
+import { initSentry, sentryErrorHandler } from "../sentry";
 import { securityHeaders, requestLogger, apiRateLimit, authRateLimit, paymentRateLimit, errorHandler, validateContentType } from "../middleware/security";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -93,6 +95,7 @@ async function startServer() {
   );
 
   // Global error handler (must be last)
+  app.use(sentryErrorHandler());
   app.use(errorHandler);
 
   const preferredPort = parseInt(process.env.PORT || "3000");
@@ -104,6 +107,8 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`[api] server listening on port ${port}`);
+    logStripeStatus();
+    initSentry();
   });
 }
 

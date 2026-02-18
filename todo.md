@@ -1632,3 +1632,31 @@
 - [x] Store listing experiments suggestion: A/B test screenshots week 1
 - [x] App Privacy Details for App Store Connect (14 data types documented)
 - [x] Post-launch ASO optimization plan (weeks 1-2, months 1-3, ongoing)
+
+## Launch Operations
+
+### Stripe Live Mode
+- [x] Verify platform fee is 7.5% in all release code paths (fixed bug: was using 7.5 instead of 0.075)
+- [x] Environment config: stripe-config.ts validates live vs test mode at startup
+- [x] STRIPE_SECRET_KEY (live mode) already configured (sk_live_)
+- [x] STRIPE_PUBLISHABLE_KEY (live mode) already configured (pk_live_)
+- [ ] STRIPE_WEBHOOK_SECRET — create webhook endpoint in Stripe Dashboard
+- [ ] Test $1 transaction verification path
+
+### Error Tracking
+- [x] Sentry integration for server-side error tracking (server/sentry.ts)
+- [x] Sentry error handler middleware registered before global error handler
+- [x] Payment event tracking (capturePaymentEvent)
+- [ ] Sentry integration for React Native client — needs @sentry/react-native
+- [ ] Request SENTRY_DSN
+
+### Launch Runbook
+- [x] Pre-launch checklist document (LAUNCH_RUNBOOK.md)
+- [x] App Store Connect submission steps with exact field values
+- [x] Google Play Console submission steps with IARC answers
+- [x] Post-launch monitoring plan (Day 1, Week 1, Stripe daily check)
+- [x] Incident response procedures (P0-P3 severity levels)
+- [x] Rollback plan for both stores
+- [x] Build commands (EAS CLI)
+- [x] Test account setup instructions
+- [x] Legal requirements checklist
