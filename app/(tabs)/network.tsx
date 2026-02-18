@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { OnboardingOverlay } from "@/components/onboarding/OnboardingTooltip";
 
 type TabKey = "messages" | "talent";
 
@@ -207,6 +208,8 @@ export default function NetworkScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       />
+      {/* Onboarding: producer_network step */}
+      <OnboardingOverlay screen="network" />
     </ScreenContainer>
   );
 }

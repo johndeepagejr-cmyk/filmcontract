@@ -1,4 +1,4 @@
-import { FlatList, Text, View, TouchableOpacity, ActivityIndicator, RefreshControl, StyleSheet } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, RefreshControl, StyleSheet, FlatList } from "react-native";
 import { useState, useCallback } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { useAuth } from "@/hooks/use-auth";
@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { OnboardingOverlay } from "@/components/onboarding/OnboardingTooltip";
 
 const STATUS_ORDER = ["pending", "active", "draft", "completed", "cancelled"];
 
@@ -190,6 +191,8 @@ export default function ContractsScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       />
+      {/* Onboarding: actor_contracts / producer_contracts step */}
+      <OnboardingOverlay screen="contracts" />
     </ScreenContainer>
   );
 }

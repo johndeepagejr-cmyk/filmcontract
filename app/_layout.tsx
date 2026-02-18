@@ -19,6 +19,7 @@ import type { EdgeInsets, Metrics, Rect } from "react-native-safe-area-context";
 import { trpc, createTRPCClient } from "@/lib/trpc";
 import { initManusRuntime, subscribeSafeAreaInsets } from "@/lib/_core/manus-runtime";
 import { NetworkProvider, useNetwork } from "@/context/NetworkContext";
+import { OnboardingProvider } from "@/context/OnboardingContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { NetworkStatusBanner } from "@/components/NetworkStatusBanner";
 import { MaintenanceScreen } from "@/components/MaintenanceScreen";
@@ -109,7 +110,9 @@ export default function RootLayout() {
         <trpc.Provider client={trpcClient} queryClient={queryClient}>
           <QueryClientProvider client={queryClient}>
             <NetworkProvider>
-              <AppContent />
+              <OnboardingProvider>
+                <AppContent />
+              </OnboardingProvider>
             </NetworkProvider>
           </QueryClientProvider>
         </trpc.Provider>

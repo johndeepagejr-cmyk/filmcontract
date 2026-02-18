@@ -1672,3 +1672,12 @@
 - [x] Create reviewer test accounts (testactor@filmcontract.app, testproducer@filmcontract.app) with seed data
 - [x] Build and serve privacy policy page at /privacy
 - [x] Build and serve terms of service page at /terms
+
+## Contextual Onboarding Tooltips
+- [x] Create onboarding context/provider with AsyncStorage persistence
+- [x] Build reusable tooltip/spotlight component
+- [x] Actor onboarding flow (5 steps): Find casting calls → Submit tape → Track applications → Manage contracts → Build profile
+- [x] Producer onboarding flow (5 steps): Post casting call → Review submissions → Hire & pay → Manage contracts → Grow network
+- [x] Skip option always available
+- [x] Track completion rate (onboarding_completed flag per role)
+- [x] Don't show again after complete

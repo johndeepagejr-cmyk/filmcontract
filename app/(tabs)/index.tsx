@@ -1,5 +1,5 @@
 import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, RefreshControl, StyleSheet, FlatList } from "react-native";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { LoginScreen } from "@/components/auth/login-screen";
 import { RoleSelectionScreen } from "@/components/auth/role-selection-screen";
@@ -8,11 +8,22 @@ import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { useOnboarding } from "@/context/OnboardingContext";
+import { OnboardingTooltip, OnboardingOverlay } from "@/components/onboarding/OnboardingTooltip";
 
 // ─── Actor Home: Casting Feed ───────────────────────────────────────────────
 function ActorHome({ user, colors }: { user: any; colors: any }) {
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<string>("all");
+  const { startOnboarding, isOnboardingDone, loading: onboardingLoading } = useOnboarding();
+
+  // Auto-start onboarding for first-time actors
+  useEffect(() => {
+    if (!onboardingLoading && !isOnboardingDone("actor")) {
+      const timer = setTimeout(() => startOnboarding("actor"), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [onboardingLoading, isOnboardingDone, startOnboarding]);
 
   const { data: castings, isLoading, refetch } = trpc.casting.listOpen.useQuery(
     undefined,
@@ -139,8 +150,8 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
           ))}
         </ScrollView>
 
-        {/* My Submissions Summary */}
-        {submissionCount > 0 && (
+        {/* My Submissions Summary — Onboarding Step 3: Track applications */}
+        <OnboardingTooltip screen="home" stepId="actor_track_submissions" placement="bottom">
           <TouchableOpacity
             onPress={() => router.push("/casting/my-submissions" as any)}
             style={[styles.submissionsBanner, { backgroundColor: colors.surface, borderColor: colors.border }]}
@@ -149,16 +160,17 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
             <View style={{ flex: 1 }}>
               <Text style={[styles.submissionsBannerTitle, { color: colors.foreground }]}>My Submissions</Text>
               <Text style={[styles.submissionsBannerSub, { color: colors.muted }]}>
-                {submissionCount} total{shortlistedCount > 0 ? ` · ${shortlistedCount} shortlisted` : ""}{hiredCount > 0 ? ` · ${hiredCount} hired` : ""}
+                {submissionCount || 0} total{shortlistedCount > 0 ? ` · ${shortlistedCount} shortlisted` : ""}{hiredCount > 0 ? ` · ${hiredCount} hired` : ""}
               </Text>
             </View>
             <IconSymbol name="chevron.right" size={16} color={colors.muted} />
           </TouchableOpacity>
-        )}
+        </OnboardingTooltip>
 
-        {/* Casting Feed */}
-        <View style={styles.feedSection}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Open Casting Calls</Text>
+        {/* Casting Feed — Onboarding Step 1: Find casting calls */}
+        <OnboardingTooltip screen="home" stepId="actor_casting_feed" placement="bottom">
+          <View style={styles.feedSection}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Open Casting Calls</Text>
 
           {isLoading ? (
             <View style={styles.loadingContainer}>
@@ -213,7 +225,7 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
               ))}
             </View>
           ) : (
-            <View style={[styles.emptyState, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.emptyState, { backgroundColor: colors.surface, borderColor: colors.border, borderStyle: "dashed" }]}>
               <Text style={styles.emptyIcon}>🎬</Text>
               <Text style={[styles.emptyTitle, { color: colors.foreground }]}>No Casting Calls Yet</Text>
               <Text style={[styles.emptyDesc, { color: colors.muted }]}>
@@ -221,8 +233,11 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
               </Text>
             </View>
           )}
-        </View>
+          </View>
+        </OnboardingTooltip>
       </ScrollView>
+      {/* Onboarding Step 2: Submit tape overlay (contextual hint) */}
+      <OnboardingOverlay screen="home" />
     </ScreenContainer>
   );
 }
@@ -230,6 +245,15 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
 // ─── Producer Home: Dashboard ───────────────────────────────────────────────
 function ProducerHome({ user, colors }: { user: any; colors: any }) {
   const [refreshing, setRefreshing] = useState(false);
+  const { startOnboarding, isOnboardingDone, loading: onboardingLoading } = useOnboarding();
+
+  // Auto-start onboarding for first-time producers
+  useEffect(() => {
+    if (!onboardingLoading && !isOnboardingDone("producer")) {
+      const timer = setTimeout(() => startOnboarding("producer"), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [onboardingLoading, isOnboardingDone, startOnboarding]);
 
   const { data: contracts, isLoading: contractsLoading, refetch: refetchContracts } = trpc.contracts.list.useQuery(
     undefined,
@@ -361,7 +385,7 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
             </View>
           )}
 
-          {/* Quick Actions */}
+          {/* Quick Actions — Onboarding Step 1: Post Casting */}
           <View style={styles.quickActionsSection}>
             <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Quick Actions</Text>
             <View style={styles.actionGrid}>
@@ -373,14 +397,16 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
                 <IconSymbol name="doc.text.fill" size={24} color="#fff" />
                 <Text style={styles.actionCardTitle}>New Contract</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => router.push("/casting/create" as any)}
-                style={[styles.actionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
-                activeOpacity={0.8}
-              >
-                <IconSymbol name="megaphone.fill" size={24} color={colors.primary} />
-                <Text style={[styles.actionCardTitle, { color: colors.foreground }]}>Post Casting</Text>
-              </TouchableOpacity>
+              <OnboardingTooltip screen="home" stepId="producer_post_casting" placement="bottom">
+                <TouchableOpacity
+                  onPress={() => router.push("/casting/create" as any)}
+                  style={[styles.actionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
+                  activeOpacity={0.8}
+                >
+                  <IconSymbol name="megaphone.fill" size={24} color={colors.primary} />
+                  <Text style={[styles.actionCardTitle, { color: colors.foreground }]}>Post Casting</Text>
+                </TouchableOpacity>
+              </OnboardingTooltip>
               <TouchableOpacity
                 onPress={() => router.push("/templates" as any)}
                 style={[styles.actionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
@@ -509,6 +535,8 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
           </View>
         </View>
       </ScrollView>
+      {/* Onboarding Steps 2 & 3: Review submissions / Hire & pay overlay */}
+      <OnboardingOverlay screen="home" />
     </ScreenContainer>
   );
 }

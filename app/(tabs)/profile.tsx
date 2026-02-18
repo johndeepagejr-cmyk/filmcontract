@@ -6,6 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { AppFooter } from "@/components/app-footer";
 import { NotificationSettings } from "@/components/notification-settings";
+import { OnboardingOverlay } from "@/components/onboarding/OnboardingTooltip";
 
 export default function ProfileScreen() {
   const { user, isAuthenticated, logout, loading: authLoading } = useAuth();
@@ -503,6 +504,8 @@ export default function ProfileScreen() {
           <AppFooter />
         </View>
       </ScrollView>
+      {/* Onboarding: actor_profile step */}
+      <OnboardingOverlay screen="profile" />
     </ScreenContainer>
   );
 }
