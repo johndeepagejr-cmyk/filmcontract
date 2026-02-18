@@ -45,6 +45,33 @@ const MAPPING = {
   "bubble.left.fill": "chat-bubble",
   "phone.fill": "phone",
   "arrow.left": "arrow-back",
+  // Navigation tabs
+  "doc.text.fill": "description",
+  "person.2.fill": "people",
+  "network": "hub",
+  // Casting & content
+  "film": "movie",
+  "star.fill": "star",
+  "star": "star-border",
+  "bookmark.fill": "bookmark",
+  "bookmark": "bookmark-border",
+  "location.fill": "location-on",
+  "location": "location-on",
+  "calendar": "event",
+  "dollarsign.circle": "attach-money",
+  "slider.horizontal.3": "tune",
+  "camera.fill": "photo-camera",
+  "photo.fill": "photo",
+  "checkmark.circle.fill": "check-circle",
+  "checkmark": "check",
+  "trash": "delete",
+  "pencil": "edit",
+  "arrow.up.circle.fill": "upload",
+  "arrow.right": "arrow-forward",
+  "info.circle": "info",
+  "person.crop.rectangle": "badge",
+  "theatermasks.fill": "theater-comedy",
+  "gearshape.fill": "settings",
 } as IconMapping;
 
 /**

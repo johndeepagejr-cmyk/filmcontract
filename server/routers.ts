@@ -1158,6 +1158,212 @@ export const appRouter = router({
         };
       }),
   }),
+
+  // Casting Calls
+  casting: router({
+    // List all open casting calls (for actors)
+    listOpen: protectedProcedure.query(async () => {
+      const database = await getDb();
+      if (!database) return [];
+      const { castingCalls, users: usersTable } = await import("../drizzle/schema.js");
+      return database
+        .select({
+          id: castingCalls.id,
+          producerId: castingCalls.producerId,
+          title: castingCalls.title,
+          description: castingCalls.description,
+          roles: castingCalls.roles,
+          budget: castingCalls.budget,
+          deadline: castingCalls.deadline,
+          status: castingCalls.status,
+          createdAt: castingCalls.createdAt,
+          producerName: usersTable.name,
+        })
+        .from(castingCalls)
+        .leftJoin(usersTable, eq(castingCalls.producerId, usersTable.id))
+        .where(eq(castingCalls.status, "open"))
+        .orderBy(castingCalls.createdAt);
+    }),
+
+    // List producer's own casting calls
+    listMine: protectedProcedure.query(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) return [];
+      const { castingCalls } = await import("../drizzle/schema.js");
+      return database
+        .select()
+        .from(castingCalls)
+        .where(eq(castingCalls.producerId, ctx.user.id))
+        .orderBy(castingCalls.createdAt);
+    }),
+
+    // Get a single casting call by ID
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const database = await getDb();
+        if (!database) return null;
+        const { castingCalls, users: usersTable, castingSubmissions } = await import("../drizzle/schema.js");
+        const result = await database
+          .select({
+            id: castingCalls.id,
+            producerId: castingCalls.producerId,
+            title: castingCalls.title,
+            description: castingCalls.description,
+            roles: castingCalls.roles,
+            budget: castingCalls.budget,
+            deadline: castingCalls.deadline,
+            status: castingCalls.status,
+            createdAt: castingCalls.createdAt,
+            updatedAt: castingCalls.updatedAt,
+            producerName: usersTable.name,
+          })
+          .from(castingCalls)
+          .leftJoin(usersTable, eq(castingCalls.producerId, usersTable.id))
+          .where(eq(castingCalls.id, input.id))
+          .limit(1);
+        if (!result[0]) return null;
+        // Get submission count
+        const subs = await database
+          .select()
+          .from(castingSubmissions)
+          .where(eq(castingSubmissions.castingCallId, input.id));
+        return { ...result[0], submissionCount: subs.length };
+      }),
+
+    // Create a new casting call (producers only)
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(1),
+        description: z.string().min(1),
+        roles: z.string().optional(),
+        budget: z.string().optional(),
+        deadline: z.string().optional(),
+        status: z.enum(["open", "closed", "filled"]).default("open"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database unavailable");
+        const { castingCalls } = await import("../drizzle/schema.js");
+        const result = await database.insert(castingCalls).values({
+          producerId: ctx.user.id,
+          title: input.title,
+          description: input.description,
+          roles: input.roles || null,
+          budget: input.budget || null,
+          deadline: input.deadline ? new Date(input.deadline) : null,
+          status: input.status,
+        });
+        return { id: result[0].insertId, success: true };
+      }),
+
+    // Update a casting call
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        roles: z.string().optional(),
+        budget: z.string().optional(),
+        deadline: z.string().optional(),
+        status: z.enum(["open", "closed", "filled"]).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database unavailable");
+        const { castingCalls } = await import("../drizzle/schema.js");
+        const { id, ...data } = input;
+        const updateData: any = {};
+        if (data.title) updateData.title = data.title;
+        if (data.description) updateData.description = data.description;
+        if (data.roles !== undefined) updateData.roles = data.roles;
+        if (data.budget !== undefined) updateData.budget = data.budget;
+        if (data.deadline) updateData.deadline = new Date(data.deadline);
+        if (data.status) updateData.status = data.status;
+        await database.update(castingCalls).set(updateData).where(eq(castingCalls.id, id));
+        return { success: true };
+      }),
+
+    // Submit for a casting call (actors only)
+    submit: protectedProcedure
+      .input(z.object({
+        castingCallId: z.number(),
+        videoUrl: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database unavailable");
+        const { castingSubmissions } = await import("../drizzle/schema.js");
+        const result = await database.insert(castingSubmissions).values({
+          castingCallId: input.castingCallId,
+          actorId: ctx.user.id,
+          videoUrl: input.videoUrl || null,
+          notes: input.notes || null,
+          status: "submitted",
+        });
+        return { id: result[0].insertId, success: true };
+      }),
+
+    // Get submissions for a casting call (producer view)
+    getSubmissions: protectedProcedure
+      .input(z.object({ castingCallId: z.number() }))
+      .query(async ({ input }) => {
+        const database = await getDb();
+        if (!database) return [];
+        const { castingSubmissions, users: usersTable } = await import("../drizzle/schema.js");
+        return database
+          .select({
+            id: castingSubmissions.id,
+            actorId: castingSubmissions.actorId,
+            videoUrl: castingSubmissions.videoUrl,
+            notes: castingSubmissions.notes,
+            status: castingSubmissions.status,
+            createdAt: castingSubmissions.createdAt,
+            actorName: usersTable.name,
+          })
+          .from(castingSubmissions)
+          .leftJoin(usersTable, eq(castingSubmissions.actorId, usersTable.id))
+          .where(eq(castingSubmissions.castingCallId, input.castingCallId));
+      }),
+
+    // Get actor's own submissions
+    mySubmissions: protectedProcedure.query(async ({ ctx }) => {
+      const database = await getDb();
+      if (!database) return [];
+      const { castingSubmissions, castingCalls } = await import("../drizzle/schema.js");
+      return database
+        .select({
+          id: castingSubmissions.id,
+          castingCallId: castingSubmissions.castingCallId,
+          videoUrl: castingSubmissions.videoUrl,
+          notes: castingSubmissions.notes,
+          status: castingSubmissions.status,
+          createdAt: castingSubmissions.createdAt,
+          castingTitle: castingCalls.title,
+          castingDeadline: castingCalls.deadline,
+        })
+        .from(castingSubmissions)
+        .leftJoin(castingCalls, eq(castingSubmissions.castingCallId, castingCalls.id))
+        .where(eq(castingSubmissions.actorId, ctx.user.id));
+    }),
+
+    // Update submission status (producer)
+    updateSubmissionStatus: protectedProcedure
+      .input(z.object({
+        submissionId: z.number(),
+        status: z.enum(["submitted", "reviewing", "shortlisted", "rejected", "hired"]),
+      }))
+      .mutation(async ({ input }) => {
+        const database = await getDb();
+        if (!database) throw new Error("Database unavailable");
+        const { castingSubmissions } = await import("../drizzle/schema.js");
+        await database.update(castingSubmissions)
+          .set({ status: input.status })
+          .where(eq(castingSubmissions.id, input.submissionId));
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

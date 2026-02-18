@@ -1,5 +1,5 @@
-import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, RefreshControl, StyleSheet, Platform } from "react-native";
-import { useState, useCallback } from "react";
+import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, RefreshControl, StyleSheet, FlatList } from "react-native";
+import { useState, useCallback, useMemo } from "react";
 import { ScreenContainer } from "@/components/screen-container";
 import { LoginScreen } from "@/components/auth/login-screen";
 import { RoleSelectionScreen } from "@/components/auth/role-selection-screen";
@@ -7,27 +7,197 @@ import { useAuth } from "@/hooks/use-auth";
 import { trpc } from "@/lib/trpc";
 import { router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
-import { AppFooter } from "@/components/app-footer";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 
-export default function HomeScreen() {
-  const { user, isAuthenticated, loading: authLoading, refresh } = useAuth();
-  const colors = useColors();
+// ─── Actor Home: Casting Feed ───────────────────────────────────────────────
+function ActorHome({ user, colors }: { user: any; colors: any }) {
+  const [refreshing, setRefreshing] = useState(false);
+  const [filter, setFilter] = useState<string>("all");
+
+  const { data: castings, isLoading, refetch } = trpc.casting.listOpen.useQuery(
+    undefined,
+    { enabled: true }
+  );
+
+  const { data: contracts } = trpc.contracts.list.useQuery(undefined, { enabled: true });
+  const { data: unreadCount } = trpc.messaging.getUnreadCount.useQuery(undefined, { enabled: true });
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  }, [refetch]);
+
+  const activeContracts = contracts?.filter((c: any) => c.status === "active") || [];
+  const pendingContracts = contracts?.filter((c: any) => c.status === "pending") || [];
+  const unreadMessages = unreadCount?.count || 0;
+
+  const filters = [
+    { key: "all", label: "All Roles" },
+    { key: "film", label: "Film" },
+    { key: "tv", label: "TV" },
+    { key: "commercial", label: "Commercial" },
+    { key: "voice_over", label: "Voice Over" },
+  ];
+
+  return (
+    <ScreenContainer className="p-0">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+      >
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.greeting, { color: colors.foreground }]}>
+                {getGreeting()}, {user.name?.split(" ")[0] || "there"}
+              </Text>
+              <Text style={[styles.subtitle, { color: colors.muted }]}>
+                Discover casting opportunities
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => router.push("/messages" as any)}
+              style={[styles.iconBtn, { backgroundColor: colors.surface }]}
+            >
+              <IconSymbol name="paperplane.fill" size={20} color={colors.primary} />
+              {unreadMessages > 0 && (
+                <View style={[styles.badge, { backgroundColor: colors.error }]}>
+                  <Text style={styles.badgeText}>{unreadMessages > 9 ? "9+" : unreadMessages}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          {/* Quick Stats */}
+          <View style={styles.quickStats}>
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/contracts" as any)}
+              style={[styles.statChip, { backgroundColor: colors.success + "15" }]}
+            >
+              <Text style={[styles.statNum, { color: colors.success }]}>{activeContracts.length}</Text>
+              <Text style={[styles.statLabel, { color: colors.success }]}>Active</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)/contracts" as any)}
+              style={[styles.statChip, { backgroundColor: colors.warning + "15" }]}
+            >
+              <Text style={[styles.statNum, { color: colors.warning }]}>{pendingContracts.length}</Text>
+              <Text style={[styles.statLabel, { color: colors.warning }]}>Pending</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/messages" as any)}
+              style={[styles.statChip, { backgroundColor: colors.primary + "15" }]}
+            >
+              <Text style={[styles.statNum, { color: colors.primary }]}>{unreadMessages}</Text>
+              <Text style={[styles.statLabel, { color: colors.primary }]}>Messages</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Filter Bar */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterBar} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
+          {filters.map((f) => (
+            <TouchableOpacity
+              key={f.key}
+              onPress={() => setFilter(f.key)}
+              style={[
+                styles.filterChip,
+                { borderColor: colors.border },
+                filter === f.key && { backgroundColor: colors.primary, borderColor: colors.primary },
+              ]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.filterText, { color: filter === f.key ? "#fff" : colors.muted }]}>{f.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Casting Feed */}
+        <View style={styles.feedSection}>
+          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Open Casting Calls</Text>
+
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              {[1, 2, 3].map((i) => (
+                <View key={i} style={[styles.skeletonCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <View style={[styles.skeletonLine, { backgroundColor: colors.border, width: "70%" }]} />
+                  <View style={[styles.skeletonLine, { backgroundColor: colors.border, width: "50%", height: 12 }]} />
+                  <View style={[styles.skeletonLine, { backgroundColor: colors.border, width: "90%", height: 10 }]} />
+                </View>
+              ))}
+            </View>
+          ) : castings && castings.length > 0 ? (
+            <View style={{ gap: 12 }}>
+              {castings.map((casting: any) => (
+                <TouchableOpacity
+                  key={casting.id}
+                  onPress={() => router.push(`/casting/${casting.id}` as any)}
+                  style={[styles.castingCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.castingCardHeader}>
+                    <View style={[styles.castingTypeBadge, { backgroundColor: colors.primary + "15" }]}>
+                      <Text style={[styles.castingTypeText, { color: colors.primary }]}>
+                        {casting.projectType || "Film"}
+                      </Text>
+                    </View>
+                    {casting.deadline && (
+                      <Text style={[styles.deadlineText, { color: colors.warning }]}>
+                        Deadline: {new Date(casting.deadline).toLocaleDateString()}
+                      </Text>
+                    )}
+                  </View>
+                  <Text style={[styles.castingTitle, { color: colors.foreground }]} numberOfLines={1}>
+                    {casting.title}
+                  </Text>
+                  <Text style={[styles.castingCompany, { color: colors.muted }]} numberOfLines={1}>
+                    {casting.producerName || "Production Company"}
+                  </Text>
+                  <Text style={[styles.castingDesc, { color: colors.muted }]} numberOfLines={2}>
+                    {casting.description}
+                  </Text>
+                  <View style={styles.castingFooter}>
+                    {casting.budget && (
+                      <View style={[styles.budgetChip, { backgroundColor: colors.success + "15" }]}>
+                        <Text style={[styles.budgetText, { color: colors.success }]}>${casting.budget}</Text>
+                      </View>
+                    )}
+                    <View style={{ flex: 1 }} />
+                    <Text style={[styles.applyText, { color: colors.primary }]}>View Details →</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <View style={[styles.emptyState, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={styles.emptyIcon}>🎬</Text>
+              <Text style={[styles.emptyTitle, { color: colors.foreground }]}>No Casting Calls Yet</Text>
+              <Text style={[styles.emptyDesc, { color: colors.muted }]}>
+                New casting opportunities will appear here. Check back soon!
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </ScreenContainer>
+  );
+}
+
+// ─── Producer Home: Dashboard ───────────────────────────────────────────────
+function ProducerHome({ user, colors }: { user: any; colors: any }) {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data: contracts, isLoading: contractsLoading, refetch: refetchContracts } = trpc.contracts.list.useQuery(
     undefined,
-    { enabled: isAuthenticated && !!user?.userRole }
+    { enabled: true }
   );
-
-  const { data: unreadCount } = trpc.messaging.getUnreadCount.useQuery(
-    undefined,
-    { enabled: isAuthenticated && !!user?.userRole }
-  );
-
-  const { data: currentSub } = trpc.subscription.getCurrent.useQuery(
-    undefined,
-    { enabled: isAuthenticated && !!user?.userRole }
-  );
+  const { data: unreadCount } = trpc.messaging.getUnreadCount.useQuery(undefined, { enabled: true });
+  const { data: currentSub } = trpc.subscription.getCurrent.useQuery(undefined, { enabled: true });
+  const { data: castings } = trpc.casting.listOpen.useQuery(undefined, { enabled: true });
+  const { refresh } = useAuth();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -36,7 +206,212 @@ export default function HomeScreen() {
     setRefreshing(false);
   }, [refresh, refetchContracts]);
 
-  // Show loading spinner while auth is being checked
+  const activeContracts = contracts?.filter((c: any) => c.status === "active") || [];
+  const pendingContracts = contracts?.filter((c: any) => c.status === "pending") || [];
+  const draftContracts = contracts?.filter((c: any) => c.status === "draft") || [];
+  const completedContracts = contracts?.filter((c: any) => c.status === "completed") || [];
+  const totalContracts = contracts?.length || 0;
+  const unreadMessages = unreadCount?.count || 0;
+
+  return (
+    <ScreenContainer className="p-0">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
+      >
+        {/* Header */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.greeting, { color: colors.foreground }]}>
+                {getGreeting()}, {user.name?.split(" ")[0] || "there"}
+              </Text>
+              <Text style={[styles.subtitle, { color: colors.muted }]}>
+                Manage your productions
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => router.push("/messages" as any)}
+              style={[styles.iconBtn, { backgroundColor: colors.surface }]}
+            >
+              <IconSymbol name="paperplane.fill" size={20} color={colors.primary} />
+              {unreadMessages > 0 && (
+                <View style={[styles.badge, { backgroundColor: colors.error }]}>
+                  <Text style={styles.badgeText}>{unreadMessages > 9 ? "9+" : unreadMessages}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.dashboardContent}>
+          {/* Upgrade Banner */}
+          {currentSub && currentSub.plan === "free" && (
+            <TouchableOpacity
+              onPress={() => router.push("/subscription" as any)}
+              style={[styles.upgradeBanner, { backgroundColor: colors.primary }]}
+              activeOpacity={0.8}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={styles.upgradeTitle}>Upgrade to Pro</Text>
+                <Text style={styles.upgradeDesc}>Unlimited contracts, templates & more</Text>
+              </View>
+              <IconSymbol name="chevron.right" size={20} color="#fff" />
+            </TouchableOpacity>
+          )}
+
+          {/* Stats Grid */}
+          <View style={styles.statsGrid}>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.statCardNum, { color: colors.foreground }]}>{totalContracts}</Text>
+              <Text style={[styles.statCardLabel, { color: colors.muted }]}>Total</Text>
+            </View>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.statCardNum, { color: colors.success }]}>{activeContracts.length}</Text>
+              <Text style={[styles.statCardLabel, { color: colors.muted }]}>Active</Text>
+            </View>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.statCardNum, { color: colors.warning }]}>{pendingContracts.length}</Text>
+              <Text style={[styles.statCardLabel, { color: colors.muted }]}>Pending</Text>
+            </View>
+            <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.statCardNum, { color: colors.primary }]}>{completedContracts.length}</Text>
+              <Text style={[styles.statCardLabel, { color: colors.muted }]}>Done</Text>
+            </View>
+          </View>
+
+          {/* Quick Actions */}
+          <View style={styles.quickActionsSection}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Quick Actions</Text>
+            <View style={styles.actionGrid}>
+              <TouchableOpacity
+                onPress={() => router.push("/create-contract" as any)}
+                style={[styles.actionCard, { backgroundColor: colors.primary }]}
+                activeOpacity={0.8}
+              >
+                <IconSymbol name="doc.text.fill" size={24} color="#fff" />
+                <Text style={styles.actionCardTitle}>New Contract</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/casting/create" as any)}
+                style={[styles.actionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
+                activeOpacity={0.8}
+              >
+                <IconSymbol name="megaphone.fill" size={24} color={colors.primary} />
+                <Text style={[styles.actionCardTitle, { color: colors.foreground }]}>Post Casting</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/templates" as any)}
+                style={[styles.actionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
+                activeOpacity={0.8}
+              >
+                <IconSymbol name="doc.on.doc.fill" size={24} color={colors.primary} />
+                <Text style={[styles.actionCardTitle, { color: colors.foreground }]}>Templates</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/casting" as any)}
+                style={[styles.actionCard, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
+                activeOpacity={0.8}
+              >
+                <IconSymbol name="person.2.fill" size={24} color={colors.primary} />
+                <Text style={[styles.actionCardTitle, { color: colors.foreground }]}>Browse Talent</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* My Casting Calls */}
+          {castings && castings.length > 0 && (
+            <View style={styles.sectionBlock}>
+              <View style={styles.sectionHeaderRow}>
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>My Casting Calls</Text>
+                <TouchableOpacity onPress={() => router.push("/casting" as any)}>
+                  <Text style={[styles.seeAll, { color: colors.primary }]}>See All</Text>
+                </TouchableOpacity>
+              </View>
+              {castings.slice(0, 3).map((casting: any) => (
+                <TouchableOpacity
+                  key={casting.id}
+                  onPress={() => router.push(`/casting/${casting.id}` as any)}
+                  style={[styles.listItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  activeOpacity={0.7}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.listItemTitle, { color: colors.foreground }]} numberOfLines={1}>{casting.title}</Text>
+                    <Text style={[styles.listItemSub, { color: colors.muted }]}>
+                      {casting.submissionCount || 0} submissions
+                    </Text>
+                  </View>
+                  <IconSymbol name="chevron.right" size={16} color={colors.muted} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {/* Recent Contracts */}
+          <View style={styles.sectionBlock}>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Recent Contracts</Text>
+              <TouchableOpacity onPress={() => router.push("/(tabs)/contracts" as any)}>
+                <Text style={[styles.seeAll, { color: colors.primary }]}>See All</Text>
+              </TouchableOpacity>
+            </View>
+
+            {contractsLoading ? (
+              <View style={[styles.loadingCard, { backgroundColor: colors.surface }]}>
+                <ActivityIndicator size="small" color={colors.primary} />
+              </View>
+            ) : contracts && contracts.length > 0 ? (
+              contracts.slice(0, 5).map((contract: any) => (
+                <TouchableOpacity
+                  key={contract.id}
+                  onPress={() => router.push(`/contract/${contract.id}` as any)}
+                  style={[styles.listItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  activeOpacity={0.7}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.listItemTitle, { color: colors.foreground }]} numberOfLines={1}>
+                      {contract.projectTitle}
+                    </Text>
+                    <Text style={[styles.listItemSub, { color: colors.muted }]}>
+                      {contract.actorName || "No actor assigned"} · {contract.status}
+                    </Text>
+                  </View>
+                  <View style={[styles.statusDot, {
+                    backgroundColor: contract.status === "active" ? colors.success
+                      : contract.status === "pending" ? colors.warning
+                      : contract.status === "completed" ? colors.primary
+                      : colors.muted
+                  }]} />
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View style={[styles.emptyState, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={styles.emptyIcon}>📄</Text>
+                <Text style={[styles.emptyTitle, { color: colors.foreground }]}>No Contracts Yet</Text>
+                <Text style={[styles.emptyDesc, { color: colors.muted }]}>
+                  Create your first contract to get started
+                </Text>
+                <TouchableOpacity
+                  onPress={() => router.push("/create-contract" as any)}
+                  style={[styles.emptyBtn, { backgroundColor: colors.primary }]}
+                >
+                  <Text style={styles.emptyBtnText}>Create Contract</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+    </ScreenContainer>
+  );
+}
+
+// ─── Main Home Screen ───────────────────────────────────────────────────────
+export default function HomeScreen() {
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const colors = useColors();
+
   if (authLoading) {
     return (
       <ScreenContainer className="items-center justify-center">
@@ -46,285 +421,19 @@ export default function HomeScreen() {
     );
   }
 
-  // Show login screen if not authenticated
   if (!isAuthenticated || !user) {
     return <LoginScreen />;
   }
 
-  // Show role selection if user hasn't picked a role yet
   if (!user.userRole) {
     return <RoleSelectionScreen />;
   }
 
-  // Calculate contract stats
-  const activeContracts = contracts?.filter((c: any) => c.status === "active") || [];
-  const pendingContracts = contracts?.filter((c: any) => c.status === "pending") || [];
-  const draftContracts = contracts?.filter((c: any) => c.status === "draft") || [];
-  const completedContracts = contracts?.filter((c: any) => c.status === "completed") || [];
-  const totalContracts = contracts?.length || 0;
-  const unreadMessages = unreadCount?.count || 0;
+  if (user.userRole === "producer") {
+    return <ProducerHome user={user} colors={colors} />;
+  }
 
-  const isProducer = user.userRole === "producer";
-
-  return (
-    <ScreenContainer className="p-4">
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-        }
-      >
-        <View className="flex-1 gap-5">
-          {/* Greeting */}
-          <View className="gap-1 pt-2">
-            <Text className="text-3xl font-bold text-foreground">
-              {getGreeting()}, {user.name?.split(" ")[0] || "there"}
-            </Text>
-            <Text className="text-base text-muted">
-              {isProducer ? "Manage your contracts and find talent" : "Track your contracts and opportunities"}
-            </Text>
-          </View>
-
-          {/* Upgrade Banner for Free Users */}
-          {currentSub && currentSub.plan === "free" && (
-            <TouchableOpacity
-              onPress={() => router.push("/subscription")}
-              style={{
-                backgroundColor: colors.primary,
-                borderRadius: 16,
-                padding: 16,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-              activeOpacity={0.8}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
-                  Upgrade to Pro
-                </Text>
-                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 13, marginTop: 2 }}>
-                  Unlimited contracts, templates, PDF export & more — $4.99/mo
-                </Text>
-              </View>
-              <Text style={{ color: "#fff", fontSize: 24 }}>›</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Contract Usage for Free Users */}
-          {currentSub && currentSub.plan === "free" && (
-            <View className="bg-surface rounded-2xl p-4 border border-border">
-              <Text className="text-sm text-muted">Monthly Contracts</Text>
-              <Text className="text-lg font-bold text-foreground">
-                {currentSub.contractsUsedThisMonth} / {currentSub.limits.contractsPerMonth} used
-              </Text>
-            </View>
-          )}
-
-          {/* Stats Overview */}
-          <View className="flex-row gap-3">
-            <View className="flex-1 bg-surface rounded-2xl p-4 border border-border">
-              <Text className="text-sm text-muted">Total</Text>
-              <Text className="text-3xl font-bold text-foreground">{totalContracts}</Text>
-              <Text className="text-xs text-muted">Contracts</Text>
-            </View>
-            <View className="flex-1 bg-surface rounded-2xl p-4 border border-border">
-              <Text className="text-sm text-muted">Active</Text>
-              <Text className="text-3xl font-bold text-success">{activeContracts.length}</Text>
-              <Text className="text-xs text-muted">In Progress</Text>
-            </View>
-            <View className="flex-1 bg-surface rounded-2xl p-4 border border-border">
-              <Text className="text-sm text-muted">Pending</Text>
-              <Text className="text-3xl font-bold text-warning">{pendingContracts.length}</Text>
-              <Text className="text-xs text-muted">Awaiting</Text>
-            </View>
-          </View>
-
-          {/* Quick Actions */}
-          <View className="gap-3">
-            <Text className="text-lg font-bold text-foreground">Quick Actions</Text>
-            <View className="gap-2">
-              {isProducer && (
-                <TouchableOpacity
-                  onPress={() => router.push("/create-contract" as any)}
-                  style={[styles.quickActionBtn, { backgroundColor: colors.primary }]}
-                >
-                  <Text style={styles.quickActionIcon}>📝</Text>
-                  <View style={styles.quickActionContent}>
-                    <Text style={[styles.quickActionTitle, { color: "#fff" }]}>Create New Contract</Text>
-                    <Text style={[styles.quickActionSub, { color: "rgba(255,255,255,0.7)" }]}>Draft a contract with an actor</Text>
-                  </View>
-                  <Text style={{ color: "#fff", fontSize: 20 }}>›</Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity
-                onPress={() => router.push("/messages" as any)}
-                style={[styles.quickActionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
-              >
-                <Text style={styles.quickActionIcon}>💬</Text>
-                <View style={styles.quickActionContent}>
-                  <Text style={[styles.quickActionTitle, { color: colors.foreground }]}>Messages</Text>
-                  <Text style={[styles.quickActionSub, { color: colors.muted }]}>
-                    {unreadMessages > 0 ? `${unreadMessages} unread message${unreadMessages > 1 ? "s" : ""}` : "Chat with actors and producers"}
-                  </Text>
-                </View>
-                {unreadMessages > 0 && (
-                  <View style={[styles.unreadBadge, { backgroundColor: colors.error }]}>
-                    <Text style={styles.unreadText}>{unreadMessages}</Text>
-                  </View>
-                )}
-                <Text style={{ color: colors.muted, fontSize: 20 }}>›</Text>
-              </TouchableOpacity>
-
-              {isProducer && (
-                <TouchableOpacity
-                  onPress={() => router.push("/templates" as any)}
-                  style={[styles.quickActionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
-                >
-                  <Text style={styles.quickActionIcon}>📋</Text>
-                  <View style={styles.quickActionContent}>
-                    <Text style={[styles.quickActionTitle, { color: colors.foreground }]}>Contract Templates</Text>
-                    <Text style={[styles.quickActionSub, { color: colors.muted }]}>Use pre-built contract templates</Text>
-                  </View>
-                  <Text style={{ color: colors.muted, fontSize: 20 }}>›</Text>
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity
-                onPress={() => {
-                  if (isProducer) {
-                    router.push("/(tabs)/actors" as any);
-                  } else {
-                    router.push("/(tabs)/producers" as any);
-                  }
-                }}
-                style={[styles.quickActionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
-              >
-                <Text style={styles.quickActionIcon}>{isProducer ? "🎭" : "🎬"}</Text>
-                <View style={styles.quickActionContent}>
-                  <Text style={[styles.quickActionTitle, { color: colors.foreground }]}>
-                    {isProducer ? "Browse Actors" : "Browse Producers"}
-                  </Text>
-                  <Text style={[styles.quickActionSub, { color: colors.muted }]}>
-                    {isProducer ? "Find talent for your projects" : "Discover producers and opportunities"}
-                  </Text>
-                </View>
-                <Text style={{ color: colors.muted, fontSize: 20 }}>›</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Recent Contracts */}
-          <View className="gap-3">
-            <View className="flex-row items-center justify-between">
-              <Text className="text-lg font-bold text-foreground">Recent Contracts</Text>
-              {totalContracts > 0 && (
-                <TouchableOpacity
-                  onPress={() => router.push("/(tabs)/analytics-old" as any)}
-                  style={{ opacity: 1 }}
-                >
-                  <Text style={{ fontSize: 14, color: colors.primary, fontWeight: "600" }}>View All →</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {contractsLoading ? (
-              <View className="bg-surface rounded-2xl p-8 items-center border border-border">
-                <ActivityIndicator size="small" color={colors.primary} />
-              </View>
-            ) : contracts && contracts.length > 0 ? (
-              <View className="gap-2">
-                {contracts.slice(0, 5).map((contract: any) => (
-                  <TouchableOpacity
-                    key={contract.id}
-                    onPress={() => router.push(`/contract/${contract.id}` as any)}
-                    style={[styles.contractCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                  >
-                    <View className="flex-row items-start justify-between gap-2">
-                      <View className="flex-1 gap-1">
-                        <Text className="text-base font-semibold text-foreground" numberOfLines={1}>
-                          {contract.projectTitle}
-                        </Text>
-                        <Text className="text-sm text-muted" numberOfLines={1}>
-                          {isProducer
-                            ? `Actor: ${contract.actorName || "Unknown"}`
-                            : `Producer: ${contract.producerName || "Unknown"}`}
-                        </Text>
-                        {contract.paymentAmount && (
-                          <Text className="text-sm text-foreground font-medium">
-                            ${parseFloat(contract.paymentAmount).toLocaleString()}
-                          </Text>
-                        )}
-                      </View>
-                      <View
-                        style={[
-                          styles.statusBadge,
-                          {
-                            backgroundColor:
-                              contract.status === "active"
-                                ? colors.success + "20"
-                                : contract.status === "pending"
-                                ? colors.warning + "20"
-                                : contract.status === "completed"
-                                ? colors.primary + "20"
-                                : contract.status === "cancelled"
-                                ? colors.error + "20"
-                                : colors.muted + "20",
-                          },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.statusText,
-                            {
-                              color:
-                                contract.status === "active"
-                                  ? colors.success
-                                  : contract.status === "pending"
-                                  ? colors.warning
-                                  : contract.status === "completed"
-                                  ? colors.primary
-                                  : contract.status === "cancelled"
-                                  ? colors.error
-                                  : colors.muted,
-                            },
-                          ]}
-                        >
-                          {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
-                        </Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            ) : (
-              <View className="bg-surface rounded-2xl p-8 items-center gap-3 border border-border">
-                <Text className="text-4xl">📄</Text>
-                <Text className="text-base font-semibold text-foreground">No Contracts Yet</Text>
-                <Text className="text-sm text-muted text-center">
-                  {isProducer
-                    ? "Create your first contract to get started"
-                    : "Contracts from producers will appear here"}
-                </Text>
-                {isProducer && (
-                  <TouchableOpacity
-                    onPress={() => router.push("/create-contract" as any)}
-                    style={[styles.createBtn, { backgroundColor: colors.primary }]}
-                  >
-                    <Text style={styles.createBtnText}>Create Contract</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-          </View>
-
-          {/* Footer */}
-          <AppFooter />
-        </View>
-      </ScrollView>
-    </ScreenContainer>
-  );
+  return <ActorHome user={user} colors={colors} />;
 }
 
 function getGreeting(): string {
@@ -335,61 +444,62 @@ function getGreeting(): string {
 }
 
 const styles = StyleSheet.create({
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  quickActionBtn: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderRadius: 12,
-  },
-  quickActionIcon: {
-    fontSize: 24,
-  },
-  quickActionContent: {
-    flex: 1,
-  },
-  quickActionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  quickActionSub: {
-    fontSize: 14,
-  },
-  unreadBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
-    minWidth: 24,
-    alignItems: "center" as const,
-  },
-  unreadText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  contractCard: {
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-  },
-  createBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 999,
-    marginTop: 8,
-  },
-  createBtnText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
+  headerSection: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8, gap: 12 },
+  headerRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  greeting: { fontSize: 26, fontWeight: "800" },
+  subtitle: { fontSize: 15, marginTop: 2 },
+  iconBtn: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  badge: { position: "absolute", top: -2, right: -2, minWidth: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
+  badgeText: { color: "#fff", fontSize: 10, fontWeight: "800" },
+  quickStats: { flexDirection: "row", gap: 10 },
+  statChip: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: "center", gap: 2 },
+  statNum: { fontSize: 22, fontWeight: "800" },
+  statLabel: { fontSize: 11, fontWeight: "600" },
+  filterBar: { marginBottom: 12 },
+  filterChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
+  filterText: { fontSize: 13, fontWeight: "600" },
+  feedSection: { paddingHorizontal: 16, gap: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: "700" },
+  castingCard: { borderRadius: 16, padding: 16, borderWidth: 1, gap: 6 },
+  castingCardHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  castingTypeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+  castingTypeText: { fontSize: 11, fontWeight: "700", textTransform: "uppercase" },
+  deadlineText: { fontSize: 11, fontWeight: "600" },
+  castingTitle: { fontSize: 17, fontWeight: "700" },
+  castingCompany: { fontSize: 13 },
+  castingDesc: { fontSize: 13, lineHeight: 18 },
+  castingFooter: { flexDirection: "row", alignItems: "center", marginTop: 4 },
+  budgetChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+  budgetText: { fontSize: 12, fontWeight: "700" },
+  applyText: { fontSize: 13, fontWeight: "600" },
+  emptyState: { borderRadius: 16, padding: 32, borderWidth: 1, alignItems: "center", gap: 8, borderStyle: "dashed" },
+  emptyIcon: { fontSize: 40 },
+  emptyTitle: { fontSize: 17, fontWeight: "700" },
+  emptyDesc: { fontSize: 13, textAlign: "center", lineHeight: 18 },
+  emptyBtn: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 24, marginTop: 8 },
+  emptyBtnText: { color: "#fff", fontSize: 15, fontWeight: "700" },
+  loadingContainer: { gap: 12 },
+  skeletonCard: { borderRadius: 16, padding: 16, borderWidth: 1, gap: 10 },
+  skeletonLine: { height: 16, borderRadius: 4 },
+  // Producer styles
+  dashboardContent: { paddingHorizontal: 16, gap: 20, paddingTop: 8 },
+  upgradeBanner: { borderRadius: 16, padding: 16, flexDirection: "row", alignItems: "center" },
+  upgradeTitle: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  upgradeDesc: { color: "rgba(255,255,255,0.8)", fontSize: 13, marginTop: 2 },
+  statsGrid: { flexDirection: "row", gap: 10 },
+  statCard: { flex: 1, borderRadius: 14, padding: 14, borderWidth: 1, alignItems: "center", gap: 2 },
+  statCardNum: { fontSize: 24, fontWeight: "800" },
+  statCardLabel: { fontSize: 11, fontWeight: "600" },
+  quickActionsSection: { gap: 12 },
+  actionGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  actionCard: { width: "48%", borderRadius: 14, padding: 16, alignItems: "center", gap: 8 },
+  actionCardTitle: { color: "#fff", fontSize: 13, fontWeight: "700" },
+  sectionBlock: { gap: 10 },
+  sectionHeaderRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  seeAll: { fontSize: 14, fontWeight: "600" },
+  listItem: { flexDirection: "row", alignItems: "center", padding: 14, borderRadius: 12, borderWidth: 1, gap: 12 },
+  listItemTitle: { fontSize: 15, fontWeight: "600" },
+  listItemSub: { fontSize: 12, marginTop: 2 },
+  statusDot: { width: 10, height: 10, borderRadius: 5 },
+  loadingCard: { borderRadius: 14, padding: 24, alignItems: "center" },
 });

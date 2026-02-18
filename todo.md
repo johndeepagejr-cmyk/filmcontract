@@ -1310,3 +1310,17 @@
 - [x] Health check on app launch with maintenance mode screen
 - [x] NetworkContext provider for global network state
 - [x] Integrate all services into app layout
+
+## Role-Based Navigation + Casting Calls System
+- [x] Restructure tabs from 5 to 4 (Home, Contracts, Network, Profile)
+- [x] Update icon mappings in icon-symbol.tsx
+- [x] Role-conditional Home screen (Actors=casting feed, Producers=dashboard)
+- [x] CastingCallsFeed screen with filter bar and cards
+- [x] CastingCallDetail screen with tabs and sticky footer
+- [x] SelfTapeUploadFlow (3-step wizard: record/select, slate, submit)
+- [x] ProducerCreateCasting screen with form and template selector
+- [x] Empty states for all new screens
+- [x] Loading skeletons for casting feed and detail
+- [x] Success animations for submissions
+- [x] Contracts tab with unified list and create button
+- [x] Network tab with messages and talent pools

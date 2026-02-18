@@ -36,33 +36,30 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="contracts"
+        options={{
+          title: "Contracts",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="doc.text.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="network"
+        options={{
+          title: "Network",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.2.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="actors"
-        options={{
-          title: "Actors",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="producers"
-        options={{
-          title: "Producers",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="analytics-old"
-        options={{
-          title: "Analytics",
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="chart.bar" color={color} />,
-        }}
-      />
+      {/* Hide old tabs that are now merged into Network or removed */}
+      <Tabs.Screen name="actors" options={{ href: null }} />
+      <Tabs.Screen name="producers" options={{ href: null }} />
+      <Tabs.Screen name="analytics-old" options={{ href: null }} />
     </Tabs>
   );
 }
