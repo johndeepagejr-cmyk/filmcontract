@@ -11,6 +11,7 @@ import { handleStripeWebhook } from "../stripe-webhooks";
 import { logStripeStatus } from "../stripe-config";
 import { initSentry, sentryErrorHandler } from "../sentry";
 import { securityHeaders, requestLogger, apiRateLimit, authRateLimit, paymentRateLimit, errorHandler, validateContentType } from "../middleware/security";
+import { privacyPolicyHtml, termsOfServiceHtml } from "../legal-pages";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise((resolve) => {
@@ -69,6 +70,18 @@ async function startServer() {
 
   registerOAuthRoutes(app);
   registerEmailAuthRoutes(app);
+
+  // Privacy Policy page (required by App Store & Google Play)
+  app.get("/privacy", (_req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(privacyPolicyHtml);
+  });
+
+  // Terms of Service page
+  app.get("/terms", (_req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(termsOfServiceHtml);
+  });
 
   // Health check endpoint with version info
   app.get("/api/health", (_req, res) => {

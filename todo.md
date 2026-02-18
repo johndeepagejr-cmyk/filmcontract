@@ -1660,3 +1660,15 @@
 - [x] Build commands (EAS CLI)
 - [x] Test account setup instructions
 - [x] Legal requirements checklist
+
+### Launch Deployment Progress
+- [x] Stripe Dashboard → Activate live account
+- [x] Verify sk_live_ key in production environment
+- [x] Server logs confirm "Stripe LIVE mode confirmed" ✅
+- [x] Upload build to TestFlight / Play Console Internal
+
+### Pre-Public-Release Tasks
+- [x] Set up STRIPE_WEBHOOK_SECRET environment variable (built-in secret, user sets via Settings panel)
+- [x] Create reviewer test accounts (testactor@filmcontract.app, testproducer@filmcontract.app) with seed data
+- [x] Build and serve privacy policy page at /privacy
+- [x] Build and serve terms of service page at /terms
