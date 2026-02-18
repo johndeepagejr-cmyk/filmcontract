@@ -170,19 +170,44 @@ export default function SelfTapeUploadFlow() {
                 </View>
                 <Text style={[styles.videoFileName, { color: colors.foreground }]} numberOfLines={1}>{videoName}</Text>
                 <Text style={[styles.videoReady, { color: colors.success }]}>Ready to upload</Text>
-                <TouchableOpacity onPress={() => { setVideoUri(null); setVideoName(""); }} style={styles.removeBtn}>
-                  <Text style={[styles.removeBtnText, { color: colors.error }]}>Remove</Text>
-                </TouchableOpacity>
+                <View style={styles.videoPreviewActions}>
+                  <TouchableOpacity
+                    onPress={() => router.push({ pathname: "/casting/editor" as any, params: { castingId, videoUri, duration: "0", quality: "1080p" } })}
+                    style={[styles.editVideoBtn, { backgroundColor: colors.primary + "15" }]}
+                  >
+                    <IconSymbol name="slider.horizontal.3" size={16} color={colors.primary} />
+                    <Text style={[styles.editVideoBtnText, { color: colors.primary }]}>Edit Video</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { setVideoUri(null); setVideoName(""); }} style={styles.removeBtn}>
+                    <Text style={[styles.removeBtnText, { color: colors.error }]}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ) : (
               <View style={styles.videoActions}>
+                {/* Pro Recorder */}
+                <TouchableOpacity
+                  onPress={() => router.push({ pathname: "/casting/recorder" as any, params: { castingId } })}
+                  style={[styles.proRecorderBtn, { backgroundColor: "#1a1a2e", borderColor: colors.primary }]}
+                  activeOpacity={0.8}
+                >
+                  <View style={[styles.proBadge, { backgroundColor: colors.primary }]}>
+                    <Text style={styles.proBadgeText}>PRO</Text>
+                  </View>
+                  <IconSymbol name="camera.fill" size={28} color={colors.primary} />
+                  <Text style={[styles.proRecorderTitle, { color: "#fff" }]}>Pro Recorder</Text>
+                  <Text style={[styles.proRecorderDesc, { color: "rgba(255,255,255,0.5)" }]}>
+                    Teleprompter, quality presets, multiple takes
+                  </Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity
                   onPress={recordVideo}
                   style={[styles.videoActionBtn, { backgroundColor: colors.primary }]}
                   activeOpacity={0.8}
                 >
                   <IconSymbol name="camera.fill" size={24} color="#fff" />
-                  <Text style={styles.videoActionText}>Record Video</Text>
+                  <Text style={styles.videoActionText}>Quick Record</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={pickVideo}
@@ -438,4 +463,12 @@ const styles = StyleSheet.create({
   secondaryBtnText: { fontSize: 15, fontWeight: "600" },
   primaryBtn: { flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 14, borderRadius: 14 },
   primaryBtnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  videoPreviewActions: { flexDirection: "row", gap: 12, marginTop: 4 },
+  editVideoBtn: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
+  editVideoBtnText: { fontSize: 13, fontWeight: "700" },
+  proRecorderBtn: { borderRadius: 16, borderWidth: 2, padding: 20, alignItems: "center", gap: 8, position: "relative" as const },
+  proBadge: { position: "absolute" as const, top: 10, right: 10, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  proBadgeText: { color: "#fff", fontSize: 10, fontWeight: "800", letterSpacing: 1 },
+  proRecorderTitle: { fontSize: 18, fontWeight: "800" },
+  proRecorderDesc: { fontSize: 12, textAlign: "center" as const, lineHeight: 18 },
 });

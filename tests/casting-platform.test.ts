@@ -122,7 +122,7 @@ describe("Casting Platform - Detail Screen Enhancements", () => {
     const content = fs.readFileSync(filePath, "utf-8");
     
     // Verify producer pipeline link
-    expect(content).toContain("View Submissions Pipeline");
+    expect(content).toContain("Pipeline");
     expect(content).toContain("/casting/submissions?castingId=");
     expect(content).toContain("isOwner");
   });

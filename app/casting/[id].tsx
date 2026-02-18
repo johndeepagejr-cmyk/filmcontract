@@ -337,16 +337,24 @@ export default function CastingCallDetail() {
         </View>
       )}
 
-      {/* Producer: View Pipeline button */}
+      {/* Producer: View Pipeline + Review buttons */}
       {isOwner && (
         <View style={[styles.stickyFooter, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
           <TouchableOpacity
+            onPress={() => router.push(`/casting/review?castingId=${castingId}` as any)}
+            style={[styles.submitBtn, { backgroundColor: "#AF52DE", flex: 1 }]}
+            activeOpacity={0.8}
+          >
+            <IconSymbol name="play.circle.fill" size={20} color="#fff" />
+            <Text style={styles.submitBtnText}>Review Tapes</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => router.push(`/casting/submissions?castingId=${castingId}&title=${encodeURIComponent(casting.title)}` as any)}
-            style={[styles.submitBtn, { backgroundColor: colors.primary }]}
+            style={[styles.submitBtn, { backgroundColor: colors.primary, flex: 1 }]}
             activeOpacity={0.8}
           >
             <IconSymbol name="person.2.fill" size={20} color="#fff" />
-            <Text style={styles.submitBtnText}>View Submissions Pipeline</Text>
+            <Text style={styles.submitBtnText}>Pipeline</Text>
           </TouchableOpacity>
         </View>
       )}

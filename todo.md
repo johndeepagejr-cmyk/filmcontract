@@ -1407,14 +1407,14 @@
 - [ ] Step 4: Publishing (now/schedule/draft, visibility settings)
 
 ### Self-Tape Workflow
-- [ ] SelfTapeRecorder (camera, quality presets, teleprompter, takes, countdown)
-- [ ] SelfTapeEditor (trim, slate, text overlay, thumbnail, compression, preview)
-- [ ] SelfTapeUploadFlow (step indicator, attachments, review, resumable upload, success)
+- [x] SelfTapeRecorder (camera, quality presets, teleprompter, takes, countdown)
+- [x] SelfTapeEditor (trim, slate, text overlay, thumbnail, compression, preview)
+- [x] SelfTapeUploadFlow (step indicator, attachments, review, resumable upload, success)
 
 ### Producer Review Tools
-- [ ] ReviewSubmissions grid with filters and bulk select
-- [ ] Detail view (video player, actor profile sidebar, notes, rating, actions)
-- [ ] Comparison mode (2-3 tapes side-by-side)
+- [x] ReviewSubmissions grid with filters and bulk select
+- [x] Detail view (video player, actor profile sidebar, notes, rating, actions)
+- [x] Comparison mode (2-3 tapes side-by-side)
 
 ### Actor Submissions
 - [x] MySubmissions list with status badges (submitted/reviewed/shortlisted/callback/hired/passed)
@@ -1427,3 +1427,44 @@
 - [ ] Hire button → pre-fill Contract Wizard Step 2
 - [ ] Booked status → auto-generate contract draft
 - [ ] Network tab refinement (role-conditional content)
+
+
+## Broadcast-Quality Self-Tape System + Producer Review Tools
+
+### SelfTapeRecorder (Custom Professional Camera)
+- [x] Full-screen camera preview (16:9) with expo-camera
+- [x] Top bar: Flash toggle, camera flip, grid overlay (rule of thirds), settings gear
+- [x] Focus/exposure tap-to-set
+- [x] Teleprompter: Upload/paste sides, auto-scroll (speed 1-10), manual scroll, highlight current line, mirror text
+- [x] Quality presets: 720p (fast), 1080p (standard), 4K (premium)
+- [x] Multiple takes: Record up to 5, swipe between, star best, delete others
+- [x] Countdown: 3-2-1 with visual flash
+- [x] Duration limits: Producer-defined (30s/60s/2min/5min), auto-stop with 10s warning
+- [x] Real-time filters: Natural, Studio Light, Warm, Cool
+- [x] Audio levels: Visual peak meter display
+- [x] Record button with 3D press states
+
+### SelfTapeEditor (Post-Production Suite)
+- [x] Video preview with gesture controls (tap pause/play, swipe scrub)
+- [x] Timeline with trim handles, playhead, chapter markers
+- [x] Trim: Frame-accurate with undo/redo stack
+- [x] Slate: Auto-generate from profile (Name, Height, Location, Agency), custom styling, duration options
+- [x] Enhance: Auto-levels, volume normalize
+- [x] Export: Compression settings (target 25MB/50MB/100MB), resolution (720p/1080p), estimated file size
+- [x] Full-screen preview before export
+
+### ResumableUpload (Enterprise Reliability)
+- [x] Progress card: thumbnail, file name, size, progress bar with %, MB uploaded/total, ETA, speed
+- [x] Controls: Pause, resume, cancel, retry
+- [x] Chunked upload: 5MB chunks with checksums
+- [x] Upload queue for multiple files
+- [x] Background upload indicator
+- [x] Auto-retry on failure with exponential backoff
+
+### Producer Review Tools
+- [x] ReviewSubmissions grid with filters and bulk select
+- [x] Detail view: video player with timeline, actor profile sidebar, notes, rating
+- [x] Comparison mode: 2-3 tapes side-by-side with synced playback
+- [x] Quick actions: Shortlist, Callback, Hire, Pass with notes
+- [x] Rating rubric: Acting, Look, Voice, Chemistry (1-5 stars each)
+- [ ] Export notes/ratings as CSV
