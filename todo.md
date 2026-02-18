@@ -1324,3 +1324,36 @@
 - [x] Success animations for submissions
 - [x] Contracts tab with unified list and create button
 - [x] Network tab with messages and talent pools
+
+## Contract Wizard + Professional Polish (Complete Build)
+
+### Design System
+- [x] Professional navy/gold color palette with dark mode cinematic
+- [x] Typography system (Inter/SF Pro + monospaced for contract terms)
+- [x] 8pt grid spacing system
+- [x] Core components (Buttons primary/secondary/ghost, Inputs, Cards, Modals, Steppers)
+
+### Contract Wizard (6 Steps)
+- [x] Step 1: ProjectDetails (title, type, dates, locations, project code)
+- [x] Step 2: SelectTalent (search, mini-profile, invite by email)
+- [x] Step 3: TermsPayment (rate type, amount, schedule, kill fees, expenses, overtime)
+- [x] Step 4: Deliverables (call times, wardrobe, usage rights, exclusivity, credit, special provisions)
+- [x] Step 5: Review (side-by-side terms, red-line changes, total cost calculator)
+- [x] Step 6: Send (recipient preview, custom message, push + email notification)
+
+### Post-Send Features
+- [x] Negotiation thread (clause-specific comments, revision proposals, version comparison)
+- [x] Signature capture (drawing canvas, typed signature, date/IP/timestamp, celebration animation)
+- [x] Contract timeline (Draft → Sent → Opened → Negotiating → Signed → Active → Completed)
+
+### Onboarding Flow (4 Steps)
+- [x] Role selection (Actor/Producer/Both)
+- [x] IMDb Connect (import credits pattern)
+- [x] Union verification (SAG-AFTRA/Equity/Non-union)
+- [x] Portfolio setup (headshot, reel, skills)
+
+### Professional Polish
+- [x] Verification badges (Union, IMDb, Email, Phone, Gov ID)
+- [x] Portfolio redesign (hero section, credited roles, skills, photo gallery)
+- [x] Review cards (aggregate rating, distribution graph, recent reviews)
+- [x] Micro-interactions (haptics on sign/complete, pull-to-refresh, skeleton loading, success animations)

@@ -14,12 +14,22 @@ import { trpc } from "@/lib/trpc";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import { useColors } from "@/hooks/use-colors";
 import { useAuth } from "@/hooks/use-auth";
+import { Card, SectionHeader, Divider, Button } from "@/components/ui/design-system";
+import { Typography, Spacing, Radius } from "@/constants/design-tokens";
+import { NegotiationThread } from "@/components/contract/NegotiationThread";
+import { SignatureCapture } from "@/components/contract/SignatureCapture";
+import { ContractTimeline } from "@/components/contract/ContractTimeline";
+import * as Haptics from "expo-haptics";
+
+type Tab = "details" | "negotiate" | "timeline";
 
 export default function ContractDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const contractId = parseInt(id || "0", 10);
   const colors = useColors();
+  const accent = (colors as any).accent || "#C9963B";
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<Tab>("details");
 
   const { data: contract, isLoading, refetch } = trpc.contracts.getById.useQuery(
     { id: contractId },
@@ -34,14 +44,14 @@ export default function ContractDetailScreen() {
 
   const handleStatusUpdate = async (newStatus: string) => {
     setUpdatingStatus(true);
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      await updateStatusMutation.mutateAsync({
-        id: contractId,
-        status: newStatus as any,
-      });
+      await updateStatusMutation.mutateAsync({ id: contractId, status: newStatus as any });
+      if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       const msg = `Contract status updated to ${newStatus}.`;
       Platform.OS === "web" ? alert(msg) : Alert.alert("Updated", msg);
     } catch (error) {
+      if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       const errorMsg = error instanceof Error ? error.message : "Failed to update status.";
       Platform.OS === "web" ? alert(errorMsg) : Alert.alert("Error", errorMsg);
     } finally {
@@ -51,301 +61,264 @@ export default function ContractDetailScreen() {
 
   if (isLoading) {
     return (
-      <ScreenContainer className="items-center justify-center">
+      <ScreenContainer>
         <Stack.Screen options={{ title: "Contract Details" }} />
-        <ActivityIndicator size="large" color={colors.primary} />
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+          <ActivityIndicator size="large" color={accent} />
+        </View>
       </ScreenContainer>
     );
   }
 
   if (!contract) {
     return (
-      <ScreenContainer className="p-6 items-center justify-center">
+      <ScreenContainer>
         <Stack.Screen options={{ title: "Contract Not Found" }} />
-        <Text className="text-4xl mb-4">📄</Text>
-        <Text className="text-lg font-semibold text-foreground">Contract Not Found</Text>
-        <Text className="text-sm text-muted mt-2">This contract may have been deleted.</Text>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.goBackBtn}
-        >
-          <Text style={styles.goBackText}>Go Back</Text>
-        </TouchableOpacity>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: Spacing.lg }}>
+          <Text style={{ fontSize: 48 }}>📄</Text>
+          <Text style={[Typography.h2, { color: colors.foreground, marginTop: 12 }]}>Contract Not Found</Text>
+          <Text style={[Typography.bodySm, { color: colors.muted, marginTop: 4 }]}>This contract may have been deleted.</Text>
+          <Button title="Go Back" onPress={() => router.back()} variant="primary" style={{ marginTop: 24 }} />
+        </View>
       </ScreenContainer>
     );
   }
 
   const isProducer = user?.id === contract.producerId;
   const isActor = user?.id === contract.actorId;
+  const userRole = isProducer ? "producer" : "actor";
 
-  const statusColor =
-    contract.status === "active"
-      ? colors.success
-      : contract.status === "pending"
-      ? colors.warning
-      : contract.status === "completed"
-      ? colors.primary
-      : contract.status === "cancelled"
-      ? colors.error
-      : colors.muted;
+  const statusConfig: Record<string, { color: string; label: string }> = {
+    active: { color: colors.success, label: "Active" },
+    pending: { color: colors.warning, label: "Pending" },
+    completed: { color: colors.primary, label: "Completed" },
+    cancelled: { color: colors.error, label: "Cancelled" },
+    draft: { color: colors.muted, label: "Draft" },
+  };
+  const status = statusConfig[contract.status] || statusConfig.draft;
+
+  const TABS: { key: Tab; label: string; icon: string }[] = [
+    { key: "details", label: "Details", icon: "📋" },
+    { key: "negotiate", label: "Discuss", icon: "💬" },
+    { key: "timeline", label: "Timeline", icon: "📅" },
+  ];
 
   return (
     <ScreenContainer>
       <Stack.Screen
         options={{
-          title: contract.projectTitle || "Contract Details",
+          title: contract.projectTitle || "Contract",
           headerShown: true,
           headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.foreground,
         }}
       />
-      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 20, paddingBottom: 60 }}>
-        <View className="gap-5">
-          {/* Status Badge */}
-          <View className="flex-row items-center gap-3">
-            <View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-              <Text style={[styles.statusText, { color: statusColor }]}>
-                {contract.status.charAt(0).toUpperCase() + contract.status.slice(1)}
-              </Text>
+
+      {/* Tab Bar */}
+      <View style={[styles.tabBar, { borderBottomColor: colors.border }]}>
+        {TABS.map((tab) => (
+          <TouchableOpacity
+            key={tab.key}
+            onPress={() => {
+              setActiveTab(tab.key);
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            activeOpacity={0.7}
+            style={[styles.tab, activeTab === tab.key && { borderBottomColor: accent, borderBottomWidth: 2 }]}
+          >
+            <Text style={{ fontSize: 14 }}>{tab.icon}</Text>
+            <Text style={[Typography.labelSm, { color: activeTab === tab.key ? accent : colors.muted }]}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {activeTab === "details" && (
+        <ScrollView contentContainerStyle={{ padding: Spacing.lg, paddingBottom: 120, gap: Spacing.lg }}>
+          {/* Status + Payment Badge */}
+          <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+            <View style={[styles.badge, { backgroundColor: status.color + "15", borderColor: status.color + "30" }]}>
+              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: status.color }} />
+              <Text style={[Typography.labelSm, { color: status.color }]}>{status.label}</Text>
             </View>
             {contract.paymentStatus && (
-              <View
-                style={[
-                  styles.statusBadge,
-                  {
-                    backgroundColor:
-                      contract.paymentStatus === "paid"
-                        ? colors.success + "20"
-                        : contract.paymentStatus === "partial"
-                        ? colors.warning + "20"
-                        : colors.muted + "20",
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.statusText,
-                    {
-                      color:
-                        contract.paymentStatus === "paid"
-                          ? colors.success
-                          : contract.paymentStatus === "partial"
-                          ? colors.warning
-                          : colors.muted,
-                    },
-                  ]}
-                >
-                  {contract.paymentStatus === "paid"
-                    ? "Paid"
-                    : contract.paymentStatus === "partial"
-                    ? "Partially Paid"
-                    : "Unpaid"}
+              <View style={[styles.badge, {
+                backgroundColor: contract.paymentStatus === "paid" ? colors.success + "15" : colors.warning + "15",
+                borderColor: contract.paymentStatus === "paid" ? colors.success + "30" : colors.warning + "30",
+              }]}>
+                <Text style={[Typography.labelSm, {
+                  color: contract.paymentStatus === "paid" ? colors.success : colors.warning,
+                }]}>
+                  {contract.paymentStatus === "paid" ? "Paid" : contract.paymentStatus === "partial" ? "Partially Paid" : "Unpaid"}
                 </Text>
               </View>
             )}
           </View>
 
-          {/* Project Title */}
-          <View className="gap-1">
-            <Text className="text-2xl font-bold text-foreground">{contract.projectTitle}</Text>
-          </View>
-
-          {/* Parties */}
-          <View className="bg-surface rounded-xl p-4 border border-border gap-3">
-            <Text className="text-sm font-semibold text-muted uppercase">Parties</Text>
-            <View className="gap-2">
-              <View className="flex-row justify-between items-center">
-                <Text className="text-sm text-muted">Producer</Text>
-                <Text className="text-base font-semibold text-foreground">
-                  {contract.producer?.name || "Unknown"}
-                </Text>
+          {/* Parties Card */}
+          <Card>
+            <SectionHeader title="Parties" />
+            <View style={{ gap: 12, marginTop: 8 }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <View style={{ gap: 2 }}>
+                  <Text style={[Typography.caption, { color: colors.muted }]}>Producer</Text>
+                  <Text style={[Typography.labelMd, { color: colors.foreground }]}>
+                    {(contract as any).producer?.name || (contract as any).producerName || "Unknown"}
+                  </Text>
+                </View>
+                {(contract as any).producerSignature && (
+                  <View style={[styles.signedBadge, { backgroundColor: colors.success + "15" }]}>
+                    <Text style={[Typography.caption, { color: colors.success }]}>Signed ✓</Text>
+                  </View>
+                )}
               </View>
-              <View style={[styles.divider, { backgroundColor: colors.border }]} />
-              <View className="flex-row justify-between items-center">
-                <Text className="text-sm text-muted">Actor</Text>
-                <Text className="text-base font-semibold text-foreground">
-                  {contract.actor?.name || "Unknown"}
+              <Divider />
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <View style={{ gap: 2 }}>
+                  <Text style={[Typography.caption, { color: colors.muted }]}>Actor</Text>
+                  <Text style={[Typography.labelMd, { color: colors.foreground }]}>
+                    {(contract as any).actor?.name || (contract as any).actorName || "Unknown"}
+                  </Text>
+                </View>
+                {(contract as any).actorSignature && (
+                  <View style={[styles.signedBadge, { backgroundColor: colors.success + "15" }]}>
+                    <Text style={[Typography.caption, { color: colors.success }]}>Signed ✓</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </Card>
+
+          {/* Payment Card */}
+          <Card>
+            <SectionHeader title="Payment" />
+            <View style={{ gap: 12, marginTop: 8 }}>
+              {contract.paymentAmount && (
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                  <Text style={[Typography.bodySm, { color: colors.muted }]}>Amount</Text>
+                  <Text style={[Typography.displaySm, { color: accent }]}>
+                    ${parseFloat(contract.paymentAmount).toLocaleString()}
+                  </Text>
+                </View>
+              )}
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <Text style={[Typography.bodySm, { color: colors.muted }]}>Terms</Text>
+                <Text style={[Typography.bodySm, { color: colors.foreground, flex: 1, textAlign: "right", marginLeft: 16 }]} numberOfLines={3}>
+                  {contract.paymentTerms}
                 </Text>
               </View>
             </View>
-          </View>
-
-          {/* Payment Details */}
-          <View className="bg-surface rounded-xl p-4 border border-border gap-3">
-            <Text className="text-sm font-semibold text-muted uppercase">Payment</Text>
-            {contract.paymentAmount && (
-              <View className="flex-row justify-between items-center">
-                <Text className="text-sm text-muted">Amount</Text>
-                <Text className="text-2xl font-bold text-foreground">
-                  ${parseFloat(contract.paymentAmount).toLocaleString()}
-                </Text>
-              </View>
-            )}
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-muted">Terms</Text>
-              <Text className="text-sm text-foreground flex-1 text-right ml-4" numberOfLines={3}>
-                {contract.paymentTerms}
-              </Text>
-            </View>
-          </View>
+          </Card>
 
           {/* Deliverables */}
           {contract.deliverables && (
-            <View className="bg-surface rounded-xl p-4 border border-border gap-2">
-              <Text className="text-sm font-semibold text-muted uppercase">Deliverables</Text>
-              <Text className="text-base text-foreground leading-6">{contract.deliverables}</Text>
-            </View>
+            <Card>
+              <SectionHeader title="Deliverables" />
+              <Text style={[Typography.bodySm, { color: colors.foreground, lineHeight: 22, marginTop: 8 }]}>
+                {contract.deliverables}
+              </Text>
+            </Card>
           )}
 
-          {/* Dates */}
-          <View className="bg-surface rounded-xl p-4 border border-border gap-3">
-            <Text className="text-sm font-semibold text-muted uppercase">Timeline</Text>
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-muted">Start Date</Text>
-              <Text className="text-sm text-foreground">
-                {contract.startDate ? new Date(contract.startDate).toLocaleDateString() : "Not set"}
-              </Text>
+          {/* Timeline Dates */}
+          <Card>
+            <SectionHeader title="Schedule" />
+            <View style={{ gap: 10, marginTop: 8 }}>
+              {[
+                { label: "Start Date", value: contract.startDate },
+                { label: "End Date", value: contract.endDate },
+                { label: "Created", value: contract.createdAt },
+              ].map((item) => (
+                <View key={item.label} style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                  <Text style={[Typography.bodySm, { color: colors.muted }]}>{item.label}</Text>
+                  <Text style={[Typography.labelSm, { color: colors.foreground }]}>
+                    {item.value ? new Date(item.value).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Not set"}
+                  </Text>
+                </View>
+              ))}
             </View>
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-muted">End Date</Text>
-              <Text className="text-sm text-foreground">
-                {contract.endDate ? new Date(contract.endDate).toLocaleDateString() : "Not set"}
-              </Text>
-            </View>
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm text-muted">Created</Text>
-              <Text className="text-sm text-foreground">
-                {contract.createdAt ? new Date(contract.createdAt).toLocaleDateString() : "Unknown"}
-              </Text>
-            </View>
-          </View>
+          </Card>
 
-          {/* Actions */}
-          <View className="gap-3 mt-2">
-            {/* Payment button for producers */}
+          {/* Signature Section */}
+          {(contract.status === "active" || contract.status === "pending") && (isProducer || isActor) && (
+            <SignatureCapture
+              contractId={contractId}
+              signerName={user?.name || ""}
+              signerRole={userRole as "producer" | "actor"}
+              onSigned={refetch}
+            />
+          )}
+
+          {/* Action Buttons */}
+          <View style={{ gap: 12 }}>
             {isProducer && contract.paymentStatus !== "paid" && contract.paymentAmount && (
-              <TouchableOpacity
-                onPress={() => router.push(`/payment/${contract.id}` as any)}
-                style={[styles.actionBtn, { backgroundColor: colors.primary }]}
-              >
-                <Text style={styles.actionBtnText}>Make Payment</Text>
-              </TouchableOpacity>
+              <Button title="Make Payment" onPress={() => router.push(`/payment/${contract.id}` as any)} variant="accent" fullWidth />
             )}
-
-            {/* Status update buttons */}
             {isProducer && contract.status === "draft" && (
-              <TouchableOpacity
-                onPress={() => handleStatusUpdate("pending")}
-                disabled={updatingStatus}
-                style={[styles.actionBtn, { backgroundColor: colors.warning, opacity: updatingStatus ? 0.6 : 1 }]}
-              >
-                {updatingStatus ? (
-                  <ActivityIndicator color="#ffffff" />
-                ) : (
-                  <Text style={styles.actionBtnText}>Send to Actor</Text>
-                )}
-              </TouchableOpacity>
+              <Button title="Send to Actor" onPress={() => handleStatusUpdate("pending")} variant="primary" fullWidth loading={updatingStatus} />
             )}
-
             {isActor && contract.status === "pending" && (
-              <View style={styles.rowBtns}>
-                <TouchableOpacity
-                  onPress={() => handleStatusUpdate("active")}
-                  disabled={updatingStatus}
-                  style={[styles.actionBtn, styles.flexBtn, { backgroundColor: colors.success, opacity: updatingStatus ? 0.6 : 1 }]}
-                >
-                  <Text style={styles.actionBtnText}>Accept</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleStatusUpdate("cancelled")}
-                  disabled={updatingStatus}
-                  style={[styles.actionBtn, styles.flexBtn, { backgroundColor: colors.error, opacity: updatingStatus ? 0.6 : 1 }]}
-                >
-                  <Text style={styles.actionBtnText}>Decline</Text>
-                </TouchableOpacity>
+              <View style={{ flexDirection: "row", gap: 12 }}>
+                <View style={{ flex: 1 }}>
+                  <Button title="Accept" onPress={() => handleStatusUpdate("active")} variant="primary" fullWidth loading={updatingStatus} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button title="Decline" onPress={() => handleStatusUpdate("cancelled")} variant="outline" fullWidth loading={updatingStatus} />
+                </View>
               </View>
             )}
-
             {isProducer && contract.status === "active" && (
-              <TouchableOpacity
-                onPress={() => handleStatusUpdate("completed")}
-                disabled={updatingStatus}
-                style={[styles.actionBtn, { backgroundColor: colors.primary, opacity: updatingStatus ? 0.6 : 1 }]}
-              >
-                {updatingStatus ? (
-                  <ActivityIndicator color="#ffffff" />
-                ) : (
-                  <Text style={styles.actionBtnText}>Mark as Completed</Text>
-                )}
-              </TouchableOpacity>
-            )}
-
-            {/* Review buttons */}
-            {contract.status === "completed" && isProducer && (
-              <TouchableOpacity
-                onPress={() => router.push(`/review-actor/${contract.id}` as any)}
-                style={[styles.actionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
-              >
-                <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Review Actor</Text>
-              </TouchableOpacity>
-            )}
-
-            {contract.status === "completed" && isActor && (
-              <TouchableOpacity
-                onPress={() => router.push(`/review/${contract.id}` as any)}
-                style={[styles.actionBtn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]}
-              >
-                <Text style={[styles.actionBtnText, { color: colors.foreground }]}>Review Producer</Text>
-              </TouchableOpacity>
+              <Button title="Mark as Completed" onPress={() => handleStatusUpdate("completed")} variant="accent" fullWidth loading={updatingStatus} />
             )}
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
+
+      {activeTab === "negotiate" && (
+        <NegotiationThread
+          contractId={contractId}
+          currentUserId={user?.id || 0}
+        />
+      )}
+
+      {activeTab === "timeline" && (
+        <ScrollView contentContainerStyle={{ padding: Spacing.lg, paddingBottom: 60 }}>
+          <ContractTimeline contractId={contractId} />
+        </ScrollView>
+      )}
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  statusBadge: {
+  tabBar: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    paddingHorizontal: Spacing.md,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  badge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: 20,
+    borderWidth: 1,
   },
-  statusText: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  divider: {
-    height: 0.5,
-    width: "100%",
-  },
-  goBackBtn: {
-    marginTop: 24,
-    backgroundColor: "#0a7ea4",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 999,
-  },
-  goBackText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  actionBtn: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: "center" as const,
-  },
-  actionBtnText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  rowBtns: {
-    flexDirection: "row" as const,
-    gap: 12,
-  },
-  flexBtn: {
-    flex: 1,
+  signedBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
 });
