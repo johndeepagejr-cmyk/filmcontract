@@ -1505,3 +1505,9 @@
 - [ ] Lazy load video components
 - [ ] Image caching for submission thumbnails
 - [ ] Background threading for compression (non-blocking UI)
+
+## Hire→Contract Integration Patch
+- [x] Review screen Hire button passes actor name, role, rate, castingCallId to Contract Wizard
+- [x] Contract Wizard accepts pre-fill search params and auto-populates Step 2 (Select Talent)
+- [x] Contract Wizard skips to Step 3 (Terms) when pre-filled from Hire action
+- [x] castingCallId stored as reference on the contract

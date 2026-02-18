@@ -233,6 +233,8 @@ export default function ProducerReviewScreen() {
   // ─── Hire → Contract ─────────────────────────────────────
   const hireAndCreateContract = useCallback((sub: ReviewSubmission) => {
     updateStatus(sub.id, "hired");
+    // Navigate to Contract Wizard with full pre-fill: actor, project, rate, and castingCallId
+    // fromHire=true tells the wizard to skip to Step 3 (Terms) since Project + Talent are pre-filled
     router.push({
       pathname: "/contract-wizard" as any,
       params: {
@@ -240,9 +242,12 @@ export default function ProducerReviewScreen() {
         actorId: sub.actorId?.toString() || "",
         actorEmail: sub.actorEmail,
         projectTitle: castingTitle || "",
+        roleName: sub.notes || "",
+        castingCallId: castingId || "",
+        fromHire: "true",
       },
     });
-  }, [castingTitle, updateStatus]);
+  }, [castingTitle, castingId, updateStatus]);
 
   // ─── Request Retake ───────────────────────────────────────
   const sendRetakeRequest = useCallback(() => {

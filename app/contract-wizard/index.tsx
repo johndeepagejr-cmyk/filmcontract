@@ -42,18 +42,40 @@ export default function ContractWizardScreen() {
     projectType?: string;
     amount?: string;
     rateType?: string;
+    roleName?: string;
+    castingCallId?: string;
+    fromHire?: string;
   }>();
 
   // Pre-fill from Hire action or other sources
+  const isFromHire = params.fromHire === "true";
   const initialData: WizardData = useMemo(() => {
     const d = { ...defaultData };
-    if (params.actorName) d.talent = { ...d.talent, selectedActorName: params.actorName, selectedActorId: params.actorId ? parseInt(params.actorId, 10) : null, inviteEmail: params.actorEmail || "" };
-    if (params.projectTitle) d.project = { ...d.project, title: params.projectTitle, type: params.projectType || "Feature Film" };
-    if (params.amount) d.terms = { ...d.terms, amount: params.amount, rateType: (params.rateType as any) || "flat" };
+    if (params.actorName) {
+      d.talent = {
+        ...d.talent,
+        selectedActorName: params.actorName,
+        selectedActorId: params.actorId ? parseInt(params.actorId, 10) : null,
+        inviteEmail: params.actorEmail || "",
+      };
+    }
+    if (params.projectTitle) {
+      d.project = {
+        ...d.project,
+        title: params.roleName ? `${params.projectTitle} — ${params.roleName}` : params.projectTitle,
+        type: params.projectType || "Feature Film",
+      };
+    }
+    if (params.amount) {
+      d.terms = { ...d.terms, amount: params.amount, rateType: (params.rateType as any) || "flat" };
+    }
     return d;
   }, []);
 
-  const [step, setStep] = useState(params.actorName ? 1 : 0);
+  // When coming from Hire action: skip directly to Step 3 (Terms) since Project + Talent are pre-filled
+  // Step 0 = Project, Step 1 = Talent, Step 2 = Terms
+  const [step, setStep] = useState(isFromHire ? 2 : params.actorName ? 1 : 0);
+  const castingCallId = params.castingCallId ? parseInt(params.castingCallId, 10) : null;
   const [data, setData] = useState<WizardData>(initialData);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -114,6 +136,7 @@ export default function ContractWizardScreen() {
           data.deliverables.exclusivity ? "Exclusivity clause" : "",
         ].filter(Boolean).join(" | "),
         status: "active" as const,
+        ...(castingCallId ? { castingCallId } : {}),
       };
       await createContract.mutateAsync(payload as any);
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
