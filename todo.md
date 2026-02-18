@@ -1592,3 +1592,43 @@
 - [ ] Error tracking (Sentry integration) — needs Sentry DSN
 - [ ] Database analytics (active users, contract volume)
 - [ ] Alert setup for payment failures, error rate, downtime
+
+## App Store Submission Package
+
+### Store Listing (ASO)
+- [x] App name: "FilmContract: Cast & Pay" (iOS) / "FilmContract: Cast & Pay - Casting Calls" (Android)
+- [x] Subtitle: "Casting, Contracts & Escrow"
+- [x] Short description: "Find casting calls, record self-tapes, sign contracts, get paid with escrow."
+- [x] Full description (~2,480 chars, well under 4,000 limit)
+- [x] Keywords: casting call,audition,self tape,actor,film contract,escrow payment,talent,production,hire talent,SAG
+- [x] Primary: Entertainment, Secondary: Business
+- [x] What's New / Release Notes for v1.0.0
+
+### Screenshots
+- [x] iPhone 16 Pro Max (6.9") specs and content plan (6 screenshots)
+- [x] iPhone 14 Pro Max (6.7") specs and content plan
+- [x] iPhone 14 Plus (6.5") specs and content plan
+- [x] iPhone 14 Pro (6.1") specs and content plan
+- [x] iPad Pro 13" specs and content plan
+- [x] Screenshot generation script (scripts/generate-screenshots.py) with device frames, gradient backgrounds, and marketing text
+- [x] 6 screenshot content plan: Casting Feed, Recorder, Editor, Pipeline, Contract, Payments
+
+### App Preview Video
+- [x] 30-second script with 8 scenes (Opening, Feed, Recorder, Editor, Pipeline, Contract, Payment, Closing)
+- [x] Caption text for each scene
+- [x] Specs: 1290x2796, 30fps, H.264, under 500MB
+- [x] Recording instructions for each scene
+
+### Review Guidelines
+- [x] Test account credentials (actor + producer) with passwords
+- [x] Feature walkthrough: Actor flow (5 min) and Producer flow (5 min)
+- [x] Notes for Apple reviewer (camera/mic permissions, Stripe payments, push notifications)
+- [x] Compliance checklist (IAP 3.1.1, Design 4.0, Privacy 5.1.1/5.1.2, Export, Age Rating)
+
+### Play Console Metadata
+- [x] Content rating (IARC) questionnaire answers — Expected: Everyone / PEGI 3
+- [x] Data safety section responses (all data types documented)
+- [x] Target audience: 18+ (financial transactions)
+- [x] Store listing experiments suggestion: A/B test screenshots week 1
+- [x] App Privacy Details for App Store Connect (14 data types documented)
+- [x] Post-launch ASO optimization plan (weeks 1-2, months 1-3, ongoing)
