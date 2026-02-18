@@ -1681,3 +1681,22 @@
 - [x] Skip option always available
 - [x] Track completion rate (onboarding_completed flag per role)
 - [x] Don't show again after complete
+
+## App Store & Google Play Submission Package
+- [x] App Store Connect listing copy (title, subtitle, description, keywords)
+- [x] App Preview video script (30s, 8 scenes)
+- [x] Privacy nutrition label answers
+- [x] App Review information with test credentials
+- [x] Google Play listing copy (adapted for Play Store)
+- [x] IARC content rating questionnaire answers
+- [x] Feature graphic (1024x500) — generated and saved
+- [x] Stripe webhook configuration docs
+- [x] Test event payloads for verification
+- [x] Platform fee explanation doc
+- [x] Step-by-step submission checklist
+- [x] Common rejection reasons guide
+- [x] Press release template
+- [x] Email announcement for beta list
+- [x] Social media posts (Instagram, Twitter, LinkedIn)
+- [x] One-page pitch deck
+- [x] Screenshot specifications and frame layouts
