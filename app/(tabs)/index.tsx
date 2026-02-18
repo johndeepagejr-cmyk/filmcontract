@@ -64,6 +64,18 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
               </Text>
             </View>
             <TouchableOpacity
+              onPress={() => router.push("/payments" as any)}
+              style={[styles.iconBtn, { backgroundColor: colors.surface, marginRight: 8 }]}
+            >
+              <IconSymbol name="dollarsign.circle" size={20} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/notifications" as any)}
+              style={[styles.iconBtn, { backgroundColor: colors.surface, marginRight: 8 }]}
+            >
+              <IconSymbol name="bell.fill" size={20} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => router.push("/messages" as any)}
               style={[styles.iconBtn, { backgroundColor: colors.surface }]}
             >
@@ -262,6 +274,18 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
                 Manage your productions
               </Text>
             </View>
+            <TouchableOpacity
+              onPress={() => router.push("/payments" as any)}
+              style={[styles.iconBtn, { backgroundColor: colors.surface, marginRight: 8 }]}
+            >
+              <IconSymbol name="dollarsign.circle" size={20} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/notifications" as any)}
+              style={[styles.iconBtn, { backgroundColor: colors.surface, marginRight: 8 }]}
+            >
+              <IconSymbol name="bell.fill" size={20} color={colors.primary} />
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/messages" as any)}
               style={[styles.iconBtn, { backgroundColor: colors.surface }]}

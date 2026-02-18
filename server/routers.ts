@@ -19,6 +19,8 @@ import { messagingRouter } from "./messaging-router";
 import { getHelloSignService } from "./hellosign-service";
 import { subscriptionRouter } from "./subscription-router";
 import { castingRouter } from "./casting-router";
+import { escrowRouter } from "./escrow-router";
+import { notificationRouter } from "./notification-router";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -26,6 +28,8 @@ export const appRouter = router({
   social: socialRouter,
   messaging: messagingRouter,
   subscription: subscriptionRouter,
+  escrow: escrowRouter,
+  notifications: notificationRouter,
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -769,35 +773,8 @@ export const appRouter = router({
       }),
   }),
 
-  // Push notifications
-  notifications: router({
-    // Register push token
-    registerToken: protectedProcedure
-      .input(z.object({ pushToken: z.string() }))
-      .mutation(async ({ ctx, input }) => {
-        const success = await savePushToken(ctx.user.id, input.pushToken);
-        return { success };
-      }),
-  }),
-
-  // Payments (Stripe removed for lightweight build)
-  payments: router({
-    createContractPayment: protectedProcedure
-      .input(z.object({ contractId: z.number(), amount: z.number(), actorEmail: z.string(), projectTitle: z.string() }))
-      .mutation(async () => {
-        throw new Error("Payment processing not configured. Please set up Stripe.");
-      }),
-    createDonation: publicProcedure
-      .input(z.object({ amount: z.number(), donorEmail: z.string().optional(), donorName: z.string().optional() }))
-      .mutation(async () => {
-        throw new Error("Payment processing not configured. Please set up Stripe.");
-      }),
-    verifyPayment: protectedProcedure
-      .input(z.object({ paymentIntentId: z.string() }))
-      .mutation(async () => {
-        throw new Error("Payment processing not configured. Please set up Stripe.");
-      }),
-  }),
+  // Push notifications & in-app notification center → notificationRouter (registered above)
+  // Payments/escrow → escrowRouter (registered above)
 
   // Analytics
   analytics: router({

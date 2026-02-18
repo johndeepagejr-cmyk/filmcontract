@@ -29,7 +29,8 @@ export default function PaymentScreen() {
     { enabled: !!contractIdNum }
   );
 
-  const createPaymentMutation = trpc.payments.createContractPayment.useMutation();
+  const createEscrowMutation = trpc.escrow.create.useMutation();
+  const fundEscrowMutation = trpc.escrow.fund.useMutation();
   const updatePaymentMutation = trpc.contracts.updatePaymentStatus.useMutation();
 
   const handlePayment = async () => {
@@ -48,19 +49,16 @@ export default function PaymentScreen() {
     setIsProcessing(true);
 
     try {
-      // Create payment intent
-      const { clientSecret } = await createPaymentMutation.mutateAsync({
+      // Create and fund escrow
+      const { id: escrowId } = await createEscrowMutation.mutateAsync({
         contractId: contractIdNum,
-        amount: parseFloat(contract.paymentAmount || "0"),
-        actorEmail: contract.actor?.email || "",
-        projectTitle: contract.projectTitle,
+        amount: (contract.paymentAmount || "0"),
+        description: `Payment for ${contract.projectTitle}`,
       });
+      await fundEscrowMutation.mutateAsync({ escrowId });
 
-      // Process payment with Stripe
-      // Note: In production, you should use Stripe's official SDK or hosted checkout
-      // For now, we'll verify the payment intent was created and update the status
-      
-      if (clientSecret) {
+      // Escrow created and funded successfully
+      if (escrowId) {
         // Update contract payment status
         await updatePaymentMutation.mutateAsync({
           id: contractIdNum,

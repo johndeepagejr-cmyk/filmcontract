@@ -963,3 +963,71 @@ export const subscriptions = mysqlTable("subscriptions", {
 
 export type Subscription = typeof subscriptions.$inferSelect;
 export type InsertSubscription = typeof subscriptions.$inferInsert;
+
+
+/**
+ * Escrow Payments table - holds funds in escrow between producer and actor
+ * State machine: pending → funded → released | disputed → resolved
+ */
+export const escrowPayments = mysqlTable("escrow_payments", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(),
+  payerId: int("payerId").notNull(), // Producer
+  payeeId: int("payeeId").notNull(), // Actor
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  /** Escrow lifecycle: pending → funded → released | disputed → resolved */
+  status: mysqlEnum("escrowStatus", [
+    "pending",    // Created, awaiting funding
+    "funded",     // Money deposited in escrow
+    "released",   // Funds released to actor
+    "disputed",   // One party raised a dispute
+    "resolved",   // Dispute resolved
+    "refunded",   // Funds returned to producer
+    "cancelled",  // Escrow cancelled before funding
+  ]).default("pending").notNull(),
+  /** Stripe PaymentIntent ID for tracking the deposit */
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  /** Stripe Transfer ID for payout to actor */
+  stripeTransferId: varchar("stripeTransferId", { length: 255 }),
+  /** Description / milestone label */
+  description: text("description"),
+  /** Milestone number (for multi-milestone contracts) */
+  milestoneNumber: int("milestoneNumber").default(1),
+  /** Dispute reason if disputed */
+  disputeReason: text("disputeReason"),
+  /** Dispute resolution notes */
+  resolutionNotes: text("resolutionNotes"),
+  /** Who initiated the dispute */
+  disputedBy: int("disputedBy"),
+  fundedAt: timestamp("fundedAt"),
+  releasedAt: timestamp("releasedAt"),
+  disputedAt: timestamp("disputedAt"),
+  resolvedAt: timestamp("resolvedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EscrowPayment = typeof escrowPayments.$inferSelect;
+export type InsertEscrowPayment = typeof escrowPayments.$inferInsert;
+
+/**
+ * In-App Notifications table - persistent notification history for notification center
+ */
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // e.g., "escrow_funded", "contract_signed", "submission_status", "hire"
+  title: varchar("title", { length: 255 }).notNull(),
+  body: text("body").notNull(),
+  /** JSON data for deep linking / context */
+  data: text("data"),
+  /** Whether the notification has been read */
+  isRead: boolean("isRead").default(false).notNull(),
+  /** Group key for collapsing similar notifications */
+  groupKey: varchar("groupKey", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;

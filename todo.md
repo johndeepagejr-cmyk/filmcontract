@@ -1511,3 +1511,35 @@
 - [x] Contract Wizard accepts pre-fill search params and auto-populates Step 2 (Select Talent)
 - [x] Contract Wizard skips to Step 3 (Terms) when pre-filled from Hire action
 - [x] castingCallId stored as reference on the contract
+
+## Launch Blockers
+
+### Payments / Escrow System
+- [x] DB schema: escrow_payments table (id, contractId, payerId, payeeId, amount, currency, status, stripePaymentIntentId, createdAt, releasedAt, disputedAt)
+- [x] Escrow state machine: pending → funded → released / disputed → resolved
+- [x] Backend routes: create, fund, release, dispute, resolve, cancel, getHistory, getEarningsSummary
+- [ ] Stripe integration: PaymentIntent creation, webhook handling for payment confirmation
+- [x] Payments Dashboard screen: earnings overview, payment history, filter by status, fund/release/dispute/cancel actions
+- [x] Confirmation dialogs before all payment actions
+- [x] Wire existing contract payment screen to use escrow
+- [ ] Contract integration: auto-create escrow when contract is signed, release on deliverable completion
+
+### Push / Email Notifications
+- [x] Backend notification router: list, unreadCount, markRead, markAllRead, delete, registerPushToken
+- [x] DB schema: notifications table (id, userId, type, title, body, data, isRead, createdAt)
+- [x] Push notification triggers: submission status change, escrow funded/released/disputed, new submission, contract events
+- [x] Expo push token registration on login (use-push-notifications hook)
+- [x] In-app Notification Center screen: grouped by type, filter All/Unread, mark all read, delete, deep linking
+- [x] Notification bell icon in both Actor and Producer home headers
+- [x] In-app notification creation alongside push notifications
+- [ ] Email notification fallback for critical events (hire, payment, contract)
+
+### App Store Assets
+- [x] App Store description copy (short + long, under 4000 chars)
+- [x] App Store keywords (under 100 chars) and category selection (Entertainment + Business)
+- [x] Privacy policy URL placeholder
+- [x] Support URL placeholder
+- [x] Screenshot descriptions for 6 key screens
+- [x] Privacy data collection table
+- [x] Age rating, release notes, review notes for Apple
+- [x] Full APP_STORE_METADATA.md document

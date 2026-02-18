@@ -123,7 +123,22 @@ const MAPPING = {
   "speaker.slash.fill": "volume-off",
   "pip": "picture-in-picture",
   "questionmark.circle": "help-outline",
-} as IconMapping;
+  // Payment & escrow icons
+  "creditcard.fill": "credit-card",
+  "banknote.fill": "payments",
+  "lock.fill": "lock",
+  "lock.open.fill": "lock-open",
+  "shield.fill": "shield",
+
+  "arrow.left.arrow.right": "swap-horiz",
+  "exclamationmark.circle.fill": "error",
+  // Notification icons
+  "bell.fill": "notifications-active",
+  "bell.badge.fill": "notifications-active",
+  "bell.slash.fill": "notifications-off",
+  "tray.and.arrow.down.fill": "move-to-inbox",
+  "line.3.horizontal.decrease": "filter-list",
+} satisfies Partial<IconMapping> as unknown as IconMapping;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

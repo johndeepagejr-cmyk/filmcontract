@@ -136,3 +136,111 @@ export async function notifyNewMessage(recipientId: number, senderName: string, 
     data: { type: "new_message", recipientId, senderName },
   });
 }
+
+// ─── Escrow Notifications ─────────────────────────────────────
+
+export async function notifyEscrowFunded(actorId: number, amount: string, projectTitle: string) {
+  const pushToken = await getUserPushToken(actorId);
+  await createInAppNotification(actorId, "escrow_funded", "Payment Secured",
+    `$${amount} has been deposited in escrow for "${projectTitle}"`,
+    { amount, projectTitle });
+  if (!pushToken) return;
+  await sendPushNotification({
+    to: pushToken,
+    title: "Payment Secured in Escrow",
+    body: `$${amount} deposited for "${projectTitle}"`,
+    data: { type: "escrow_funded", amount, projectTitle },
+  });
+}
+
+export async function notifyEscrowReleased(actorId: number, amount: string, projectTitle: string) {
+  const pushToken = await getUserPushToken(actorId);
+  await createInAppNotification(actorId, "escrow_released", "Payment Released",
+    `$${amount} has been released to you for "${projectTitle}"`,
+    { amount, projectTitle });
+  if (!pushToken) return;
+  await sendPushNotification({
+    to: pushToken,
+    title: "Payment Released!",
+    body: `$${amount} released for "${projectTitle}"`,
+    data: { type: "escrow_released", amount, projectTitle },
+  });
+}
+
+export async function notifyEscrowDisputed(userId: number, amount: string, projectTitle: string, reason: string) {
+  const pushToken = await getUserPushToken(userId);
+  await createInAppNotification(userId, "escrow_disputed", "Payment Disputed",
+    `A dispute has been raised on $${amount} for "${projectTitle}": ${reason.substring(0, 80)}`,
+    { amount, projectTitle, reason });
+  if (!pushToken) return;
+  await sendPushNotification({
+    to: pushToken,
+    title: "Escrow Disputed",
+    body: `Dispute on $${amount} for "${projectTitle}"`,
+    data: { type: "escrow_disputed", amount, projectTitle },
+  });
+}
+
+// ─── Casting/Submission Notifications ─────────────────────────
+
+export async function notifySubmissionStatus(
+  actorId: number, castingTitle: string, status: string, producerNote?: string
+) {
+  const statusLabels: Record<string, string> = {
+    reviewed: "Your submission is being reviewed",
+    shortlisted: "You've been shortlisted!",
+    callback: "You've been called back!",
+    hired: "Congratulations, you've been hired!",
+    passed: "The production has moved forward with other talent",
+  };
+  const body = statusLabels[status] || `Status updated to ${status}`;
+  const fullBody = producerNote ? `${body} — "${producerNote.substring(0, 60)}"` : body;
+
+  await createInAppNotification(actorId, "submission_status", `Casting: ${castingTitle}`,
+    fullBody, { castingTitle, status, producerNote });
+
+  const pushToken = await getUserPushToken(actorId);
+  if (!pushToken) return;
+  await sendPushNotification({
+    to: pushToken,
+    title: status === "hired" ? "You're Hired!" : `Casting Update: ${castingTitle}`,
+    body: fullBody,
+    data: { type: "submission_status", castingTitle, status },
+  });
+}
+
+export async function notifyNewSubmission(producerId: number, actorName: string, castingTitle: string) {
+  await createInAppNotification(producerId, "new_submission", "New Submission",
+    `${actorName} submitted a self-tape for "${castingTitle}"`,
+    { actorName, castingTitle });
+
+  const pushToken = await getUserPushToken(producerId);
+  if (!pushToken) return;
+  await sendPushNotification({
+    to: pushToken,
+    title: "New Self-Tape Submission",
+    body: `${actorName} applied for "${castingTitle}"`,
+    data: { type: "new_submission", actorName, castingTitle },
+  });
+}
+
+// ─── In-App Notification Helper ───────────────────────────────
+
+async function createInAppNotification(
+  userId: number, type: string, title: string, body: string, data?: Record<string, any>
+) {
+  try {
+    const db = await getDb();
+    if (!db) return;
+    const { notifications } = await import("@/drizzle/schema");
+    await db.insert(notifications).values({
+      userId,
+      type,
+      title,
+      body,
+      data: data ? JSON.stringify(data) : null,
+    });
+  } catch (error) {
+    console.error("Failed to create in-app notification:", error);
+  }
+}

@@ -23,7 +23,7 @@ export function usePushNotifications() {
   const notificationListener = useRef<Notifications.Subscription | undefined>(undefined);
   const responseListener = useRef<Notifications.Subscription | undefined>(undefined);
 
-  const registerToken = trpc.notifications.registerToken.useMutation({});
+  const registerTokenMutation = trpc.notifications.registerPushToken.useMutation({});
 
   useEffect(() => {
     // Register for push notifications
@@ -31,8 +31,8 @@ export function usePushNotifications() {
       if (token) {
         setExpoPushToken(token);
         // Send token to server
-        registerToken.mutate({ pushToken: token }, {
-          onError: (error) => {
+        registerTokenMutation.mutate({ pushToken: token }, {
+          onError: (error: any) => {
             console.error("Failed to register push token:", error);
           },
         });
