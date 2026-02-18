@@ -1467,4 +1467,41 @@
 - [x] Comparison mode: 2-3 tapes side-by-side with synced playback
 - [x] Quick actions: Shortlist, Callback, Hire, Pass with notes
 - [x] Rating rubric: Acting, Look, Voice, Chemistry (1-5 stars each)
-- [ ] Export notes/ratings as CSV
+- [x] Export notes/ratings as CSV
+
+## Broadcast-Quality Spec Completion (Round 2)
+
+### CreateCastingWizard (4-Step Posting)
+- [x] Step 1: Project Setup (title, production type, banner image 16:9, company auto-fill, synopsis)
+- [x] Step 2: Role Creation (multi-role, duplicate, drag reorder, per-role details: title/type/description/requirements/compensation)
+- [x] Step 3: Requirements Builder (union status, custom questions text/yes-no/multiple-choice/file-upload, self-tape specs, sides PDF upload, auto-decline filters)
+- [x] Step 4: Publish (visibility: public/agents-only/invite-only, timing: now/schedule/draft, actor-facing preview)
+
+### Enhanced Review Features
+- [x] Playback speed controls (0.5x-2x)
+- [x] Quick tags: "Callback", "Wrong type", "Great energy", "Poor audio", "Booked"
+- [x] Request Retake action with specific feedback
+- [x] Hire → pre-fill Contract Wizard (actor details auto-populated)
+- [x] Timestamped notes (auto-save, private to production team)
+- [x] Weighted average rating auto-calculated
+
+### Reusable Hooks & Services
+- [x] useCamera hook (camera state, recording, flash, flip, quality)
+- [x] useVideoProcessing hook (trim, slate, enhance, export)
+- [x] useResumableUpload hook (chunked upload, progress, pause/resume)
+- [ ] useCastingCreation hook (wizard state, validation, submission)
+- [x] uploadQueue service (AsyncStorage persistence, crash recovery)
+- [ ] videoCompression service (background threading)
+
+### State Management (Zustand)
+- [x] recordingState store (takes, quality, teleprompter, filters)
+- [x] editingState store (timeline, trim, slate, enhance, undo/redo)
+- [x] uploadQueue store (queue items, progress, retry state)
+- [x] reviewState store (ratings, notes, comparison selections)
+- [x] AsyncStorage persistence for all stores (survive crashes)
+
+### Performance & Polish
+- [x] CSV export for producer review notes/ratings
+- [ ] Lazy load video components
+- [ ] Image caching for submission thumbnails
+- [ ] Background threading for compression (non-blocking UI)

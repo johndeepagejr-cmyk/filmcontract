@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { ScreenContainer } from "@/components/screen-container";
 import { Stepper, Button, Divider } from "@/components/ui/design-system";
 import { Typography, Spacing } from "@/constants/design-tokens";
@@ -34,8 +34,27 @@ const defaultData: WizardData = {
 export default function ContractWizardScreen() {
   const colors = useColors();
   const router = useRouter();
-  const [step, setStep] = useState(0);
-  const [data, setData] = useState<WizardData>(defaultData);
+  const params = useLocalSearchParams<{
+    actorName?: string;
+    actorId?: string;
+    actorEmail?: string;
+    projectTitle?: string;
+    projectType?: string;
+    amount?: string;
+    rateType?: string;
+  }>();
+
+  // Pre-fill from Hire action or other sources
+  const initialData: WizardData = useMemo(() => {
+    const d = { ...defaultData };
+    if (params.actorName) d.talent = { ...d.talent, selectedActorName: params.actorName, selectedActorId: params.actorId ? parseInt(params.actorId, 10) : null, inviteEmail: params.actorEmail || "" };
+    if (params.projectTitle) d.project = { ...d.project, title: params.projectTitle, type: params.projectType || "Feature Film" };
+    if (params.amount) d.terms = { ...d.terms, amount: params.amount, rateType: (params.rateType as any) || "flat" };
+    return d;
+  }, []);
+
+  const [step, setStep] = useState(params.actorName ? 1 : 0);
+  const [data, setData] = useState<WizardData>(initialData);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [customMessage, setCustomMessage] = useState("");

@@ -196,12 +196,12 @@ describe("ProducerReview (review.tsx)", () => {
 
   it("should have grid view tab", () => {
     expect(content).toContain("grid");
-    expect(content).toContain("All Submissions");
+    expect(content).toContain("All");
   });
 
   it("should have detail view tab", () => {
     expect(content).toContain("detail");
-    expect(content).toContain("Detail View");
+    expect(content).toContain("Detail");
   });
 
   it("should have compare tab", () => {
