@@ -72,6 +72,21 @@ const MAPPING = {
   "person.crop.rectangle": "badge",
   "theatermasks.fill": "theater-comedy",
   "gearshape.fill": "settings",
+  "megaphone.fill": "campaign",
+  "doc.on.doc.fill": "file-copy",
+  "xmark.circle.fill": "cancel",
+  "square.and.arrow.up": "share",
+  "ellipsis": "more-horiz",
+  "hand.thumbsup.fill": "thumb-up",
+  "hand.thumbsdown.fill": "thumb-down",
+  "eye.fill": "visibility",
+  "flag.fill": "flag",
+  "bolt.fill": "flash-on",
+  "sparkles": "auto-awesome",
+  "arrow.up.arrow.down": "swap-vert",
+  "clock.fill": "schedule",
+  "envelope.fill": "email",
+  "arrow.counterclockwise": "refresh",
 } as IconMapping;
 
 /**

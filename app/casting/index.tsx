@@ -8,6 +8,7 @@ import { useColors } from "@/hooks/use-colors";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 
 type FilterKey = "all" | "film" | "commercial" | "tv" | "voice_over";
+type SortKey = "newest" | "deadline" | "budget_high" | "budget_low";
 
 export default function CastingCallsFeed() {
   const { user } = useAuth();
@@ -15,6 +16,8 @@ export default function CastingCallsFeed() {
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterKey>("all");
+  const [sortBy, setSortBy] = useState<SortKey>("newest");
+  const [showSort, setShowSort] = useState(false);
 
   const isProducer = user?.userRole === "producer";
 
@@ -30,7 +33,9 @@ export default function CastingCallsFeed() {
 
   const filteredCalls = useMemo(() => {
     if (!castingCalls) return [];
-    let filtered = [...castingCalls];
+    // listOpen returns {items, nextCursor}, listMine returns array
+    const rawList = Array.isArray(castingCalls) ? castingCalls : (castingCalls as any).items || [];
+    let filtered = [...rawList];
 
     // Search filter
     if (searchQuery) {
@@ -54,8 +59,22 @@ export default function CastingCallsFeed() {
       });
     }
 
+    // Sort
+    if (sortBy === "deadline") {
+      filtered.sort((a: any, b: any) => {
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      });
+    } else if (sortBy === "budget_high") {
+      filtered.sort((a: any, b: any) => parseFloat(b.budget || "0") - parseFloat(a.budget || "0"));
+    } else if (sortBy === "budget_low") {
+      filtered.sort((a: any, b: any) => parseFloat(a.budget || "0") - parseFloat(b.budget || "0"));
+    }
+    // newest is default order from API
+
     return filtered;
-  }, [castingCalls, searchQuery, activeFilter]);
+  }, [castingCalls, searchQuery, activeFilter, sortBy]);
 
   const getDaysLeft = (deadline: string | null) => {
     if (!deadline) return null;
@@ -142,6 +161,24 @@ export default function CastingCallsFeed() {
               </Text>
             </View>
           )}
+          {item.submissionCount !== undefined && (
+            <View style={styles.footerItem}>
+              <IconSymbol name="person.2.fill" size={14} color={colors.muted} />
+              <Text style={[styles.footerText, { color: colors.muted }]}>
+                {item.submissionCount}
+              </Text>
+            </View>
+          )}
+          <View style={{ flex: 1 }} />
+          {isProducer && (
+            <TouchableOpacity
+              onPress={() => router.push(`/casting/submissions?castingId=${item.id}&title=${encodeURIComponent(item.title)}` as any)}
+              style={[styles.pipelineBtn, { backgroundColor: colors.primary + "12" }]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.pipelineBtnText, { color: colors.primary }]}>Pipeline</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -176,18 +213,51 @@ export default function CastingCallsFeed() {
           )}
         </View>
 
-        {/* Search */}
-        <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <IconSymbol name="magnifyingglass" size={18} color={colors.muted} />
-          <TextInput
-            style={[styles.searchInput, { color: colors.foreground }]}
-            placeholder="Search casting calls..."
-            placeholderTextColor={colors.muted}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            returnKeyType="search"
-          />
+        {/* Search + Sort */}
+        <View style={styles.searchSortRow}>
+          <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border, flex: 1 }]}>
+            <IconSymbol name="magnifyingglass" size={18} color={colors.muted} />
+            <TextInput
+              style={[styles.searchInput, { color: colors.foreground }]}
+              placeholder="Search casting calls..."
+              placeholderTextColor={colors.muted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+            />
+          </View>
+          <TouchableOpacity
+            onPress={() => setShowSort(!showSort)}
+            style={[styles.sortBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            activeOpacity={0.7}
+          >
+            <IconSymbol name="arrow.up.arrow.down" size={16} color={colors.primary} />
+          </TouchableOpacity>
         </View>
+
+        {/* Sort options */}
+        {showSort && (
+          <View style={[styles.sortOptions, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            {[
+              { key: "newest" as SortKey, label: "Newest First" },
+              { key: "deadline" as SortKey, label: "Closing Soon" },
+              { key: "budget_high" as SortKey, label: "Highest Budget" },
+              { key: "budget_low" as SortKey, label: "Lowest Budget" },
+            ].map((s) => (
+              <TouchableOpacity
+                key={s.key}
+                onPress={() => { setSortBy(s.key); setShowSort(false); }}
+                style={[styles.sortOption, sortBy === s.key && { backgroundColor: colors.primary + "12" }]}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.sortOptionText, { color: sortBy === s.key ? colors.primary : colors.foreground }]}>
+                  {s.label}
+                </Text>
+                {sortBy === s.key && <IconSymbol name="checkmark" size={14} color={colors.primary} />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         {/* Filter chips */}
         <FlatList
@@ -294,4 +364,11 @@ const styles = StyleSheet.create({
   emptyMessage: { fontSize: 14, textAlign: "center", maxWidth: 260 },
   emptyBtn: { paddingHorizontal: 24, paddingVertical: 12, borderRadius: 24, marginTop: 8 },
   emptyBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  searchSortRow: { flexDirection: "row", gap: 8 },
+  sortBtn: { width: 44, height: 44, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  sortOptions: { borderRadius: 12, borderWidth: 1, overflow: "hidden" },
+  sortOption: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingVertical: 11 },
+  sortOptionText: { fontSize: 14, fontWeight: "600" },
+  pipelineBtn: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  pipelineBtnText: { fontSize: 12, fontWeight: "700" },
 });

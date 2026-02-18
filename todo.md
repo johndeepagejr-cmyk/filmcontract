@@ -1357,3 +1357,73 @@
 - [x] Portfolio redesign (hero section, credited roles, skills, photo gallery)
 - [x] Review cards (aggregate rating, distribution graph, recent reviews)
 - [x] Micro-interactions (haptics on sign/complete, pull-to-refresh, skeleton loading, success animations)
+
+## Complete Casting Calls Platform + Self-Tape System
+
+### Backend Upgrades
+- [x] Casting submissions pipeline routes (submit, update status, bulk actions)
+- [x] Applicant pipeline Kanban routes (Submitted/Viewed/Shortlisted/CalledBack/Cast/Passed)
+- [x] Casting analytics routes (views, applications, conversion, watch time)
+- [ ] Self-tape upload/storage routes with resumable uploads
+- [x] Producer review routes (rate, shortlist, pass, hire, compare)
+- [x] hasSubmitted check route (prevents duplicate submissions)
+- [x] mySubmissions route (actor's submission history)
+- [x] getAnalytics route (producer casting analytics)
+
+### Actor Home (Casting Feed)
+- [ ] Infinite scroll with cursor pagination (20 items/fetch)
+- [x] Sticky filter bar (role type filters)
+- [x] Smart sorting (Newest, Closing Soon, Highest Budget, Lowest Budget)
+- [x] Card design with deadline countdown, budget, applicant count
+- [x] Pull-to-refresh
+- [x] Free text search
+- [x] My Submissions summary banner with shortlisted/hired counts
+- [x] Applied count in quick stats
+
+### Casting Call Detail (4 Tabs)
+- [x] Hero with production banner, gradient overlay, bookmark
+- [x] Quick stats row (posted date, deadline, applicant count, views)
+- [x] Tab 1: Role Details (character info, sides, conflict check)
+- [x] Tab 2: Production Info (director, dates, location, synopsis)
+- [x] Tab 3: Requirements (wardrobe, hair/makeup, custom questions, warnings)
+- [x] Tab 4: Compensation (rate, payment terms, usage rights, expenses)
+- [x] Sticky footer (Submit Self-Tape / Applied status / View Pipeline)
+- [x] hasSubmitted check prevents duplicate applications
+- [x] Producer pipeline link from detail screen
+
+### Producer Casting Dashboard
+- [x] Active casting calls list with applicant counts and pipeline mini-bars
+- [x] Applicant pipeline Kanban view (6 columns: Submitted/Reviewed/Shortlisted/Callback/Hired/Passed)
+- [x] Applicant card with quick actions (shortlist, callback, hire, pass, message)
+- [ ] Bulk actions (message all, export CSV, close role, extend deadline)
+- [x] Casting analytics card (total castings, open, applicants, hired)
+- [x] Post New Casting Call button
+- [x] Producer submissions pipeline screen with status filters
+
+### Create Casting Call (4-Step Wizard)
+- [ ] Step 1: Project Setup (title, type, banner, company, synopsis)
+- [ ] Step 2: Role Creation (multiple roles, clone, per-role details)
+- [ ] Step 3: Requirements Builder (union toggle, custom questions, auto-decline)
+- [ ] Step 4: Publishing (now/schedule/draft, visibility settings)
+
+### Self-Tape Workflow
+- [ ] SelfTapeRecorder (camera, quality presets, teleprompter, takes, countdown)
+- [ ] SelfTapeEditor (trim, slate, text overlay, thumbnail, compression, preview)
+- [ ] SelfTapeUploadFlow (step indicator, attachments, review, resumable upload, success)
+
+### Producer Review Tools
+- [ ] ReviewSubmissions grid with filters and bulk select
+- [ ] Detail view (video player, actor profile sidebar, notes, rating, actions)
+- [ ] Comparison mode (2-3 tapes side-by-side)
+
+### Actor Submissions
+- [x] MySubmissions list with status badges (submitted/reviewed/shortlisted/callback/hired/passed)
+- [x] Feedback display (producer notes, ratings)
+- [ ] Withdraw/reapply/message actions
+- [x] Filter by status
+- [x] Navigation from Home quick stats and submissions banner
+
+### Integration
+- [ ] Hire button → pre-fill Contract Wizard Step 2
+- [ ] Booked status → auto-generate contract draft
+- [ ] Network tab refinement (role-conditional content)

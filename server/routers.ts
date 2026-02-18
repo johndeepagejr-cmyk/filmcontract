@@ -18,6 +18,7 @@ import { socialRouter } from "./social-router";
 import { messagingRouter } from "./messaging-router";
 import { getHelloSignService } from "./hellosign-service";
 import { subscriptionRouter } from "./subscription-router";
+import { castingRouter } from "./casting-router";
 
 export const appRouter = router({
   // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -1159,8 +1160,11 @@ export const appRouter = router({
       }),
   }),
 
-  // Casting Calls
-  casting: router({
+  // Casting Calls (enhanced router)
+  casting: castingRouter,
+
+  // Legacy casting routes (kept for reference, overridden by castingRouter)
+  _castingLegacy: router({
     // List all open casting calls (for actors)
     listOpen: protectedProcedure.query(async () => {
       const database = await getDb();

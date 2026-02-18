@@ -27,6 +27,11 @@ export default function CastingCallDetail() {
     { enabled: castingId > 0 && user?.userRole === "producer" }
   );
 
+  const { data: hasSubmitted } = trpc.casting.hasSubmitted.useQuery(
+    { castingCallId: castingId },
+    { enabled: castingId > 0 && user?.userRole !== "producer" }
+  );
+
   const submitMutation = trpc.casting.submit.useMutation({
     onSuccess: () => {
       Alert.alert("Success", "Your submission has been sent!");
@@ -80,6 +85,13 @@ export default function CastingCallDetail() {
   const isExpired = daysLeft === "Expired";
 
   const handleQuickSubmit = () => {
+    if (hasSubmitted) {
+      Alert.alert("Already Applied", "You have already submitted for this casting call. Check your submissions for status updates.", [
+        { text: "View Submissions", onPress: () => router.push("/casting/my-submissions" as any) },
+        { text: "OK", style: "cancel" },
+      ]);
+      return;
+    }
     Alert.alert(
       "Submit Application",
       "Would you like to submit a quick application or record a self-tape?",
@@ -293,23 +305,48 @@ export default function CastingCallDetail() {
         </View>
       </ScrollView>
 
-      {/* Sticky Footer - Submit Button (actors only) */}
+      {/* Sticky Footer */}
       {!isProducer && !isExpired && (
         <View style={[styles.stickyFooter, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+          {hasSubmitted ? (
+            <TouchableOpacity
+              onPress={() => router.push("/casting/my-submissions" as any)}
+              style={[styles.submitBtn, { backgroundColor: colors.success }]}
+              activeOpacity={0.8}
+            >
+              <IconSymbol name="checkmark.circle.fill" size={20} color="#fff" />
+              <Text style={styles.submitBtnText}>Applied – View Status</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={handleQuickSubmit}
+              style={[styles.submitBtn, { backgroundColor: colors.primary }]}
+              activeOpacity={0.8}
+              disabled={submitMutation.isPending}
+            >
+              {submitMutation.isPending ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <>
+                  <IconSymbol name="camera.fill" size={20} color="#fff" />
+                  <Text style={styles.submitBtnText}>Submit Self-Tape</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
+      {/* Producer: View Pipeline button */}
+      {isOwner && (
+        <View style={[styles.stickyFooter, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
           <TouchableOpacity
-            onPress={handleQuickSubmit}
+            onPress={() => router.push(`/casting/submissions?castingId=${castingId}&title=${encodeURIComponent(casting.title)}` as any)}
             style={[styles.submitBtn, { backgroundColor: colors.primary }]}
             activeOpacity={0.8}
-            disabled={submitMutation.isPending}
           >
-            {submitMutation.isPending ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <>
-                <IconSymbol name="camera.fill" size={20} color="#fff" />
-                <Text style={styles.submitBtnText}>Submit Self-Tape</Text>
-              </>
-            )}
+            <IconSymbol name="person.2.fill" size={20} color="#fff" />
+            <Text style={styles.submitBtnText}>View Submissions Pipeline</Text>
           </TouchableOpacity>
         </View>
       )}

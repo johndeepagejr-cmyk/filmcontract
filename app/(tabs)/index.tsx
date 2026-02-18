@@ -21,6 +21,11 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
 
   const { data: contracts } = trpc.contracts.list.useQuery(undefined, { enabled: true });
   const { data: unreadCount } = trpc.messaging.getUnreadCount.useQuery(undefined, { enabled: true });
+  const { data: mySubmissions } = trpc.casting.mySubmissions.useQuery(undefined, { enabled: true });
+
+  const submissionCount = mySubmissions?.length || 0;
+  const shortlistedCount = mySubmissions?.filter((s: any) => s.status === "shortlisted").length || 0;
+  const hiredCount = mySubmissions?.filter((s: any) => s.status === "hired").length || 0;
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -94,6 +99,13 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
               <Text style={[styles.statNum, { color: colors.primary }]}>{unreadMessages}</Text>
               <Text style={[styles.statLabel, { color: colors.primary }]}>Messages</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/casting/my-submissions" as any)}
+              style={[styles.statChip, { backgroundColor: "#8B5CF6" + "15" }]}
+            >
+              <Text style={[styles.statNum, { color: "#8B5CF6" }]}>{submissionCount}</Text>
+              <Text style={[styles.statLabel, { color: "#8B5CF6" }]}>Applied</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -115,6 +127,23 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
           ))}
         </ScrollView>
 
+        {/* My Submissions Summary */}
+        {submissionCount > 0 && (
+          <TouchableOpacity
+            onPress={() => router.push("/casting/my-submissions" as any)}
+            style={[styles.submissionsBanner, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            activeOpacity={0.7}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.submissionsBannerTitle, { color: colors.foreground }]}>My Submissions</Text>
+              <Text style={[styles.submissionsBannerSub, { color: colors.muted }]}>
+                {submissionCount} total{shortlistedCount > 0 ? ` · ${shortlistedCount} shortlisted` : ""}{hiredCount > 0 ? ` · ${hiredCount} hired` : ""}
+              </Text>
+            </View>
+            <IconSymbol name="chevron.right" size={16} color={colors.muted} />
+          </TouchableOpacity>
+        )}
+
         {/* Casting Feed */}
         <View style={styles.feedSection}>
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Open Casting Calls</Text>
@@ -129,9 +158,9 @@ function ActorHome({ user, colors }: { user: any; colors: any }) {
                 </View>
               ))}
             </View>
-          ) : castings && castings.length > 0 ? (
+          ) : castings?.items && castings.items.length > 0 ? (
             <View style={{ gap: 12 }}>
-              {castings.map((casting: any) => (
+              {castings.items.map((casting: any) => (
                 <TouchableOpacity
                   key={casting.id}
                   onPress={() => router.push(`/casting/${casting.id}` as any)}
@@ -197,6 +226,8 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
   const { data: unreadCount } = trpc.messaging.getUnreadCount.useQuery(undefined, { enabled: true });
   const { data: currentSub } = trpc.subscription.getCurrent.useQuery(undefined, { enabled: true });
   const { data: castings } = trpc.casting.listOpen.useQuery(undefined, { enabled: true });
+  const { data: myCastings } = trpc.casting.listMine.useQuery(undefined, { enabled: true });
+  const { data: analytics } = trpc.casting.getAnalytics.useQuery(undefined, { enabled: true });
   const { refresh } = useAuth();
 
   const onRefresh = useCallback(async () => {
@@ -261,11 +292,11 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
             </TouchableOpacity>
           )}
 
-          {/* Stats Grid */}
+          {/* Contract Stats Grid */}
           <View style={styles.statsGrid}>
             <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Text style={[styles.statCardNum, { color: colors.foreground }]}>{totalContracts}</Text>
-              <Text style={[styles.statCardLabel, { color: colors.muted }]}>Total</Text>
+              <Text style={[styles.statCardLabel, { color: colors.muted }]}>Contracts</Text>
             </View>
             <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Text style={[styles.statCardNum, { color: colors.success }]}>{activeContracts.length}</Text>
@@ -280,6 +311,31 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
               <Text style={[styles.statCardLabel, { color: colors.muted }]}>Done</Text>
             </View>
           </View>
+
+          {/* Casting Analytics */}
+          {analytics && analytics.totalCastings > 0 && (
+            <View style={[styles.analyticsCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.analyticsTitle, { color: colors.foreground }]}>Casting Analytics</Text>
+              <View style={styles.analyticsRow}>
+                <View style={styles.analyticsItem}>
+                  <Text style={[styles.analyticsNum, { color: colors.primary }]}>{analytics.totalCastings}</Text>
+                  <Text style={[styles.analyticsLabel, { color: colors.muted }]}>Castings</Text>
+                </View>
+                <View style={styles.analyticsItem}>
+                  <Text style={[styles.analyticsNum, { color: colors.success }]}>{analytics.openCastings}</Text>
+                  <Text style={[styles.analyticsLabel, { color: colors.muted }]}>Open</Text>
+                </View>
+                <View style={styles.analyticsItem}>
+                  <Text style={[styles.analyticsNum, { color: colors.warning }]}>{analytics.totalSubmissions}</Text>
+                  <Text style={[styles.analyticsLabel, { color: colors.muted }]}>Applicants</Text>
+                </View>
+                <View style={styles.analyticsItem}>
+                  <Text style={[styles.analyticsNum, { color: "#8B5CF6" }]}>{analytics.hiredCount}</Text>
+                  <Text style={[styles.analyticsLabel, { color: colors.muted }]}>Hired</Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           {/* Quick Actions */}
           <View style={styles.quickActionsSection}>
@@ -321,7 +377,7 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
           </View>
 
           {/* My Casting Calls */}
-          {castings && castings.length > 0 && (
+          {myCastings && myCastings.length > 0 && (
             <View style={styles.sectionBlock}>
               <View style={styles.sectionHeaderRow}>
                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>My Casting Calls</Text>
@@ -329,18 +385,44 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
                   <Text style={[styles.seeAll, { color: colors.primary }]}>See All</Text>
                 </TouchableOpacity>
               </View>
-              {castings.slice(0, 3).map((casting: any) => (
+              {myCastings.slice(0, 4).map((casting: any) => (
                 <TouchableOpacity
                   key={casting.id}
-                  onPress={() => router.push(`/casting/${casting.id}` as any)}
-                  style={[styles.listItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  onPress={() => router.push(`/casting/submissions?castingId=${casting.id}&title=${encodeURIComponent(casting.title)}` as any)}
+                  style={[styles.castingListItem, { backgroundColor: colors.surface, borderColor: colors.border }]}
                   activeOpacity={0.7}
                 >
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.listItemTitle, { color: colors.foreground }]} numberOfLines={1}>{casting.title}</Text>
-                    <Text style={[styles.listItemSub, { color: colors.muted }]}>
-                      {casting.submissionCount || 0} submissions
-                    </Text>
+                    <View style={styles.castingListMeta}>
+                      <Text style={[styles.listItemSub, { color: colors.muted }]}>
+                        {casting.submissionCount || 0} applicants
+                      </Text>
+                      <View style={[styles.castingStatusDot, { backgroundColor: casting.status === "open" ? colors.success : colors.muted }]} />
+                      <Text style={[styles.listItemSub, { color: casting.status === "open" ? colors.success : colors.muted }]}>
+                        {casting.status === "open" ? "Open" : "Closed"}
+                      </Text>
+                    </View>
+                    {/* Pipeline mini-bar */}
+                    {casting.pipeline && Object.keys(casting.pipeline).length > 0 && (
+                      <View style={styles.miniPipeline}>
+                        {casting.pipeline.submitted > 0 && (
+                          <View style={[styles.miniPipelineChip, { backgroundColor: colors.muted + "15" }]}>
+                            <Text style={[styles.miniPipelineText, { color: colors.muted }]}>{casting.pipeline.submitted} new</Text>
+                          </View>
+                        )}
+                        {casting.pipeline.shortlisted > 0 && (
+                          <View style={[styles.miniPipelineChip, { backgroundColor: colors.success + "15" }]}>
+                            <Text style={[styles.miniPipelineText, { color: colors.success }]}>{casting.pipeline.shortlisted} shortlisted</Text>
+                          </View>
+                        )}
+                        {casting.pipeline.hired > 0 && (
+                          <View style={[styles.miniPipelineChip, { backgroundColor: colors.primary + "15" }]}>
+                            <Text style={[styles.miniPipelineText, { color: colors.primary }]}>{casting.pipeline.hired} hired</Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
                   </View>
                   <IconSymbol name="chevron.right" size={16} color={colors.muted} />
                 </TouchableOpacity>
@@ -502,4 +584,19 @@ const styles = StyleSheet.create({
   listItemSub: { fontSize: 12, marginTop: 2 },
   statusDot: { width: 10, height: 10, borderRadius: 5 },
   loadingCard: { borderRadius: 14, padding: 24, alignItems: "center" },
+  submissionsBanner: { flexDirection: "row", alignItems: "center", marginHorizontal: 16, padding: 14, borderRadius: 14, borderWidth: 1, gap: 12, marginBottom: 4 },
+  submissionsBannerTitle: { fontSize: 15, fontWeight: "700" },
+  submissionsBannerSub: { fontSize: 12, marginTop: 2 },
+  analyticsCard: { borderRadius: 14, padding: 16, borderWidth: 1, gap: 12 },
+  analyticsTitle: { fontSize: 16, fontWeight: "700" },
+  analyticsRow: { flexDirection: "row", justifyContent: "space-between" },
+  analyticsItem: { alignItems: "center", flex: 1 },
+  analyticsNum: { fontSize: 24, fontWeight: "800" },
+  analyticsLabel: { fontSize: 11, fontWeight: "600", marginTop: 2 },
+  castingListItem: { padding: 14, borderRadius: 12, borderWidth: 1, gap: 6, flexDirection: "row", alignItems: "center" },
+  castingListMeta: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 2 },
+  castingStatusDot: { width: 6, height: 6, borderRadius: 3 },
+  miniPipeline: { flexDirection: "row", gap: 6, marginTop: 4 },
+  miniPipelineChip: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
+  miniPipelineText: { fontSize: 10, fontWeight: "600" },
 });
