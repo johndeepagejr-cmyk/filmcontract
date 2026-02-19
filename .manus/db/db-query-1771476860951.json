@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, email, name, \"loginMethod\", \"userRole\", \"lastSignedIn\", \"openId\" FROM users WHERE email = 'johndeepagejr@gmail.com' ORDER BY \"lastSignedIn\" DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 7kHNQX9cUeo4guX.root --database 9Ds5MzMMryKSoRAkX3DK9S --execute SELECT id, email, name, \"loginMethod\", \"userRole\", \"lastSignedIn\", \"openId\" FROM users WHERE email = 'johndeepagejr@gmail.com' ORDER BY \"lastSignedIn\" DESC;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "johndeepagejr@gmail.com",
+      "name": "John Doeknow",
+      "loginMethod": "loginMethod",
+      "userRole": "userRole",
+      "lastSignedIn": "lastSignedIn",
+      "openId": "openId"
+    },
+    {
+      "id": "1950004",
+      "email": "johndeepagejr@gmail.com",
+      "name": "John Doeknow",
+      "loginMethod": "loginMethod",
+      "userRole": "userRole",
+      "lastSignedIn": "lastSignedIn",
+      "openId": "openId"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tloginMethod\tuserRole\tlastSignedIn\topenId\n1\tjohndeepagejr@gmail.com\tJohn Doeknow\tloginMethod\tuserRole\tlastSignedIn\topenId\n1950004\tjohndeepagejr@gmail.com\tJohn Doeknow\tloginMethod\tuserRole\tlastSignedIn\topenId\n",
+  "stderr": "",
+  "execution_time_ms": 351
+}

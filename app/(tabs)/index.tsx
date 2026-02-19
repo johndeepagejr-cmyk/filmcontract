@@ -10,6 +10,8 @@ import { useColors } from "@/hooks/use-colors";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { OnboardingTooltip, OnboardingOverlay } from "@/components/onboarding/OnboardingTooltip";
+import { FirstOpenExperience, isFirstOpenDone } from "@/components/FirstOpenExperience";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ─── Actor Home: Casting Feed ───────────────────────────────────────────────
 function ActorHome({ user, colors }: { user: any; colors: any }) {
@@ -545,13 +547,31 @@ function ProducerHome({ user, colors }: { user: any; colors: any }) {
 export default function HomeScreen() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const colors = useColors();
+  const [firstOpenDone, setFirstOpenDone] = useState<boolean | null>(null);
 
-  if (authLoading) {
+  // Check if first-open experience has been completed
+  useEffect(() => {
+    isFirstOpenDone().then((done) => setFirstOpenDone(done));
+  }, []);
+
+  // Show loading while checking first-open status
+  if (authLoading || firstOpenDone === null) {
     return (
       <ScreenContainer className="items-center justify-center">
         <ActivityIndicator size="large" color={colors.primary} />
         <Text className="text-base text-muted mt-4">Loading...</Text>
       </ScreenContainer>
+    );
+  }
+
+  // Show first-open experience before anything else
+  if (!firstOpenDone) {
+    return (
+      <FirstOpenExperience
+        onComplete={(role) => {
+          setFirstOpenDone(true);
+        }}
+      />
     );
   }
 

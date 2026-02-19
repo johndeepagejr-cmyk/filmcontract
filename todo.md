@@ -1700,3 +1700,47 @@
 - [x] Social media posts (Instagram, Twitter, LinkedIn)
 - [x] One-page pitch deck
 - [x] Screenshot specifications and frame layouts
+
+## App Store Resubmission (v1.0.0 Updated Build)
+- [x] Remove current version from App Store review
+- [x] Build updated app with EAS Build (Build 8)
+- [x] Upload new build to App Store Connect
+- [x] Update review credentials
+- [x] Resubmit for App Store review — WAITING FOR REVIEW
+
+## App Store & Google Play Resubmission (Updated Build)
+- [x] Remove current iOS version from App Store review (Developer Rejected)
+- [x] Check Google Play Console status (Draft, closed testing 3/5 complete, needs 12 testers for 14 days)
+- [x] Build updated iOS (IPA) with EAS Build (Build 8, 1.0.0)
+- [ ] Build updated Android (AAB) with EAS Build (in progress)
+- [x] Upload new iOS build (Build 8) to App Store Connect
+- [x] Update review credentials (testactor@filmcontract.app / TestActor2026!)
+- [x] Resubmit iOS for App Store review — WAITING FOR REVIEW (Feb 18, 2026)
+- [ ] Upload AAB and submit to Google Play Console
+- [ ] Confirm both submissions are in review
+
+## Android AAB Optimization
+- [ ] Enable ProGuard/R8 minification in EAS build config
+- [ ] Enable resource shrinking
+- [ ] Rebuild optimized AAB (target <20MB)
+- [ ] Upload optimized AAB to Google Play Console
+- [ ] Upload AAB to Firebase Test Lab for Robo testing
+- [ ] Test matrix: Pixel 7 (Android 14), Samsung S23 (Android 13), budget device
+- [ ] Robo login: testactor@filmcontract.app / TestActor2026!
+- [ ] Deep links: /casting/123, /contracts, /profile
+- [ ] Review results: crashes, ANRs, layout issues, performance metrics
+- [ ] Complete closed testing submission
+
+## First Open Onboarding Experience
+- [x] Step 1: Welcome screen ("Welcome to FilmContract") with full-screen modal
+- [x] Step 2: Role selection (Actor / Producer / Both) with explanations
+- [x] Step 3: Home Tab tour spotlight
+- [x] Step 4: Contracts Tab tour spotlight
+- [x] Step 5: Network Tab tour spotlight
+- [x] Step 6: Profile Tab tour spotlight
+- [x] Final: Completion screen with role-specific CTA
+- [x] Persist onboarding completion in AsyncStorage
+- [x] Integrate onboarding flow into app layout
+
+## Bug Fixes
+- [x] Fix login method error for johndeepagejr@gmail.com (different login method)

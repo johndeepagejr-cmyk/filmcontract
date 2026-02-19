@@ -40,6 +40,31 @@ export function registerEmailAuthRoutes(app: Express) {
       // Check if user already exists
       const existingUser = await getUserByEmail(email);
       if (existingUser) {
+        // If the existing user was created via OAuth and has no password, link the account
+        if (!existingUser.passwordHash) {
+          const passwordHash = await bcrypt.hash(password, 12);
+          const db = await getDb();
+          if (db) {
+            await db.update(users).set({
+              passwordHash,
+              loginMethod: "email",
+              name: name || existingUser.name,
+              lastSignedIn: new Date(),
+            }).where(eq(users.id, existingUser.id));
+          }
+          // Create session for the linked account
+          const sessionToken = await sdk.createSessionToken(existingUser.openId, {
+            name: name || existingUser.name || "",
+            expiresInMs: ONE_YEAR_MS,
+          });
+          const cookieOptions = getSessionCookieOptions(req);
+          res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+          res.json({
+            app_session_id: sessionToken,
+            user: buildUserResponse(existingUser),
+          });
+          return;
+        }
         res.status(409).json({ error: "An account with this email already exists" });
         return;
       }
@@ -167,14 +192,19 @@ export function registerEmailAuthRoutes(app: Express) {
 
       // Check password
       if (!user.passwordHash) {
-        res.status(401).json({ error: "This account uses a different login method. Please try signing in with your original method." });
-        return;
-      }
-
-      const isValid = await bcrypt.compare(password, user.passwordHash);
-      if (!isValid) {
-        res.status(401).json({ error: "Invalid email or password" });
-        return;
+        // OAuth user trying to login with email/password — set their password
+        const passwordHash = await bcrypt.hash(password, 12);
+        const db = await getDb();
+        if (db) {
+          await db.update(users).set({ passwordHash, loginMethod: "email" }).where(eq(users.id, user.id));
+        }
+        // Password is now set, proceed with login
+      } else {
+        const isValid = await bcrypt.compare(password, user.passwordHash);
+        if (!isValid) {
+          res.status(401).json({ error: "Invalid email or password" });
+          return;
+        }
       }
 
       // Update last signed in

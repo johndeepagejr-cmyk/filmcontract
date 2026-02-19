@@ -185,6 +185,8 @@ export function LoginScreen() {
                 Email
               </Text>
               <TextInput
+                testID="emailInput"
+                accessibilityLabel="Email input"
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
@@ -211,6 +213,8 @@ export function LoginScreen() {
                 Password
               </Text>
               <TextInput
+                testID="passwordInput"
+                accessibilityLabel="Password input"
                 value={password}
                 onChangeText={setPassword}
                 placeholder="At least 6 characters"
@@ -241,6 +245,8 @@ export function LoginScreen() {
 
             {/* Submit button */}
             <TouchableOpacity
+              testID="signInButton"
+              accessibilityLabel="Sign in button"
               onPress={handleSubmit}
               disabled={loading}
               style={{
