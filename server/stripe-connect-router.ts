@@ -83,8 +83,8 @@ export const stripeConnectRouter = router({
 
       const accountLink = await stripe.accountLinks.create({
         account: user.stripeConnectAccountId,
-        refresh_url: `${process.env.APP_URL || "https://filmcontract.app"}/payments/connect/refresh`,
-        return_url: `${process.env.APP_URL || "https://filmcontract.app"}/payments/connect/complete`,
+        refresh_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/payments/connect/refresh`,
+        return_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/payments/connect/complete`,
         type: "account_onboarding",
       });
 
@@ -131,8 +131,8 @@ export const stripeConnectRouter = router({
     // Generate onboarding link
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: `${process.env.APP_URL || "https://filmcontract.app"}/payments/connect/refresh`,
-      return_url: `${process.env.APP_URL || "https://filmcontract.app"}/payments/connect/complete`,
+      refresh_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/payments/connect/refresh`,
+      return_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/payments/connect/complete`,
       type: "account_onboarding",
     });
 
@@ -721,8 +721,8 @@ export const stripeConnectRouter = router({
           plan: input.plan,
           billingCycle: input.billingCycle,
         },
-        success_url: `${process.env.APP_URL || "https://filmcontract.app"}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.APP_URL || "https://filmcontract.app"}/subscription/cancel`,
+        success_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/subscription/cancel`,
       });
 
       return {
@@ -761,7 +761,7 @@ export const stripeConnectRouter = router({
 
     const session = await stripe.billingPortal.sessions.create({
       customer: sub.stripeCustomerId,
-      return_url: `${process.env.APP_URL || "https://filmcontract.app"}/profile`,
+      return_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/profile`,
     });
 
     return { portalUrl: session.url };

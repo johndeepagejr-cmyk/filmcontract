@@ -1744,3 +1744,19 @@
 
 ## Bug Fixes
 - [x] Fix login method error for johndeepagejr@gmail.com (different login method)
+
+## New EAS Build (Build 14 - Onboarding + Login Fix)
+- [x] Trigger EAS build for Android (production profile - Build 14)
+- [x] Trigger EAS build for iOS (production profile - Build 9)
+- [ ] Upload new AAB to Google Play Internal Testing
+- [ ] Upload new IPA to App Store Connect
+
+## EAS Submit Setup
+- [ ] Create Google Play service account with Android Publisher API permissions
+- [ ] Link service account to Google Play Console API access
+- [ ] Configure eas.json with submit profile for Google Play
+- [ ] Upload Build 14 to Google Play via EAS Submit
+
+## Bug Fix - Purchase Redirect
+- [x] Fix purchase redirect — app should not redirect to filmcontract.app after purchase (server-side redirect pages + updated Stripe URLs)
+- [ ] Fix SSL certificate on filmcontract.app (NET::ERR_CERT_COMMON_NAME_INVALID)

@@ -351,8 +351,8 @@ export const subscriptionRouter = router({
             userId: ctx.user.id.toString(),
             plan: input.plan,
           },
-          success_url: `${process.env.APP_URL || "https://filmcontract.app"}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${process.env.APP_URL || "https://filmcontract.app"}/subscription/cancel`,
+          success_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${process.env.EXPO_PUBLIC_API_BASE_URL || process.env.APP_URL || "https://filmcontract.app"}/subscription/cancel`,
         });
 
         return {
