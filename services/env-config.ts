@@ -74,8 +74,8 @@ function resolveApiBaseUrl(env: Environment): string {
     }
   }
 
-  // 5. Development fallback
-  return "http://localhost:3000";
+  // 5. Fallback to the sandbox API URL (same as constants/oauth.ts)
+  return "https://3000-itzz2mez36esf7r2wm53a-41c31b39.us1.manus.computer";
 }
 
 /**

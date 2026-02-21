@@ -1759,4 +1759,8 @@
 
 ## Bug Fix - Purchase Redirect
 - [x] Fix purchase redirect — app should not redirect to filmcontract.app after purchase (server-side redirect pages + updated Stripe URLs)
-- [ ] Fix SSL certificate on filmcontract.app (NET::ERR_CERT_COMMON_NAME_INVALID)
+- [x] Fix SSL certificate on filmcontract.app (NET::ERR_CERT_COMMON_NAME_INVALID) — re-added custom domain in GitHub Pages, Let's Encrypt cert issued
+
+## Bug Fix - Connection Error on Tester Sign Up
+- [ ] Diagnose and fix connection error preventing testers from signing up
+- [ ] Verify overall app/server deployment health
