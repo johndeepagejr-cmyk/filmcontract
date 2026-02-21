@@ -1772,3 +1772,18 @@
 - [ ] Update app code with permanent Railway production URL
 - [ ] Create new EAS build with production URL
 - [ ] Submit new build to Google Play
+
+## Bug Fix - Actor Reel Upload Not Working
+- [x] Diagnose why actor reel upload fails
+- [x] Fix reel upload functionality for actors (added uploadVideo endpoint, real S3 upload in self-tape flow)
+- [ ] Test reel upload end-to-end
+
+## Bug Fix - Onboarding Shows Before Sign-In
+- [x] Move instructions/onboarding screen to show only after user signs in
+- [x] Ensure onboarding does not appear on the welcome/login screen
+- [ ] Test onboarding flow appears at correct time
+
+## Bug Fix - Uploaded Photos Not Displaying
+- [x] Diagnose why uploaded photos don't show up after upload
+- [x] Fix photo display after upload (fixed async FileReader timing bug)
+- [ ] Test photo upload and display end-to-end

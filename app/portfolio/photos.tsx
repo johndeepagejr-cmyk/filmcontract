@@ -44,32 +44,39 @@ export default function PortfolioPhotosScreen() {
     try {
       setUploading(true);
 
-      // Convert image to base64
+      // Convert image to base64 using a Promise wrapper
       const response = await fetch(uri);
       const blob = await response.blob();
-      const reader = new FileReader();
 
-      reader.onloadend = async () => {
-        const base64Data = reader.result as string;
-        const fileName = `photo-${Date.now()}.jpg`;
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            resolve(reader.result);
+          } else {
+            reject(new Error("Failed to read image as base64"));
+          }
+        };
+        reader.onerror = () => reject(new Error("FileReader error"));
+        reader.readAsDataURL(blob);
+      });
 
-        // Upload to S3
-        const uploadResult = await uploadPhotoMutation.mutateAsync({
-          base64Data,
-          fileName,
-          mimeType: "image/jpeg",
-        });
+      const fileName = `photo-${Date.now()}.jpg`;
 
-        // Add to portfolio
-        await addPhotoMutation.mutateAsync({
-          photoUrl: uploadResult.photoUrl,
-        });
+      // Upload to S3
+      const uploadResult = await uploadPhotoMutation.mutateAsync({
+        base64Data,
+        fileName,
+        mimeType: "image/jpeg",
+      });
 
-        await refetch();
-        Alert.alert("Success", "Photo added to portfolio!");
-      };
+      // Add to portfolio
+      await addPhotoMutation.mutateAsync({
+        photoUrl: uploadResult.photoUrl,
+      });
 
-      reader.readAsDataURL(blob);
+      await refetch();
+      Alert.alert("Success", "Photo added to portfolio!");
     } catch (error) {
       console.error("Error uploading photo:", error);
       Alert.alert("Error", "Failed to upload photo. Please try again.");

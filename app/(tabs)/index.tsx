@@ -554,7 +554,7 @@ export default function HomeScreen() {
     isFirstOpenDone().then((done) => setFirstOpenDone(done));
   }, []);
 
-  // Show loading while checking first-open status
+  // Show loading while checking auth and first-open status
   if (authLoading || firstOpenDone === null) {
     return (
       <ScreenContainer className="items-center justify-center">
@@ -564,7 +564,12 @@ export default function HomeScreen() {
     );
   }
 
-  // Show first-open experience before anything else
+  // Show login screen first — onboarding should only appear after sign-in
+  if (!isAuthenticated || !user) {
+    return <LoginScreen />;
+  }
+
+  // Show first-open experience after authentication
   if (!firstOpenDone) {
     return (
       <FirstOpenExperience
@@ -573,10 +578,6 @@ export default function HomeScreen() {
         }}
       />
     );
-  }
-
-  if (!isAuthenticated || !user) {
-    return <LoginScreen />;
   }
 
   if (!user.userRole) {

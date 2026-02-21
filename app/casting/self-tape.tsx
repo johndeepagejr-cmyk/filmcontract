@@ -32,6 +32,7 @@ export default function SelfTapeUploadFlow() {
   const [resumeUri, setResumeUri] = useState<string | null>(null);
   const [headshotUri, setHeadshotUri] = useState<string | null>(null);
 
+  const uploadVideoMutation = trpc.casting.uploadVideo.useMutation();
   const submitMutation = trpc.casting.submit.useMutation({
     onSuccess: () => {
       Alert.alert("Submitted!", "Your self-tape has been submitted successfully.", [
@@ -102,19 +103,51 @@ export default function SelfTapeUploadFlow() {
     }
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!castingId) {
       Alert.alert("Error", "Missing casting call ID");
       return;
     }
     setIsSubmitting(true);
-    const slateInfo = `Name: ${slateName}\nHeight: ${slateHeight}\nLocation: ${slateLocation}\nAgency: ${slateAgency}`;
-    const fullNotes = `${slateInfo}\n\nNotes: ${notes}`;
-    submitMutation.mutate({
-      castingCallId: parseInt(castingId, 10),
-      videoUrl: videoUri || undefined,
-      notes: fullNotes,
-    });
+    try {
+      let uploadedVideoUrl: string | undefined;
+
+      // Upload video to S3 if a video was selected
+      if (videoUri) {
+        const response = await fetch(videoUri);
+        const blob = await response.blob();
+        const base64Data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (typeof reader.result === "string") {
+              resolve(reader.result);
+            } else {
+              reject(new Error("Failed to read video as base64"));
+            }
+          };
+          reader.onerror = () => reject(new Error("FileReader error"));
+          reader.readAsDataURL(blob);
+        });
+
+        const uploadResult = await uploadVideoMutation.mutateAsync({
+          base64Data,
+          fileName: videoName || "self-tape.mp4",
+          mimeType: "video/mp4",
+        });
+        uploadedVideoUrl = uploadResult.videoUrl;
+      }
+
+      const slateInfo = `Name: ${slateName}\nHeight: ${slateHeight}\nLocation: ${slateLocation}\nAgency: ${slateAgency}`;
+      const fullNotes = `${slateInfo}\n\nNotes: ${notes}`;
+      submitMutation.mutate({
+        castingCallId: parseInt(castingId, 10),
+        videoUrl: uploadedVideoUrl,
+        notes: fullNotes,
+      });
+    } catch (error: any) {
+      Alert.alert("Upload Error", error.message || "Failed to upload video. Please try again.");
+      setIsSubmitting(false);
+    }
   };
 
   const canProceedStep1 = !!videoUri;

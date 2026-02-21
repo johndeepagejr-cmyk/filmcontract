@@ -7,6 +7,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
 import { eq, sql, and, desc, asc, like, or, gte, lte } from "drizzle-orm";
+import { storagePut } from "./storage";
 import {
   castingCalls,
   castingSubmissions,
@@ -237,6 +238,30 @@ export const castingRouter = router({
 
       await database.update(castingCalls).set(updateData).where(eq(castingCalls.id, id));
       return { success: true };
+    }),
+
+  // ─── Upload self-tape video to S3 ────────────────────────────
+  uploadVideo: protectedProcedure
+    .input(
+      z.object({
+        base64Data: z.string(),
+        fileName: z.string(),
+        mimeType: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Strip data URI prefix if present
+      const base64WithoutPrefix = input.base64Data.replace(/^data:[^;]+;base64,/, "");
+      const buffer = Buffer.from(base64WithoutPrefix, "base64");
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const uniqueFileName = `self-tapes/${ctx.user.id}/${timestamp}-${input.fileName}`;
+
+      // Upload to S3
+      const { url } = await storagePut(uniqueFileName, buffer, input.mimeType);
+
+      return { videoUrl: url };
     }),
 
   // ─── Submit for a casting call (actors) ─────────────────────

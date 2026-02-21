@@ -48,7 +48,8 @@
     "production": {
       "android": {
         "track": "internal",
-        "releaseStatus": "draft"
+        "releaseStatus": "draft",
+        "serviceAccountKeyPath": "/home/ubuntu/play-publisher-key.json"
       },
       "ios": {
         "appleId": "j.page1@lafilm.edu",
