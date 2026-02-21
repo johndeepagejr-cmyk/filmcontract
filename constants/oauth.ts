@@ -15,7 +15,7 @@ const FALLBACK_SERVER = "https://api.manus.im";
 const FALLBACK_APP_ID = "9Ds5MzMMryKSoRAkX3DK9S";
 const FALLBACK_OWNER_ID = "R729Ru8Hn3QNLeTJitmgkD";
 const FALLBACK_OWNER_NAME = "John Doeknow";
-const FALLBACK_API_BASE_URL = "https://3000-itzz2mez36esf7r2wm53a-41c31b39.us1.manus.computer";
+const FALLBACK_API_BASE_URL = "https://filmcontract-production.up.railway.app";
 
 const env = {
   portal: process.env.EXPO_PUBLIC_OAUTH_PORTAL_URL || FALLBACK_PORTAL,

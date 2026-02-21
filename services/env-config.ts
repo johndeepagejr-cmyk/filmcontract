@@ -75,7 +75,7 @@ function resolveApiBaseUrl(env: Environment): string {
   }
 
   // 5. Fallback to the sandbox API URL (same as constants/oauth.ts)
-  return "https://3000-itzz2mez36esf7r2wm53a-41c31b39.us1.manus.computer";
+  return "https://filmcontract-production.up.railway.app";
 }
 
 /**

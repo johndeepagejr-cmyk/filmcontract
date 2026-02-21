@@ -1764,3 +1764,11 @@
 ## Bug Fix - Connection Error on Tester Sign Up
 - [ ] Diagnose and fix connection error preventing testers from signing up
 - [ ] Verify overall app/server deployment health
+
+## Deploy Server to Railway (Permanent Production URL)
+- [ ] Prepare Railway deployment files (Dockerfile/Procfile/railway.json)
+- [ ] Deploy server to Railway
+- [ ] Configure environment variables on Railway
+- [ ] Update app code with permanent Railway production URL
+- [ ] Create new EAS build with production URL
+- [ ] Submit new build to Google Play
