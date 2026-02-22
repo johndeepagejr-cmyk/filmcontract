@@ -1,5 +1,6 @@
 import { protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
+import Stripe from "stripe";
 import { getDb } from "./db";
 import { subscriptions } from "@/drizzle/schema";
 import { eq, sql } from "drizzle-orm";
@@ -325,7 +326,7 @@ export const subscriptionRouter = router({
 
       // With Stripe configured, create checkout session
       try {
-        const stripe = require("stripe")(stripeKey);
+        const stripe = new Stripe(stripeKey, { apiVersion: "2024-12-18.acacia" } as any);
         const priceAmount = PLAN_PRICES[input.plan][input.billingCycle === "yearly" ? "yearly" : "monthly"];
 
         const session = await stripe.checkout.sessions.create({
