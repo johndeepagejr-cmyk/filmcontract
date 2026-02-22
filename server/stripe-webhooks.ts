@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import Stripe from "stripe";
 import { getDb } from "./db";
 import {
   escrowPayments,
@@ -14,8 +15,8 @@ import { eq } from "drizzle-orm";
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  const Stripe = require("stripe");
-  return new Stripe(key, { apiVersion: "2024-12-18.acacia" });
+
+  return new Stripe(key, { apiVersion: "2024-12-18.acacia" } as any);
 }
 
 async function createNotification(
@@ -179,8 +180,8 @@ export async function handleStripeWebhook(req: Request, res: Response) {
             status: "active" as const,
             stripeCustomerId: session.customer,
             stripeSubscriptionId: session.subscription,
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
             isTrial: false,
           };
 
