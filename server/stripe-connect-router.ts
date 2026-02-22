@@ -1,4 +1,5 @@
 import { z } from "zod";
+import Stripe from "stripe";
 import { router, protectedProcedure, publicProcedure } from "./_core/trpc";
 import { getDb } from "./db";
 import {
@@ -17,9 +18,8 @@ import { TRPCError } from "@trpc/server";
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const Stripe = require("stripe");
-  return new Stripe(key, { apiVersion: "2024-12-18.acacia" });
+
+  return new Stripe(key, { apiVersion: "2024-12-18.acacia" } as any);
 }
 
 const PLATFORM_FEE_PERCENT = 7.5; // 7.5% platform fee (display)
