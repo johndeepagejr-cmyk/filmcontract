@@ -26,7 +26,7 @@ const config: ExpoConfig = {
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   extra: {
-    apiUrl: process.env.API_URL || "https://filmcontract-production.up.railway.app",
+    apiUrl: process.env.API_URL || "https://filmcontract.vercel.app",
     eas: {
       projectId: "9e393577-c465-4442-ae8b-b77e7e3e7614",
     },
